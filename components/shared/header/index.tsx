@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, UserIcon } from "lucide-react";
+import ModeToggle from "./mode-toggle";
 
 
 
@@ -22,7 +23,8 @@ const Navbar = () => {
                     </Link>
                 </div>
 
-                <div className="space-x-2">
+                <div className="flex items-center gap-2">
+                    <ModeToggle />
                         <Button asChild variant='outline'>
                             <Link href='/cart'>
                             <ShoppingCart /> Cart

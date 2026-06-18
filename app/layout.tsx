@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, Geist } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { APP_NAME, SERVER_URL } from '@/lib/constants/index';
 import Navbar from "@/components/shared/header";
+import Providers from "@/components/Providers";
 import Footer from "@/components/Footer";
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
+
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,14 +28,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", inter.className, "font-sans", geist.variable)}
+      suppressHydrationWarning
+      className={cn("h-full", "antialiased", inter.className, "font-sans")}
     >
-      <body className="h-screen flex flex-col">
-        <Navbar />
-        <main className="wrapper flex-1">
-          {children}
-        </main>
-        <Footer />
+     <body className="h-screen flex flex-col bg-background text-foreground">
+        <Providers>
+          <Navbar />
+          <main className="wrapper flex-1">
+            {children}
+          </main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
