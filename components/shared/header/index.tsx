@@ -25,7 +25,7 @@ const Navbar = () => {
 
                 <div className="flex items-center gap-2">
                     <ModeToggle />
-                        <Button asChild variant='outline'>
+                        <Button asChild variant='ghost'>
                             <Link href='/cart'>
                             <ShoppingCart /> Cart
                              </Link>
