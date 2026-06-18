@@ -1,6 +1,8 @@
 
 const Homepage = () => {
-  return 'inside page';
+  return (
+    <div className="">page.js</div>
+  );
 };
 
 export default Homepage;
