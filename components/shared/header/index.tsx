@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, UserIcon } from "lucide-react";
-import ModeToggle from "./mode-toggle";
+import ModeToggle from "../../mode-toggle";
 
 
 
@@ -22,6 +22,7 @@ const Navbar = () => {
                         <span className="hidden lg:block font-bold text-2xl ml-3">{APP_NAME}</span>
                     </Link>
                 </div>
+
 
                 <div className="flex items-center gap-2">
                     <ModeToggle />
