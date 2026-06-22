@@ -12,42 +12,42 @@ datasource db {
   provider = "postgresql"
 }
 
-/*
-PRODUCT MODEL
-{
-  "id": "8ef1e77d-6b8d-40d1-b5f7-51490d7e2637",
-  "name": "MacBook Pro M4",
-  "slug": "macbook-pro-m4",
-  "category": "Electronics",
-  "image": [
-    "/images/macbook1.jpg",
-    "/images/macbook2.jpg"
-  ],
-  "brand": "Apple",
-  "description": "16GB RAM and 512GB SSD",
-  "stock": 25,
-  "price": 1999.99,
-  "rating": 4.80,
-  "numReviews": 145,
-  "isFeatured": true,
-  "banner": "/images/banner.jpg",
-  "createdAt": "2026-06-19T10:25:00.123456"
-}
-*/
+/**
+ * PRODUCT MODEL
+ * {
+ * "id": "8ef1e77d-6b8d-40d1-b5f7-51490d7e2637",
+ * "name": "MacBook Pro M4",
+ * "slug": "macbook-pro-m4",
+ * "category": "Electronics",
+ * "image": [
+ * "/images/macbook1.jpg",
+ * "/images/macbook2.jpg"
+ * ],
+ * "brand": "Apple",
+ * "description": "16GB RAM and 512GB SSD",
+ * "stock": 25,
+ * "price": 1999.99,
+ * "rating": 4.80,
+ * "numReviews": 145,
+ * "isFeatured": true,
+ * "banner": "/images/banner.jpg",
+ * "createdAt": "2026-06-19T10:25:00.123456"
+ * }
+ */
 
 model Product {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
- name String 
- slug String @unique(map: "product_slug_idx")
- category String
- image String[]
- brand String
- description String
- stock Int
- price Decimal @default(0) @db.Decimal(12,2)
- rating Decimal @default(0) @db.Decimal(3,2)
- numReviews Int @default(0)
- isFeatured Boolean @default(false)
- banner String?
- createdAt DateTime @default(now()) @db.Timestamp(6)
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  slug        String   @unique(map: "product_slug_idx")
+  category    String
+  images      String[]
+  brand       String
+  description String
+  stock       Int
+  price       Decimal  @default(0) @db.Decimal(12, 2)
+  rating      Decimal  @default(0) @db.Decimal(3, 2)
+  numReviews  Int      @default(0)
+  isFeatured  Boolean  @default(false)
+  banner      String?
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
 }
