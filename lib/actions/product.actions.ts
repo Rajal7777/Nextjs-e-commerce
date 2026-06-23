@@ -1,13 +1,16 @@
 'use server';
+
 //prisma object lets you communicate with database
 import { prisma } from '@/lib/prisma';
 import { convertToPlainObject } from '../utils';
+import { LATEST_PRODUCTS_LIMIT } from '../constants/index';
+
 
 
 //Get latest products
 export async function getLatestProducts() {
     const data = await prisma.product.findMany({
-        take: 4,
+        take: LATEST_PRODUCTS_LIMIT,
         orderBy: { createdAt: 'desc' }
     });
 
