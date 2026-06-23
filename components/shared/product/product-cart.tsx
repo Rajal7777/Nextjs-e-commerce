@@ -2,8 +2,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import Price from "./price";
+import { Product } from "@/types";
 
-const ProductCart = ({product}: {product: any}) => {
+const ProductCart = ({product}: {product: Product}) => {
     return ( 
         <Card className="w-full max-w-sm gap-2">
             <CardHeader>
