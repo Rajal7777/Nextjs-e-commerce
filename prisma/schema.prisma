@@ -12,29 +12,6 @@ datasource db {
   provider = "postgresql"
 }
 
-/**
- * PRODUCT MODEL
- * {
- * "id": "8ef1e77d-6b8d-40d1-b5f7-51490d7e2637",
- * "name": "MacBook Pro M4",
- * "slug": "macbook-pro-m4",
- * "category": "Electronics",
- * "image": [
- * "/images/macbook1.jpg",
- * "/images/macbook2.jpg"
- * ],
- * "brand": "Apple",
- * "description": "16GB RAM and 512GB SSD",
- * "stock": 25,
- * "price": 1999.99,
- * "rating": 4.80,
- * "numReviews": 145,
- * "isFeatured": true,
- * "banner": "/images/banner.jpg",
- * "createdAt": "2026-06-19T10:25:00.123456"
- * }
- */
-
 model Product {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
@@ -50,4 +27,18 @@ model Product {
   isFeatured  Boolean  @default(false)
   banner      String?
   createdAt   DateTime @default(now()) @db.Timestamp(6)
+}
+
+model User {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String    @default("NO_NAME")
+  email         String    @unique(map: "user_email_idx")
+  emailVerified DateTime? @db.Timestamp(6)
+  image         String?
+  password      String?
+  role          String    @default("user")
+  address       Json?     @db.Json
+  paymentMethod String?
+  createdAt     DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt
 }

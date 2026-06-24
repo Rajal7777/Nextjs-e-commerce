@@ -9,7 +9,7 @@ const ProductImages = ({images}: {images: string[]}) => {
 
 
  return ( 
-        <div className="space-y-4 border">
+        <div className="space-y-4">
             <Image 
             src={images[current]} 
             alt="Product image"
