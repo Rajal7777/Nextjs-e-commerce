@@ -12,7 +12,8 @@ props is an object containing a property called params, and that property is a P
 */
 import { getProductBySLug } from '@/lib/actions/product.actions';
 import { notFound } from 'next/navigation';
-import Price from '@/components/shared/product/price'
+import Price from '@/components/shared/product/price';
+import ProductImages from '@/components/shared/product/product-image'
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,7 +36,9 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
        <section>
         <div className='grid grid-cols-1 md:grid-cols-5'>
             {/* Images column */}
-            <div className='col-span-2'>images container</div>
+            <div className='col-span-2'>
+                <ProductImages images={product.images}/>
+                </div>
 
             {/* Detail column */}
             <div className='col-span-2 p-5'>
