@@ -1,11 +1,11 @@
-import { PrismaAdapter } from '@auth/prisma-adapter';
+import { PrismaAdapter } from '@auth/prisma-adapter'; //bridge auth logic and your database:
 import NextAuth from "next-auth";
 
 
 import { prisma } from "./db/prisma";
-import CredentialsProvider from 'next-auth/providers/credentials';
+import CredentialsProvider from 'next-auth/providers/credentials'; //determine how user logIn eg:- github,email
 import { compareSync } from "bcrypt-ts-edge";
-import type { NextAuthConfig } from 'next-auth';
+import  type {NextAuthConfig} from 'next-auth';
 
 export const config = {
   pages: {
@@ -13,16 +13,19 @@ export const config = {
     error: "/sign-in",
   },
   session: {
-    Strategy: "jwt",
+    strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, //30days
   },
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma), //connect authjs to prisma client{allows authjs to automatically create and manage users, liked acc  sessions, verification tokens}
+
+  //tells authjs user will login with email, password
   providers: [
     CredentialsProvider({
       credentials: {
         email: { type: "email" },
         password: { type: "password" },
       },
+
       async authorize(credentials) {
         if (credentials == null) return null;
 
@@ -40,7 +43,7 @@ export const config = {
             user.password,
           );
 
-          //If password is correct, return user
+          //If password is correct, return user// on sucess creates session or JWT
           if (isMatch) {
             return {
               id: user.id,
@@ -57,6 +60,8 @@ export const config = {
     }),
   ],
 
+  //callbacks let you customize what Auth.js does at different stages
+  //modifies session and return it.
   callbacks: {
     async session({ session, user, trigger, token }: any) {
       //Set the user ID from the token
