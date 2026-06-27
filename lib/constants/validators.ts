@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { formatNumberWithDecimal } from "./utils";
+import { formatNumberWithDecimal } from "../utils";
 
 //refine() lets you create your own custom validation rule.
 //syntax refine(conditon, 'Error message)
@@ -23,3 +23,10 @@ export const insertProductSchema = z.object({
     banner: z.string().nullable(), //optional value
     price: currency,
 });
+
+
+//Schema for signing users in
+export const signInFormSchema = z.object({
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(6, 'password must be at least 6 characters')
+})
