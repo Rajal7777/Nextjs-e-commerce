@@ -16,7 +16,7 @@ const Menu = () => {
                     </Link>
                 </Button>
                 <Button asChild>
-                    <Link href='/cart'>
+                    <Link href='/sign-in'>
                         <UserIcon /> Sign In
                     </Link>
                 </Button>
@@ -31,7 +31,7 @@ const Menu = () => {
                     <SheetContent className="flex flex-col items-start pl-6">
                         <SheetTitle>Menu</SheetTitle>
                         <ModeToggle />
-                        
+
                         <Button asChild variant='ghost'>
                             <Link href='/cart'>
                                 <ShoppingCart /> cart

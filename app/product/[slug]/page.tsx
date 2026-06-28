@@ -52,7 +52,7 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
                             {product.rating.toString()} of {product.numReviews} Reviews
                         </p>
                         <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
-                            <Price value={Number(product.price)} className='w-24 rounded-full bg-green-100 px-5 py-2 text-center' />
+                            <Price value={Number(product.price)} className='w-24 rounded-full bg-green-400 px-5 py-2 text-center' />
                         </div>
                     </div>
                     <div className='mt-10'>

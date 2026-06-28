@@ -19,7 +19,7 @@ export const insertProductSchema = z.object({
     description: z.string().min(3, "Description must be at least 3 characters"),
     stock: z.coerce.number(), //stcok will come as a string so convert it into the number
     images: z.array(z.string()).min(1, "Product must have at least one image"),
-    isFeateured: z.boolean,
+    isFeatured: z.boolean(),
     banner: z.string().nullable(), //optional value
     price: currency,
 });
@@ -29,4 +29,4 @@ export const insertProductSchema = z.object({
 export const signInFormSchema = z.object({
     email: z.string().email('Invalid email address'),
     password: z.string().min(6, 'password must be at least 6 characters')
-})
+});

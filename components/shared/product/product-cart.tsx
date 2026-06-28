@@ -4,16 +4,18 @@ import Link from "next/link";
 import Price from "./price";
 import { Product } from "@/types";
 
-const ProductCart = ({product}: {product: Product}) => {
-    return ( 
+const ProductCart = ({ product }: { product: Product; }) => {
+    return (
         <Card className="w-full max-w-sm gap-2">
             <CardHeader>
                 <Link href={`/product/${product.slug}`}>
-                <Image src={product.images[0]} 
-                alt={product.name}
-                height={300}
-                width={300}
-                />
+                    <Image src={product.images[0]}
+                        alt={product.name}
+                        height={300}
+                        width={300}
+                        preload={true}
+                        loading="eager"
+                    />
                 </Link>
             </CardHeader>
 
@@ -21,20 +23,20 @@ const ProductCart = ({product}: {product: Product}) => {
                 <div className="text-xs">{product.brand}</div>
 
                 <Link href={`product/${product.slug}`}>
-                {product.name}
+                    {product.name}
                 </Link>
 
                 <div className="flex-between gap-4">
-                    <p>{product.rating} Stars</p>
-                    {product.stock > 0 ?(
-                        <Price  value={Number(product.price)} />
-                    ):(
+                    <p>{String(product.rating)} Stars</p>
+                    {product.stock > 0 ? (
+                        <Price value={Number(product.price)} />
+                    ) : (
                         <p className="text-destructive">Out of stuck</p>
                     )}
                 </div>
             </CardContent>
         </Card>
-     );
-}
- 
+    );
+};
+
 export default ProductCart;

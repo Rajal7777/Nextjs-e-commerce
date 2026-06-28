@@ -11,6 +11,8 @@ const NotFound = () => {
                 width={48}
                 height={48}
                 alt={APP_NAME}
+                preload={true}
+                loading="eager"
             />
             <div className="p-6 w-1/3 rounded-lg shadow-md text-center">
                 <h1 className="text-3xl font-bold mb-4">Not Found</h1>

@@ -9,7 +9,14 @@ const LoadingPage = () => {
             alignItems: 'center',
             height: '100vh'
         }}>
-            <Image src={spinner} alt="loading..." height={48} width={48} />
+            <Image
+                src={spinner}
+                alt="loading..."
+                width={40}
+                height={40}
+                priority
+            />
+
         </div>
     );
 };

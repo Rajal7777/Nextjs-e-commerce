@@ -5,7 +5,6 @@ import NextAuth from "next-auth";
 import { prisma } from "./db/prisma";
 import CredentialsProvider from 'next-auth/providers/credentials'; //determine how user logIn eg:- github,email
 import { compareSync } from "bcrypt-ts-edge";
-import  type {NextAuthConfig} from 'next-auth';
 
 export const config = {
   pages: {
@@ -13,7 +12,7 @@ export const config = {
     error: "/sign-in",
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
     maxAge: 30 * 24 * 60 * 60, //30days
   },
   adapter: PrismaAdapter(prisma), //connect authjs to prisma client{allows authjs to automatically create and manage users, liked acc  sessions, verification tokens}
@@ -75,6 +74,6 @@ export const config = {
       return session;
     },
   },
-} satisfies NextAuthConfig;
+};
 
-export const { handlers, auth, signIn, signOut } = NextAuth(config);
+export const { auth, signIn, signOut } = NextAuth(config);
