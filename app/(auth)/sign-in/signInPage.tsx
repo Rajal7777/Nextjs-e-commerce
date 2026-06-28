@@ -2,8 +2,8 @@
 
 import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
-import { signInWithCredentials } from '@/lib/actions/user.actions';
 import Link from 'next/link';
+import { signInWithCredentials } from '@/lib/actions/user.actions';
 
 const initialState = {
     success: false,
@@ -11,10 +11,11 @@ const initialState = {
 };
 
 const SignInPage = () => {
-    const [state, formAction, pending] = useActionState(signInWithCredentials, initialState);
+  const [data, action, pending] = useActionState(signInWithCredentials, initialState)
+
 
     return (
-        <form action={formAction} className="space-y-4">
+        <form action={action} className="space-y-4">
             <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">
                     Email
@@ -50,11 +51,9 @@ const SignInPage = () => {
                 Dont&apos;t have an account?{' '}
                 <Link href='/sign-up' target='_self' className='link'>Sign Up</Link>
             </div>
-            {state.message ? (
-                <p className={`text-sm ${state.success ? 'text-green-600' : 'text-red-600'}`}>
-                    {state.message}
-                </p>
-            ) : null}
+            { data && !data.success && (
+               <p className='text-center text-destructive'>{data.message}</p>
+            ) }
         </form>
     );
 };
