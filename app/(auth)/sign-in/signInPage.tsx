@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { signInWithCredentials } from '@/lib/actions/user.actions';
+import { useSearchParams } from 'next/navigation';
 
 const initialState = {
     success: false,
@@ -11,11 +12,16 @@ const initialState = {
 };
 
 const SignInPage = () => {
-  const [data, action, pending] = useActionState(signInWithCredentials, initialState)
+    const [data, action, pending] = useActionState(signInWithCredentials, initialState);
 
+    //user who is not login try to check out then nextjs will redirect the user  to the  sign in page then to the checkout page 
+    //flow user clicks -> /checkout => Is the user logged in? no then next redirect user to sign in | /sign-in?callbackUrl=/checkout After login, send the user back to /checkout.
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get('callbackUrl') || '/';
 
     return (
         <form action={action} className="space-y-4">
+            <input type='hidden' name='callbackUrl' value={callbackUrl} />
             <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">
                     Email
@@ -49,11 +55,11 @@ const SignInPage = () => {
             </Button>
             <div className='text-sm text-center text-muted-foreground'>
                 Dont&apos;t have an account?{' '}
-                <Link href='/sign-up' target='_self' className='link'>Sign Up</Link>
+                <Link href='/sign-up' target='_self' className=' hover:underline'>Sign Up</Link>
             </div>
-            { data && !data.success && (
-               <p className='text-center text-destructive'>{data.message}</p>
-            ) }
+            {data && !data.success && (
+                <p className='text-center text-destructive'>{data.message}</p>
+            )}
         </form>
     );
 };

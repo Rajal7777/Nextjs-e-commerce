@@ -19,7 +19,7 @@ export async function signInWithCredentials(prevState: unknown, formData: FormDa
 
         return { success: true, message: 'Signed in successfully' };
     } catch (error) {
-        //after successful login{login redirect dashboard} nextjs throw a special errors after redirect so we tell next js that is not a real error continue redirect
+        //after successful login{login redirect dashboard} nextjs throws a special errors after redirect so we tell next js that is not a real error continue redirect
         if (isRedirectError(error)) {
             throw error;
         }
