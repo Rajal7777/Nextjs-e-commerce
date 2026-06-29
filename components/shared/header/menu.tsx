@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { EllipsisVertical, ShoppingCart, UserIcon } from "lucide-react";
 import Link from "next/link";
+import UserButton from "./user-button";
 
 //SideBar menu in md screen
 const Menu = () => {
@@ -15,11 +16,8 @@ const Menu = () => {
                         <ShoppingCart /> Cart
                     </Link>
                 </Button>
-                <Button asChild>
-                    <Link href='/sign-in'>
-                        <UserIcon /> Sign In
-                    </Link>
-                </Button>
+            
+                <UserButton />
             </nav>
 
             <nav className="md:hidden">
@@ -38,11 +36,7 @@ const Menu = () => {
                             </Link>
                         </Button>
 
-                        <Button asChild>
-                            <Link href='/sign-in'>
-                                <UserIcon /> Sign In
-                            </Link>
-                        </Button>
+                        <UserButton />
                     </SheetContent>
                 </Sheet>
             </nav>
