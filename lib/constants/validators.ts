@@ -44,5 +44,5 @@ export const signUpFormSchema = z.object({
 })
     .refine((data) => data.password === data.confirmPassword, {
         message: "password dont't match",
-        path: ['confirmpassword',]
+        path: ['confirmpassword'], //customize the error path
     });
