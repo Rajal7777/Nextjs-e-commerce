@@ -1,7 +1,7 @@
 import ModeToggle from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { EllipsisVertical, ShoppingCart, UserIcon } from "lucide-react";
+import { EllipsisVertical, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import UserButton from "./user-button";
 
@@ -16,10 +16,11 @@ const Menu = () => {
                         <ShoppingCart /> Cart
                     </Link>
                 </Button>
-            
+
                 <UserButton />
             </nav>
 
+            {/* md screen */}
             <nav className="md:hidden">
                 <Sheet>
                     <SheetTrigger className="align-middle">

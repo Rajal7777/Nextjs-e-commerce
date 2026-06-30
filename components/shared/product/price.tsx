@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 
 const Price = ({ value, className }: { value: number; className?: string; }) => {
-    console.log('value', value)
     const fixedPrice = value.toFixed(2);
 
     //get the int/ float from the price

@@ -10,7 +10,7 @@ const ModeToggle = () => {
     const [isMounted, setIsMounted] = useState(false);
     const { theme, setTheme } = useTheme();
 
-  console.log('theme', theme)
+
     useEffect(() => {
         setIsMounted(true);
     }, []);
@@ -19,6 +19,7 @@ const ModeToggle = () => {
     if (!isMounted) {
         return null;
     }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>

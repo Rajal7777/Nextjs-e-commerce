@@ -1,4 +1,5 @@
-import { PrismaAdapter } from '@auth/prisma-adapter'; //bridge auth logic and your database:
+//PrismaAdapter is bridge auth logic and database:
+import { PrismaAdapter } from '@auth/prisma-adapter'; 
 import NextAuth from "next-auth";
 
 

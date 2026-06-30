@@ -7,14 +7,13 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { prisma } from "@/db/prisma";
 import { hashSync } from "bcryptjs";
 
-
 //Sign in the user with credentials
 //useActionState, React automatically passes two arguments prevState, formdata
 export async function signInWithCredentials(
   prevState: unknown,
   formData: FormData,
 ) {
-  //Validate form data:- email is valid password is long enough
+  //Validate form data:- email is valid password  long enough
   try {
     const user = signInFormSchema.parse({
       email: formData.get("email"),
@@ -23,8 +22,7 @@ export async function signInWithCredentials(
 
     await signIn("credentials", user);
 
-      //const [state] = useActionState(...)  here my state expects a success and message
-  
+    //const [state] = useActionState(...)  here my state expects a success and message
     return { success: true, message: "Signed in successfully" };
   } catch (error) {
     //after successful login{login redirect dashboard} nextjs throws a special errors after redirect so we tell next js that is not a real error continue redirect

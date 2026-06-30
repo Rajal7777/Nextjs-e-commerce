@@ -15,7 +15,7 @@ const SignInPage = () => {
     const [data, action, pending] = useActionState(signInWithCredentials, initialState);
 
     //user who is not login try to check out then nextjs will redirect the user  to the  sign in page then to the checkout page 
-    //flow user clicks -> /checkout => Is the user logged in? no then next redirect user to sign in | /sign-in?callbackUrl=/checkout After login, send the user back to /checkout.
+    //flow user clicks -> /checkout => Is the user logged in? no then redirect user to sign in | /sign-in?callbackUrl=/checkout After login, send the user back to /checkout.
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get('callbackUrl') || '/';
 

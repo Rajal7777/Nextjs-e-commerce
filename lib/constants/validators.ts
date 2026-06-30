@@ -27,7 +27,7 @@ export const insertProductSchema = z.object({
 
 //Schema for signing users in
 export const signInFormSchema = z.object({
-    email: z.string().email('Invalid email address'),
+    email: z.email('Invalid email address'),
     password: z.string().min(6, 'password must be at least 6 characters')
 });
 
