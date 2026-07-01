@@ -68,7 +68,9 @@ export const config = {
     async session({ session, user, trigger, token }: any) {
       //Set the user ID from the token
       session.user.id = token.sub;
-
+      session.user.role = token.role;
+      session.user.name = token.name;
+    
       //If there is an update, set the user name
       if (trigger === "update") {
         session.user.name = user.name;
@@ -76,6 +78,24 @@ export const config = {
 
       return session;
     },
+    async jwt({ token, user, trigger, session}: any) {
+      //Add extra field to token
+      if(user){
+        token.role = user.role;
+
+        //use Email name incase no name is set
+        if(user.name === 'NO_NAME'){
+          token.name = user.email.split('@')[0];
+        }
+
+        //reflect update to db
+        await prisma.user.update({
+          where: { id: user.id},
+          data: { name: token.name}
+        })
+      }
+      return token;
+    }
   },
 };
 

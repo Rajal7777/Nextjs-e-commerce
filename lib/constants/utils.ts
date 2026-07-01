@@ -52,6 +52,3 @@ if (typeof error === "object" && error !== null && "code" in error) {
   return JSON.stringify(error?.message ?? error);
 }
 
-function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
