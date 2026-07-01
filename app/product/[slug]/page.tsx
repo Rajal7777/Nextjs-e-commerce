@@ -1,23 +1,11 @@
-/*
-props = {
-  params: {
-    slug: "iphone-16"
-  }
-}
-
-props is an object containing a property called params, and that property is a Promise that resolves to an object having a string called slug.
-(props: {
-  params: Promise<{ slug: string }>;
-})
-*/
 import { getProductBySLug } from "@/lib/actions/product-actions";
 import { notFound } from "next/navigation";
 import Price from "@/components/shared/product/price";
 import ProductImages from "@/components/shared/product/product-image";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import AddToCart from "@/components/shared/product/add-to-cart";
 
 type ProductSlugProps = {
   params: Promise<{ slug: string }>;
@@ -85,7 +73,14 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
 
               {product.stock > 0 && (
                 <div className="flex-center">
-                  <Button className="w-full">Add to cart</Button>
+                  <AddToCart item={{
+                    productId: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    price: product.price,
+                    qty: 1,
+                    image: product.images[0],
+                  }}/>
                 </div>
               )}
             </CardContent>

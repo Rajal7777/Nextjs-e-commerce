@@ -6,6 +6,7 @@ import { APP_NAME, SERVER_URL } from '@/lib/constants/utils';
 import Navbar from "@/components/shared/header";
 import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/provider/ThemeProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 
 
@@ -43,6 +44,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
