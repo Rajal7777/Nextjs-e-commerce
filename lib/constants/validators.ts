@@ -17,20 +17,20 @@ export const insertProductSchema = z.object({
   category: z.string().min(3, "Category must be at least 3 characters"),
   brand: z.string().min(3, "Brand must be at least 3 characters"),
   description: z.string().min(3, "Description must be at least 3 characters"),
-  stock: z.coerce.number(), //stcok will come as a string so convert it into the number
+  stock: z.coerce.number(), //stock will come as a string so convert it into the number
   images: z.array(z.string()).min(1, "Product must have at least one image"),
   isFeatured: z.boolean(),
   banner: z.string().nullable(), //optional value
   price: currency,
 });
 
-//Schema for signing users in
+//Schema for signing users 
 export const signInFormSchema = z.object({
   email: z.email("Invalid email address"),
   password: z.string().min(6, "password must be at least 6 characters"),
 });
 
-//Schema for signUp users in
+//Schema for signUp users 
 export const signUpFormSchema = z
   .object({
     name: z.string().min(3, "Name must be at leat 3 characters"),

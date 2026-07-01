@@ -77,7 +77,7 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
                     productId: product.id,
                     name: product.name,
                     slug: product.slug,
-                    price: product.price,
+                    price: String(product.price) ,
                     qty: 1,
                     image: product.images[0],
                   }}/>

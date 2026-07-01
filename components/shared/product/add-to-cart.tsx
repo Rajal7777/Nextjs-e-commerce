@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { toast } from "sonner";
 import addItemToCart from '@/lib/actions/cart-action';
-import { cartItem } from '@/types';
+import { CartItem } from '@/types';
+import { Plus } from 'lucide-react';
 
-const AddToCart = ({ item }: { item: cartItem; }) => {
+const AddToCart = ({ item }: { item: CartItem; }) => {
     const router = useRouter();
 
     const handleAddToCart = async () => {
@@ -19,13 +20,14 @@ const AddToCart = ({ item }: { item: cartItem; }) => {
         } else {
             toast.error(res.message);
         }
+
         return res;
     };
 
     return (
         <Button className="w-full" type='button' variant="default"
             onClick={handleAddToCart}>
-            Add to cart
+            <Plus /> Add to cart
         </Button>
     );
 };

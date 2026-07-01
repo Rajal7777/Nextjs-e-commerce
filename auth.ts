@@ -1,11 +1,13 @@
 //PrismaAdapter is bridge auth logic and database:
-import { PrismaAdapter } from '@auth/prisma-adapter'; 
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
-
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 import { prisma } from "./db/prisma";
-import CredentialsProvider from 'next-auth/providers/credentials'; //determine how user logIn eg:- github,email
+import CredentialsProvider from "next-auth/providers/credentials"; //determine how user logIn eg:- github,email
 import { compareSync } from "bcryptjs";
+
 
 export const config = {
   pages: {
@@ -28,8 +30,6 @@ export const config = {
 
       async authorize(credentials) {
         if (credentials == null) return null;
-
-      
 
         //Find user in database
         const user = await prisma.user.findFirst({
@@ -70,7 +70,7 @@ export const config = {
       session.user.id = token.sub;
       session.user.role = token.role;
       session.user.name = token.name;
-    
+
       //If there is an update, set the user name
       if (trigger === "update") {
         session.user.name = user.name;
@@ -78,24 +78,46 @@ export const config = {
 
       return session;
     },
-    async jwt({ token, user, trigger, session}: any) {
+    async jwt({ token, user, trigger, session }: any) {
       //Add extra field to token
-      if(user){
+      if (user) {
         token.role = user.role;
 
         //use Email name incase no name is set
-        if(user.name === 'NO_NAME'){
-          token.name = user.email.split('@')[0];
+        if (user.name === "NO_NAME") {
+          token.name = user.email.split("@")[0];
         }
 
         //reflect update to db
         await prisma.user.update({
-          where: { id: user.id},
-          data: { name: token.name}
-        })
+          where: { id: user.id },
+          data: { name: token.name },
+        });
       }
       return token;
-    }
+    },
+    authorized({ request, auth }: any) {
+      //Check for session cart cookie
+      if (!request.cookies.get("sessionCartId")) {
+        //generate new session cart id cookie
+        const sessionCartId = crypto.randomUUID();
+
+        const newRequestHeaders = new Headers(request.headers);
+
+        //Create a new cookie with the session cart ID
+        const response = NextResponse.next({
+          request: {
+            headers: newRequestHeaders,
+          },
+        });
+
+        //Set the cookie in the response
+        response.cookies.set("sessionCartId", sessionCartId);
+        return response;
+      }
+
+      return true;
+    },
   },
 };
 
