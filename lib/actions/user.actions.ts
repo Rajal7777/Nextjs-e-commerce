@@ -69,6 +69,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
     return { success: true, message: "Signed in successufully!" };
   } catch (error) {
+    console.log('error', error);
  //case error thrown my next we move on to actual error
     if (isRedirectError(error)) {
      throw error;
