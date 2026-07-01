@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from 'next/font/google';
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { APP_NAME, SERVER_URL } from '@/lib/constants/index';
+import { APP_NAME, SERVER_URL } from '@/lib/constants/utils';
 import Navbar from "@/components/shared/header";
 import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/provider/ThemeProvider";

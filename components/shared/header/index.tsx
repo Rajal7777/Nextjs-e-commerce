@@ -1,4 +1,4 @@
-import { APP_NAME } from "@/lib/constants";
+import { APP_NAME } from "@/lib/constants/utils";
 import Link from "next/link";
 import Image from "next/image";
 import Menu from "./menu";

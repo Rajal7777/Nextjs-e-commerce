@@ -6,6 +6,7 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 import { prisma } from "@/db/prisma";
 import { hashSync } from "bcryptjs";
+import { formatError } from "../constants/utils";
 
 //Sign in the user with credentials
 //useActionState, React automatically passes two arguments prevState, formdata
@@ -68,12 +69,12 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
     return { success: true, message: "Signed in successufully!" };
   } catch (error) {
-    //after signIn() Next app router the success sigin is  redirect or implemented by throwing a special redirect error. If this is the special redirect error, don't treat it as a failure. Throw it again so Next.js can complete the redirect."
+ //case error thrown my next we move on to actual error
     if (isRedirectError(error)) {
-      throw error;
+     throw error;
     }
 
-    return { success: false, message: "Failed to signUp" };
+    return { success: false, message: formatError(error) };
   }
 }
 

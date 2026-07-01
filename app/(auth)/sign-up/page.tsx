@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { APP_NAME } from "@/lib/constants";
+import { APP_NAME } from "@/lib/constants/utils";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,7 +41,7 @@ const SignUppage = async (props: {
                 </CardHeader>
 
                 <CardContent className="space-y-4">
-                  <SignUpForm />
+                    <SignUpForm />
                 </CardContent>
             </Card>
         </div>

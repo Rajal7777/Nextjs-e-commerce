@@ -1,14 +1,14 @@
-import {APP_NAME } from '@/lib/constants/index';
+import { APP_NAME } from '@/lib/constants/utils';
 
 const Footer = () => {
-    const currenYear = new Date().getFullYear();
-    return ( 
+  const currenYear = new Date().getFullYear();
+  return (
     <footer className='border-t'>
       <div className="p-5 flex-center">
         {APP_NAME} {currenYear}. All Rights Reserved
       </div>
-    </footer> 
-    );
-}
- 
+    </footer>
+  );
+};
+
 export default Footer;

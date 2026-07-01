@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { APP_NAME } from "@/lib/constants";
+import { APP_NAME } from "@/lib/constants/utils";
 import Image from "next/image";
 import Link from "next/link";
 

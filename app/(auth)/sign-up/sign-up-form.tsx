@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { signUpUser } from "@/lib/actions/user.actions";
 import { useSearchParams } from "next/navigation";
-import { signUpDefaultValues } from "@/lib/constants";
+import { signUpDefaultValues } from "@/lib/constants/utils";
 
 const initialState = {
   success: false,
@@ -21,7 +21,7 @@ const SignUpForm = () => {
   return (
     <form action={action} className="space-y-4">
       <input type="hidden" name="callbackUrl" value={callbackUrl} />
-     <div className="space-y-2">
+      <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium">
           Name
         </label>
@@ -31,7 +31,7 @@ const SignUpForm = () => {
           type="text"
           autoComplete="name"
           defaultValue={signUpDefaultValues.name}
-          required
+
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
         />
       </div>
@@ -46,7 +46,7 @@ const SignUpForm = () => {
           type="email"
           autoComplete="email"
           defaultValue={signUpDefaultValues.email}
-          required
+
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
         />
       </div>
@@ -61,7 +61,7 @@ const SignUpForm = () => {
           type="password"
           autoComplete="password"
           defaultValue={signUpDefaultValues.password}
-          required
+
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
           placeholder="Enter your password"
         />
@@ -77,9 +77,9 @@ const SignUpForm = () => {
           type="password"
           autoComplete="confirmPassword"
           defaultValue={signUpDefaultValues.confirmPassword}
-          required
+
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
-          placeholder="Enter your password"
+          placeholder="Confirm your password"
         />
       </div>
 
@@ -87,7 +87,7 @@ const SignUpForm = () => {
         {pending ? "Submitting..." : "Sign Up"}
       </Button>
       <div className="text-sm text-center text-muted-foreground">
-      Already have an account?{" "}
+        Already have an account?{" "}
         <Link href="/sign-in" target="_self" className=" hover:underline">
           Sign In
         </Link>
