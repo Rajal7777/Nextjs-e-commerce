@@ -43,7 +43,8 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       password: formData.get("password"),
       confirmPassword: formData.get("confirmPassword"),
     });
-
+  
+    console.log('user', user)
     //Plain password before hashed
     const plainPassword = user.password;
 

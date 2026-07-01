@@ -6,6 +6,7 @@ import { UserIcon } from "lucide-react";
 import Link from "next/link";
 
 
+
 const UserButton = async () => {
     const session = await auth();
 
@@ -20,7 +21,7 @@ const UserButton = async () => {
     }
 
     //?? means if every thing in the left is null || undefine then use 'U'
-    const firstInitial = session.user?.name?.charAt(0).toUpperCase() ?? 'U';
+    const firstInitial = session.user?.name?.charAt(0).toUpperCase() ?? 'Z';
 
     return (
         <div className="flex gap-2 items-center">
@@ -46,8 +47,10 @@ const UserButton = async () => {
                     </DropdownMenuLabel>
 
                     <DropdownMenuItem className="p-0 mb-1">
-                        <form action={signoutUser} className="w-full">
-                            <Button className="w-full py-4 px-2 h-4 justify-start" variant='ghost'>
+                        <form className="w-full">
+                            <Button
+                                onClick={signoutUser}
+                                className="w-full py-4 px-2 h-4 justify-start" variant='ghost'>
                                 Sign Out
                             </Button>
                         </form>
