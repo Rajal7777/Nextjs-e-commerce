@@ -45,6 +45,7 @@ export const signUpFormSchema = z
     path: ["confirmpassword"], //customize the error path
   });
 
+  
 //Cart Schemas
 export const cartItemSchema = z.object({
   productId: z.string().min(1, "Product is required"),
@@ -54,6 +55,7 @@ export const cartItemSchema = z.object({
   image: z.string().min(1, "Image is required"),
   price: currency,
 });
+
 
 export const insertCartItemSchema = z.object({
   items: z.array(cartItemSchema),
