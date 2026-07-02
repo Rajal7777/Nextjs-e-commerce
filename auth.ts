@@ -8,7 +8,6 @@ import { prisma } from "./db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials"; //determine how user logIn eg:- github,email
 import { compareSync } from "bcryptjs";
 
-
 export const config = {
   pages: {
     signIn: "/sign-in",
@@ -96,23 +95,16 @@ export const config = {
       }
       return token;
     },
-    authorized({ request, auth }: any) {
-      //Check for session cart cookie
+    authorized({ request }: any) {
       if (!request.cookies.get("sessionCartId")) {
-        //generate new session cart id cookie
-        const sessionCartId = crypto.randomUUID();
+        const response = NextResponse.next();
 
-        const newRequestHeaders = new Headers(request.headers);
-
-        //Create a new cookie with the session cart ID
-        const response = NextResponse.next({
-          request: {
-            headers: newRequestHeaders,
-          },
+        response.cookies.set("sessionCartId", crypto.randomUUID(), {
+          httpOnly: true,
+          sameSite: "lax",
+          path: "/",
         });
 
-        //Set the cookie in the response
-        response.cookies.set("sessionCartId", sessionCartId);
         return response;
       }
 

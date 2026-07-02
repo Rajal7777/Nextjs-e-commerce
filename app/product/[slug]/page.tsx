@@ -15,7 +15,6 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
   const { slug } = await props.params;
 
   const product = await getProductBySLug(slug);
-  console.log("product", product);
 
   if (!product) notFound();
 
@@ -73,14 +72,16 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
 
               {product.stock > 0 && (
                 <div className="flex-center">
-                  <AddToCart item={{
-                    productId: product.id,
-                    name: product.name,
-                    slug: product.slug,
-                    price: String(product.price) ,
-                    qty: 1,
-                    image: product.images[0],
-                  }}/>
+                  <AddToCart
+                    item={{
+                      productId: product.id,
+                      name: product.name,
+                      slug: product.slug,
+                      price: String(product.price),
+                      qty: 1,
+                      image: product.images[0],
+                    }}
+                  />
                 </div>
               )}
             </CardContent>
