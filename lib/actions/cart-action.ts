@@ -27,7 +27,7 @@ const calcPrice = (items: CartItem[]) => {
   };
 };
 
-// Runs when the user clicks "Add to Cart"
+//add to cart
 export default async function addItemToCart(data: CartItem) {
   try {
     // Get the unique cart ID stored in the visitor's browser cookie.
@@ -35,6 +35,7 @@ export default async function addItemToCart(data: CartItem) {
     const sessionCartId = (await cookies()).get("sessionCartId")?.value;
 
     // Stop if the visitor doesn't have a cart cookie.
+    //identifier for who's cart
     if (!sessionCartId) {
       throw new Error("Cart session not found.");
     }
@@ -86,7 +87,7 @@ export default async function addItemToCart(data: CartItem) {
     } else {
       //check if item already exist in cart
       const existingItem = cart.items.find(
-        (i) => i.productId === item.productId,
+        (cartItem) => cartItem.productId === item.productId,
       );
 
       if (existingItem) {
@@ -104,7 +105,6 @@ export default async function addItemToCart(data: CartItem) {
         //add item to cart.items
         cart.items.push(item);
       }
-      console.log("existingItme", existingItem);
 
       //Save to db
       await prisma.cart.update({
