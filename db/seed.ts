@@ -1,10 +1,10 @@
 import "dotenv/config";
 
-import { prisma } from "../lib/prisma";
+import { prisma } from "./prisma";
 import sampleData from "./sample-data";
 
 async function main() {
-    //delete all the data before seeding db
+  //delete all the data before seeding db
   await prisma.product.deleteMany();
   await prisma.account.deleteMany();
   await prisma.session.deleteMany();

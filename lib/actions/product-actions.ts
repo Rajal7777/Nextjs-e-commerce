@@ -1,7 +1,7 @@
 "use server";
 
 //prisma object lets you communicate with database
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/db/prisma";
 import { convertToPlainObject } from "../utils";
 import { LATEST_PRODUCTS_LIMIT } from "../constants/utils";
 

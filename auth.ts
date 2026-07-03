@@ -77,7 +77,7 @@ export const config = {
 
       return session;
     },
-    async jwt({ token, user, trigger, session }: any) {
+    async jwt({ token, user }: any) {
       //Add extra field to token
       if (user) {
         token.role = user.role;
