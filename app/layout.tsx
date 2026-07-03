@@ -1,24 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from 'next/font/google';
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { APP_NAME, SERVER_URL } from '@/lib/constants/utils';
+import { APP_NAME, SERVER_URL } from "@/lib/constants/utils";
 import Navbar from "@/components/shared/header";
 import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/provider/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 
-
-
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
     template: `%s | Fun store`,
-    default: APP_NAME
+    default: APP_NAME,
   },
   description: "A modern e-Commerce website.",
-  metadataBase: new URL(SERVER_URL)
+  metadataBase: new URL(SERVER_URL),
 };
 
 export default function RootLayout({
@@ -40,11 +38,19 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Navbar />
-          <main className="wrapper flex-1">
-            {children}
-          </main>
+          <main className="wrapper flex-1">{children}</main>
           <Footer />
-          <Toaster />
+          <Toaster
+            toastOptions={{
+              unstyled: true,
+              classNames: {
+                toast:
+                  "bg-background border border-border p-4 rounded-lg flex items-center gap-2",
+                success: "text-green-600",
+                error: "text-destructive",
+              },
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

@@ -10,7 +10,6 @@ import { cartItemSchema, insertCartItemSchema } from "../constants/validators";
 import { roundDecimal } from "../utils";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/db/prisma";
-import { success } from "zod";
 
 //Calculate price
 const calcPrice = (items: CartItem[]) => {
@@ -30,7 +29,7 @@ const calcPrice = (items: CartItem[]) => {
 };
 
 //add to cart
-export default async function addItemToCart(data: CartItem) {
+export async function addItemToCart(data: CartItem) {
   try {
     // Get the unique cart ID stored in the visitor's browser cookie.
     // This lets us know which shopping cart belongs to this visitor.

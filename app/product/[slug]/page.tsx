@@ -5,7 +5,8 @@ import ProductImages from "@/components/shared/product/product-image";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import AddToCart from "@/components/shared/product/add-to-cart";
+import AddToCart from "@/components/shared/product/addToCartBtn";
+import { getMyCart } from "@/lib/actions/cart-action";
 
 type ProductSlugProps = {
   params: Promise<{ slug: string }>;
@@ -17,6 +18,8 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
   const product = await getProductBySLug(slug);
 
   if (!product) notFound();
+
+  const cart = await getMyCart();
 
   return (
     <section>
@@ -73,6 +76,7 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
               {product.stock > 0 && (
                 <div className="flex-center">
                   <AddToCart
+                    cart={cart}
                     item={{
                       productId: product.id,
                       name: product.name,
