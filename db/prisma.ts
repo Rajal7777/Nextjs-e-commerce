@@ -51,5 +51,5 @@ export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 // In development, save the client to globalThis
 if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+  globalForPrisma.prisma =prisma;
 }

@@ -1,0 +1,26 @@
+[
+  {
+    "productId": "4c37e60f-3b60-486e-bf61-52a8a28fe29d",
+    "name": "Polo Sporting Stretch Shirt",
+    "slug": "polo-sporting-stretch-shirt",
+    "qty": 3,
+    "image": "/images/sample-products/p1-1.jpg",
+    "price": "59.99"
+  },
+  {
+    "productId": "cc0522ab-6ff2-4bea-9d2f-feb9f9dabc1d",
+    "name": "Calvin Klein Slim Fit Stretch Shirt",
+    "slug": "calvin-klein-slim-fit-stretch-shirt",
+    "qty": 2,
+    "image": "/images/sample-products/p4-1.jpg",
+    "price": "39.95"
+  },
+  {
+    "productId": "3cb82eff-a0b6-42d3-95dd-34e773241180",
+    "name": "Brooks Brothers Long Sleeved Shirt",
+    "slug": "brooks-brothers-long-sleeved-shirt",
+    "qty": 1,
+    "image": "/images/sample-products/p2-1.jpg",
+    "price": "85.9"
+  }
+]

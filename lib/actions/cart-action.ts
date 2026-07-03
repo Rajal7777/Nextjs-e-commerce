@@ -4,11 +4,11 @@ import { CartItem } from "@/types";
 import { formatError } from "../constants/utils";
 import { cookies } from "next/headers";
 import { auth } from "@/auth";
-import { prisma } from "@/db/prisma";
 import { convertToPlainObject } from "../utils";
 import { cartItemSchema, insertCartItemSchema } from "../constants/validators";
 import { roundDecimal } from "../utils";
 import { revalidatePath } from "next/cache";
+import { prisma } from "@/db/prisma";
 
 //Calculate price
 const calcPrice = (items: CartItem[]) => {
@@ -21,9 +21,9 @@ const calcPrice = (items: CartItem[]) => {
 
   return {
     itemsPrice: itemsPrice.toFixed(2),
-    shippingPrice: itemsPrice.toFixed(2),
-    taxPrice: itemsPrice.toFixed(2),
-    totalPrice: itemsPrice.toFixed(2),
+    shippingPrice: shippingPrice.toFixed(2),
+    taxPrice: taxPrice.toFixed(2),
+    totalPrice: totalPrice.toFixed(2),
   };
 };
 
@@ -77,14 +77,50 @@ export default async function addItemToCart(data: CartItem) {
       });
 
       //Revalidate page
-      revalidatePath(`/product/${product?.slug}`);
+      revalidatePath(`/product/${product.slug}`);
 
       return {
         success: true,
         message: "Item added to cart successfully",
       };
     } else {
-      
+      //check if item already exist in cart
+      const existingItem = cart.items.find(
+        (i) => i.productId === item.productId,
+      );
+
+      if (existingItem) {
+        //check stock
+        if (product.stock < existingItem.qty + 1) {
+          throw new Error("Not enough stock");
+        }
+
+        //Increase the quantity
+        existingItem.qty++;
+      } else {
+        //Item does not exist in cart
+        if (product.stock < 1) throw new Error("Out of Stock");
+
+        //add item to cart.items
+        cart.items.push(item);
+      }
+      console.log("existingItme", existingItem);
+
+      //Save to db
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: {
+          items: cart.items,
+          ...calcPrice(cart.items as CartItem[]),
+        },
+      });
+
+      revalidatePath(`/product/${product.slug}`);
+
+      return {
+        success: true,
+        message: `${product.name} ${existingItem ? "Updated in" : "added to"} cart`,
+      };
     }
   } catch (error) {
     // Return a friendly error message instead of crashing.
@@ -120,7 +156,7 @@ export async function getMyCart() {
   // No cart found.
   if (!cart) return undefined;
 
-  // Convert Prisma values (like Decimal) into plain JavaScript values
+  // Convert prisma values (like Decimal) into plain JavaScript values
   // so they can be safely returned to the client.
   return convertToPlainObject({
     ...cart,

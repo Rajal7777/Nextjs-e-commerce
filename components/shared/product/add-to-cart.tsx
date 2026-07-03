@@ -15,7 +15,7 @@ const AddToCart = ({ item }: { item: CartItem; }) => {
         const res = await addItemToCart(item);
 
         if (res.success) {
-            toast.success(`${item.name} ${res.message}`);
+            toast.success(res.message);
             router.refresh();
         } else {
             toast.error(res.message);
