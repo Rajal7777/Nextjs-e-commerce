@@ -44,8 +44,8 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       password: formData.get("password"),
       confirmPassword: formData.get("confirmPassword"),
     });
-  
-    console.log('user', user)
+
+    console.log("user", user);
     //Plain password before hashed
     const plainPassword = user.password;
 
@@ -69,10 +69,9 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
     return { success: true, message: "Signed in successufully!" };
   } catch (error) {
-    console.log('error', error);
- //case error thrown my next we move on to actual error
+   //case error thrown my next we move on to actual error
     if (isRedirectError(error)) {
-     throw error;
+      throw error;
     }
 
     return { success: false, message: formatError(error) };
@@ -83,3 +82,15 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 export async function signoutUser() {
   await signOut();
 }
+
+
+//Get user by the ID
+export async function getUserById(userId: string){
+  const user = await prisma.user.findFirst({
+    where: { id: userId}
+  });
+
+  if(!user) throw new Error('User not found!');
+
+  return user;
+};

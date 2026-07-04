@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -12,15 +11,17 @@ import {
 } from "@/components/ui/table";
 import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart-action";
 import { Cart } from "@/types";
-import { Loader, Minus, Plus } from "lucide-react";
+import { ArrowRight, Loader, Minus, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const CartTable = ({ cart }: { cart?: Cart }) => {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const updateQuantity = (
     action: () => Promise<{ success: boolean; message: string }>,
@@ -135,6 +136,14 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                 subTotal: ({cart.items.reduce((acc, i) => acc + i.qty, 0)})
               </span>
               <span>{formatCurrency(cart.itemsPrice)}</span>
+            <Button className="" disabled={isPending}
+             onClick={()=> startTransition(() => router.push('/shipping-address'))}>
+                {isPending ? (
+                    <Loader className="w-4 h-4" />
+                ): (
+                     <ArrowRight className="w-4 h-4" /> 
+                )}CheckOut
+            </Button>
             </div>
           </div>
         </div>
