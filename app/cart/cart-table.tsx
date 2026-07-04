@@ -17,21 +17,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTransition } from "react";
 import { toast } from "sonner";
+import { formatCurrency } from "@/lib/utils";
 
 const CartTable = ({ cart }: { cart?: Cart }) => {
   const [isPending, startTransition] = useTransition();
 
   const updateQuantity = (
-  action: () => Promise<{ success: boolean; message: string }>
-) => {
-  startTransition(async () => {
-    const res = await action();
+    action: () => Promise<{ success: boolean; message: string }>,
+  ) => {
+    startTransition(async () => {
+      const res = await action();
 
-    if (!res.success) {
-      toast.error(res.message);
-    }
-  });
-};
+      if (!res.success) {
+        toast.error(res.message);
+      }
+    });
+  };
 
   return (
     <>
@@ -43,14 +44,14 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
         </div>
       ) : (
         <div className="grid md:grid-cols-4 md:gap-5">
-          <div className="overflow-x-auto md:col-span-3">
+          <div className="overflow-x-auto md:col-span-3 mx-auto">
             <Table>
-              <TableCaption>List of your items.</TableCaption>
               <TableHeader>
                 <TableRow>
                   <TableHead>Item</TableHead>
                   <TableHead>Quantity</TableHead>
                   <TableHead>Price</TableHead>
+                  <TableHead>SubTotal</TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -123,10 +124,18 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                         )}
                       </Button>
                     </TableCell>
+                    <TableCell>{item.price}</TableCell>
+                    <TableCell>{(item.price * item.qty).toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+            <div className="flex justify-between border-t border-gray-300">
+              <span>
+                subTotal: ({cart.items.reduce((acc, i) => acc + i.qty, 0)})
+              </span>
+              <span>{formatCurrency(cart.itemsPrice)}</span>
+            </div>
           </div>
         </div>
       )}
