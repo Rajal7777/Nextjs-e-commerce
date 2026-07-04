@@ -2,11 +2,10 @@
 
 import { Prisma } from "@prisma/client";
 import { CartItem } from "@/types";
-import { formatError } from "../constants/utils";
 import { cookies } from "next/headers";
 import { auth } from "@/auth";
-import { convertToPlainObject } from "../utils";
-import { cartItemSchema, insertCartItemSchema } from "../constants/validators";
+import { convertToPlainObject, formatError } from "../utils";
+import { cartItemSchema, insertCartItemSchema } from "../validators";
 import { roundDecimal } from "../utils";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/db/prisma";

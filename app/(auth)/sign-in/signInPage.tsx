@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { signInWithCredentials } from "@/lib/actions/user.actions";
 import { useSearchParams } from "next/navigation";
-import { signInDefaultValues } from "@/lib/constants/utils";
+import { signInDefaultValues } from "@/lib/constants";
+
 
 const initialState = {
   success: false,

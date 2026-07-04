@@ -1,4 +1,4 @@
-import { APP_NAME } from '@/lib/constants/utils';
+import { APP_NAME } from '@/lib/utils';
 
 const Footer = () => {
   const currenYear = new Date().getFullYear();

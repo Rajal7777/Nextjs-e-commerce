@@ -3,7 +3,7 @@
 //prisma object lets you communicate with database
 import { prisma } from "@/db/prisma";
 import { convertToPlainObject } from "../utils";
-import { LATEST_PRODUCTS_LIMIT } from "../constants/utils";
+import { LATEST_PRODUCTS_LIMIT } from "../constants";
 
 //Get latest products
 export async function getLatestProducts() {

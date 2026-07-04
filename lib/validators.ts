@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { formatNumberWithDecimal } from "../utils";
+import { formatNumberWithDecimal } from "./utils";
 
 //refine() lets you create your own custom validation rule.
 //syntax refine(conditon, 'Error message)
@@ -68,7 +68,7 @@ export const insertCartItemSchema = z.object({
 //Schema for the shipping address
 export const shippingAddressSchema = z.object({
   fullName: z.string().min(3, "Name must be at least 3 characters"),
-  streetAdress: z.string().min(3, "Name must be at least 3 characters"),
+  streetAddress: z.string().min(3, "Name must be at least 3 characters"),
   city: z.string().min(3, "Name must be at least 3 characters"),
   postalCode: z.string().min(3, "Name must be at least 3 characters"),
   country: z.string().min(3, "Name must be at least 3 characters"),

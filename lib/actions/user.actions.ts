@@ -1,12 +1,13 @@
 "use server";
 
-import { signInFormSchema, signUpFormSchema } from "../constants/validators";
+import { signInFormSchema, signUpFormSchema } from "../validators";
 import { signIn, signOut } from "@/auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 import { prisma } from "@/db/prisma";
 import { hashSync } from "bcryptjs";
-import { formatError } from "../constants/utils";
+import { formatError } from "../utils";
+
 
 //Sign in the user with credentials
 //useActionState, React automatically passes two arguments prevState, formdata
@@ -69,7 +70,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
     return { success: true, message: "Signed in successufully!" };
   } catch (error) {
-   //case error thrown my next we move on to actual error
+    //case error thrown my next we move on to actual error
     if (isRedirectError(error)) {
       throw error;
     }
@@ -83,14 +84,13 @@ export async function signoutUser() {
   await signOut();
 }
 
-
 //Get user by the ID
-export async function getUserById(userId: string){
+export async function getUserById(userId: string) {
   const user = await prisma.user.findFirst({
-    where: { id: userId}
+    where: { id: userId },
   });
 
-  if(!user) throw new Error('User not found!');
+  if (!user) throw new Error("User not found!");
 
   return user;
-};
+}
