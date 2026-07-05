@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "./db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials"; //determine how user logIn eg:- github,email
 import { compareSync } from "bcryptjs";
+import { cookies } from "next/headers";
 
 export const config = {
   pages: {
@@ -76,9 +77,10 @@ export const config = {
 
       return session;
     },
-    async jwt({ token, user }: any) {
+    async jwt({ token, user, trigger, session }: any) {
       //Add extra field to token
       if (user) {
+        token.id = user.id;
         token.role = user.role;
 
         //use Email name incase no name is set
@@ -91,6 +93,31 @@ export const config = {
           where: { id: user.id },
           data: { name: token.name },
         });
+      }
+
+      if (trigger === "signIn" || trigger === "signUp") {
+        const cookiesObject = await cookies();
+        console.log("cookiesObject", cookiesObject);
+        const sessionCartId = cookiesObject.get("sessionCartId")?.value;
+
+        if (sessionCartId) {
+          const sessionCart = await prisma.cart.findFirst({
+            where: { sessionCartId },
+          });
+
+          if (sessionCart) {
+            //Delete current user cart
+            await prisma.cart.deleteMany({
+              where: { userId: user.id },
+            });
+
+            //Assign new cart
+            await prisma.cart.update({
+              where: { id: sessionCart.id },
+              data: { userId: user.id },
+            });
+          }
+        }
       }
       return token;
     },
