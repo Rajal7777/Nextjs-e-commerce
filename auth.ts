@@ -122,6 +122,23 @@ export const config = {
       return token;
     },
     authorized({ request }: any) {
+      //Array of regex patterns for path protected
+      const protectedPaths = [
+        /\/shipping-address/,
+        /\/payment-method/,
+        /\/place-order/,
+        /\/profile/,
+        /\/user/,
+        /\/order/,
+        /\/admin/,
+      ];
+
+      //Get pathname from the req URL obj
+      const { pathname } = request.nextUrl;
+
+      //check if user is authenticated
+      if (!auth && protectedPaths.some((p) => p.test(pathname))) return false;
+
       if (!request.cookies.get("sessionCartId")) {
         const response = NextResponse.next();
 
