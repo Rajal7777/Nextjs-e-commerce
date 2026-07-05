@@ -1,7 +1,6 @@
 //PrismaAdapter is bridge auth logic and database:
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { prisma } from "./db/prisma";

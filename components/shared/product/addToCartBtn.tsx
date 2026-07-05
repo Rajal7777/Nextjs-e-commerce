@@ -27,8 +27,6 @@ const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem; }) => {
   const existingItem =
     cart && cart.items.find((i) => i.productId === item.productId);
 
-  console.log("existing item", existingItem);
-
   //Handle remove from cart
   const handleRemoveFromCart = async () => {
     const res = await removeItemFromCart(item.productId);

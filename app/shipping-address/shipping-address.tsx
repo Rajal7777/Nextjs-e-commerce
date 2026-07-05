@@ -36,7 +36,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
     });
 
 
-    // 3. Destructure isSubmitSuccessful and reset
+    // 3. Destructure + isSubmit Successful then reset
     const { reset, formState: { isSubmitSuccessful } } = form;
 
     // 4. Trigger reset when submission succeeds
@@ -148,7 +148,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
                         />
 
                         <Field orientation="responsive">
-                            <Button type="submit" disabled={isPending} form="form-rhf-demo" onClick={() => form.resetField}>
+                            <Button type="submit" disabled={isPending} form="form-rhf-demo" >
                                 {isPending ? (
                                     <Loader className="w-4 h-4 animate-spin" />
                                 ) : (

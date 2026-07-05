@@ -13,7 +13,6 @@ import { hashSync } from "bcryptjs";
 import { formatError } from "../utils";
 import { ShippingAddress } from "@/types";
 
-
 //Sign in the user with credentials
 //useActionState, React automatically passes two arguments prevState, formdata
 export async function signInWithCredentials(
@@ -103,8 +102,14 @@ export async function getUserById(userId: string) {
 //Update the user's address
 export async function updateUserAddress(data: ShippingAddress) {
   try {
+    //user login?
     const session = await auth();
-  console.log("session",session)
+
+    if (!session?.user?.id) {
+      throw new Error("You must be signed in.");
+    }
+
+    //user exist in db ? get data
     const currentUser = await prisma.user.findUnique({
       where: { id: session?.user?.id },
     });
