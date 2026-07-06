@@ -52,7 +52,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
             const res = await updateUserAddress(data);
 
             if (!res.success) {
-                toast.error(<pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
+                toast.error(<pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-card p-4 text-code-foreground">
                     <code>{res.message}</code>
                 </pre>);
             }
@@ -70,7 +70,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
             </CardHeader>
 
             <CardContent>
-                <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
+                <form method="post" onSubmit={form.handleSubmit(onSubmit)}>
                     <FieldGroup>
                         <Controller
                             name="fullName"
@@ -148,6 +148,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
                             )}
                         />
 
+                             {/* button */}
                         <Field orientation="responsive">
                             <Button type="submit" disabled={isPending} form="form-rhf-demo" >
                                 {isPending ? (
