@@ -137,7 +137,7 @@ export const config = {
       const { pathname } = request.nextUrl;
 
       //check if user is authenticated
-      if (!auth && protectedPaths.some((p) => p.test(pathname))) return false;
+      if (!auth && protectedPaths.some((path) => path.test(pathname))) return false;
 
       if (!request.cookies.get("sessionCartId")) {
         const response = NextResponse.next();

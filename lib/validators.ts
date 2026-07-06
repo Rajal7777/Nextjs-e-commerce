@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { formatNumberWithDecimal } from "./utils";
+import { PAYMENT_METHODS } from "./constants";
+import path from "path";
 
 //refine() lets you create your own custom validation rule.
 //syntax refine(conditon, 'Error message)
@@ -73,3 +75,13 @@ export const shippingAddressSchema = z.object({
   postalCode: z.string().min(3, "Name must be at least 3 characters"),
   country: z.string().min(3, "Name must be at least 3 characters"),
 });
+
+
+//Schema for payment method
+export const paymentMethodSchema = z.object({
+  type: z.string().min(1,'Payment method is required!'),
+}).refine((data) =>PAYMENT_METHODS.includes(data.type),{
+    path: ['type'],
+    message: 'Invalid payment method',
+  }
+)
