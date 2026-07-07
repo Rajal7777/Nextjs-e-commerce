@@ -1,23 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import {
-    Field,
-    FieldError,
-    FieldLabel,
-} from "@/components/ui/field";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { updateUserPaymentMethod } from "@/lib/actions/user.actions";
 import { DEFAULT_PAYMENT_METHOD, PAYMENT_METHODS } from "@/lib/constants";
 import { paymentMethodSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -42,7 +33,6 @@ const PaymentMethodForm = ({
 
 
     function onSubmit(data: z.infer<typeof paymentMethodSchema>) {
-        console.log('data', data);
         startTransition(async () => {
             const res = await updateUserPaymentMethod(data);
 
@@ -52,11 +42,11 @@ const PaymentMethodForm = ({
                         <code>{res.message}</code>
                     </pre>,
                 );
+                return;
             }
 
-            return;
+            router.push("/place-order");
         });
-        router.push("/place-order");
     }
 
     return (
@@ -67,9 +57,7 @@ const PaymentMethodForm = ({
 
             <CardContent>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <h3 className="mb-4 text-lg font-semibold">
-                        Select Payment Method
-                    </h3>
+                    <h3 className="mb-4 text-lg font-semibold">Select Payment Method</h3>
 
                     {PAYMENT_METHODS.map((method) => (
                         <label
@@ -82,24 +70,19 @@ const PaymentMethodForm = ({
                                 {...register("type")}
                                 className="h-4 w-4"
                             />
-
                             <span>{method}</span>
                         </label>
                     ))}
 
                     {errors.type && (
-                        <p className="mt-2 text-sm text-red-500">
-                            {errors.type.message}
-                        </p>
+                        <p className="mt-2 text-sm text-red-500">{errors.type.message}</p>
                     )}
 
                     <button
                         type="submit"
                         className="mt-6 w-full rounded-md bg-black px-4 py-2 text-white hover:bg-gray-800"
                     >
-                        {isPending ? (
-                            <Loader className="animate-spin" />
-                        ) : ' Continue' }
+                        {isPending ? 'Loading...' : " Continue"}
                     </button>
                 </form>
             </CardContent>

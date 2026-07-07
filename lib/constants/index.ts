@@ -1,3 +1,5 @@
+
+
 export const APP_NAME = process.env.NEXT_APP_NAME || "New-store";
 export const SERVER_URL =
   process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
@@ -26,10 +28,8 @@ export const shippingAdressDefaultValue = {
 };
 
 
-
-export const PAYMENT_METHODS = process.env.PAYMENT_METHOD
-  ? process.env.PAYMENT_METHOD.split(",")
-  : ["PayPal", "Stripe", "CashOnDelivery"];
+export const PAYMENT_METHODS =
+  process.env.NEXT_PUBLIC_PAYMENT_METHODS?.split(",") ?? [];
 
 export const DEFAULT_PAYMENT_METHOD =
-  process.env.DEFAULT_PAYMENT_METHOD || "PayPal";
+  process.env.NEXT_PUBLIC_DEFAULT_PAYMENT_METHOD ?? "CashOnDelivery";

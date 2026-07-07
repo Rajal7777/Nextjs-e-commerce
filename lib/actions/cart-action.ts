@@ -174,7 +174,7 @@ export async function removeItemFromCart(productId: string) {
     //check cart cookie
     //add to cart create sessionId
     const sessionCartId = (await cookies()).get("sessionCartId")?.value;
-    console.log("sessionCartId from delete", sessionCartId);
+    
     if (!sessionCartId) throw new Error("Cart session not found");
 
     //Get product
@@ -185,7 +185,7 @@ export async function removeItemFromCart(productId: string) {
 
     //Get user cart
     const cart = await getMyCart();
-    console.log("cart from delete ", cart);
+
     if (!cart) throw new Error("Cart not found");
 
     //find item

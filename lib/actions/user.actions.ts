@@ -145,7 +145,8 @@ export async function updateUserPaymentMethod(
     });
 
     if (!currentUser) throw new Error("User not found");
-
+ 
+    //run time validation of payment type via zod
     const paymentMethod = paymentMethodSchema.parse(data);
 
     await prisma.user.update({
