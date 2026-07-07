@@ -62,8 +62,7 @@ const PaymentMethodForm = ({
                     {PAYMENT_METHODS.map((method) => (
                         <label
                             key={method}
-                            className="mb-3 flex cursor-pointer items-center gap-3 rounded-md border p-3 hover:bg-gray-50"
-                        >
+                            className="mb-3 flex cursor-pointer items-center gap-3 rounded-md border p-3 hover:bg-gray-50 hover:text-black">
                             <input
                                 type="radio"
                                 value={method}

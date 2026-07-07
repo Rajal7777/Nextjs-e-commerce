@@ -11,6 +11,7 @@ import { CartItem } from "@/types";
 
 //Create order and create order items
 export async function createOrder() {
+  console.log('createorder funciton')
   try {
     const session = await auth();
     if (!session) throw new Error("User is not authenticated");
@@ -92,6 +93,7 @@ export async function createOrder() {
     //incase some thing went wrong throw error instead of continue with invalid data
     if (!insertOrderId) throw new Error("Order not found");
 
+    console.log('insertOrderId',insertOrderId);
     return {
       success: true,
       message: "Order created",

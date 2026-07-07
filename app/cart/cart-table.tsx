@@ -18,31 +18,18 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import EmptyCart from "./empty-cart";
 
 const CartTable = ({ cart }: { cart?: Cart; }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  // const updateQuantity = (
-  //   action: () => Promise<{ success: boolean; message: string; }>,
-  // ) => {
-  //   startTransition(async () => {
-  //     const res = await action();
-
-  //     if (!res.success) {
-  //       toast.error(res.message);
-  //     }
-  //   });
-  // };
 
   return (
     <>
       <h1 className="py-4 h2-bold">Shopping Cart</h1>
       {!cart || cart.items.length === 0 ? (
-        <div>
-          Cart is empty.
-          <Link href="/">Go to Shopping page.</Link>
-        </div>
+        <EmptyCart />
       ) : (
         <div className="grid md:grid-cols-4 md:gap-5">
           <div className="overflow-x-auto md:col-span-3 mx-auto">
