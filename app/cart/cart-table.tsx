@@ -9,9 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart-action";
+import { addItemToCart, removeItemFromCart, removeItemsFromCart } from "@/lib/actions/cart-action";
 import { Cart } from "@/types";
-import { ArrowRight, Loader, Minus, Plus } from "lucide-react";
+import { ArrowRight, Loader, Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTransition } from "react";
@@ -23,17 +23,17 @@ const CartTable = ({ cart }: { cart?: Cart; }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const updateQuantity = (
-    action: () => Promise<{ success: boolean; message: string; }>,
-  ) => {
-    startTransition(async () => {
-      const res = await action();
+  // const updateQuantity = (
+  //   action: () => Promise<{ success: boolean; message: string; }>,
+  // ) => {
+  //   startTransition(async () => {
+  //     const res = await action();
 
-      if (!res.success) {
-        toast.error(res.message);
-      }
-    });
-  };
+  //     if (!res.success) {
+  //       toast.error(res.message);
+  //     }
+  //   });
+  // };
 
   return (
     <>
@@ -53,13 +53,14 @@ const CartTable = ({ cart }: { cart?: Cart; }) => {
                   <TableHead>Quantity</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>SubTotal</TableHead>
+                  <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
                 {cart.items.map((item) => (
                   <TableRow key={item.slug}>
-                    <TableCell>
+                    <TableCell >
                       <Link
                         href={`/product/${item.slug}`}
                         className="flex items-center space-x-4"
@@ -125,8 +126,39 @@ const CartTable = ({ cart }: { cart?: Cart; }) => {
                         )}
                       </Button>
                     </TableCell>
+
+                    {/* Price */}
+
+
                     <TableCell>{Number(item.price).toFixed(2)}</TableCell>
-                    <TableCell>{(Number(item.price) * Number(item.qty)).toFixed(2)}</TableCell>
+                    <TableCell>{(Number(item.price) * Number(item.qty)).toFixed(2)} </TableCell>
+
+                    <TableCell>
+                      <Button
+                        disabled={isPending}
+                        variant="outline"
+                        type="button"
+                        onClick={() =>
+                          startTransition(async () => {
+                            const res = await removeItemsFromCart(item);
+
+                            if (!res.success) {
+                              <Button
+                                onClick={() => toast(res.message)}
+                              ></Button>;
+                            }
+                          })
+                        }
+                      >
+                        {isPending ? (
+                          <Loader className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </TableCell>
+
+
                   </TableRow>
                 ))}
               </TableBody>

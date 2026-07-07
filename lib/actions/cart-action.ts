@@ -15,7 +15,8 @@ const calcPrice = (items: CartItem[]) => {
   const itemsPrice = roundDecimal(
     items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0),
   );
-  const shippingPrice = roundDecimal(itemsPrice > 100 ? 0 : 10);
+ console.log("items", itemsPrice)
+  const shippingPrice = roundDecimal(itemsPrice >= 1000 ? 0 : 100);
   const taxPrice = roundDecimal(0.15 * itemsPrice);
   const totalPrice = roundDecimal(itemsPrice + taxPrice + shippingPrice);
 
@@ -27,7 +28,7 @@ const calcPrice = (items: CartItem[]) => {
   };
 };
 
-//add to cart
+//ADD TO CART
 export async function addItemToCart(data: CartItem) {
   try {
     // Get the unique cart ID stored in the visitor's browser cookie.
@@ -131,6 +132,69 @@ export async function addItemToCart(data: CartItem) {
   }
 }
 
+//DELETE ITEMS
+export async function removeItemsFromCart(data: CartItem) {
+  try {
+    // Get cart
+    const cart = await getMyCart();
+
+    if (!cart) {
+      throw new Error("Cart not found");
+    }
+
+    // Validate input
+    const item = cartItemSchema.parse(data);
+
+    // Find product
+    const product = await prisma.product.findUnique({
+      where: {
+        id: item.productId,
+      },
+    });
+
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    // Check if item exists in cart
+    const existingItem = cart.items.find(
+      (cartItem) => cartItem.productId === item.productId
+    );
+
+    if (!existingItem) {
+      throw new Error("Item not found in cart");
+    }
+
+    // Remove the item completely
+    cart.items = cart.items.filter(
+      (cartItem) => cartItem.productId !== item.productId
+    );
+
+    // Update database
+    await prisma.cart.update({
+      where: {
+        id: cart.id,
+      },
+      data: {
+        items: cart.items,
+        ...calcPrice(cart.items as CartItem[]),
+      },
+    });
+
+    revalidatePath(`/product/${product.slug}`);
+
+    return {
+      success: true,
+      message: `${product.name} removed from cart`,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+}
+
 // Finds the current user's cart.
 export async function getMyCart() {
   // Read the cart ID from the browser cookie.
@@ -174,7 +238,7 @@ export async function removeItemFromCart(productId: string) {
     //check cart cookie
     //add to cart create sessionId
     const sessionCartId = (await cookies()).get("sessionCartId")?.value;
-    
+
     if (!sessionCartId) throw new Error("Cart session not found");
 
     //Get product
