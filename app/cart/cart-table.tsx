@@ -19,12 +19,12 @@ import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
-const CartTable = ({ cart }: { cart?: Cart }) => {
+const CartTable = ({ cart }: { cart?: Cart; }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const updateQuantity = (
-    action: () => Promise<{ success: boolean; message: string }>,
+    action: () => Promise<{ success: boolean; message: string; }>,
   ) => {
     startTransition(async () => {
       const res = await action();
@@ -125,26 +125,26 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                         )}
                       </Button>
                     </TableCell>
-                    <TableCell>{item.price}</TableCell>
-                    <TableCell>{(item.price * item.qty).toFixed(2)}</TableCell>
+                    <TableCell>{Number(item.price).toFixed(2)}</TableCell>
+                    <TableCell>{(Number(item.price) * Number(item.qty)).toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            <div className="flex justify-between border-t border-gray-300">
+            <div className="flex justify-between border-t border-gray-300 mt-2">
               <span>
                 subTotal: ({cart.items.reduce((acc, i) => acc + i.qty, 0)})
               </span>
               <span>{formatCurrency(cart.itemsPrice)}</span>
-            <Button className="" disabled={isPending}
-             onClick={()=> startTransition(() => router.push('/shipping-address'))}>
-                {isPending ? (
-                    <Loader className="w-4 h-4" />
-                ): (
-                     <ArrowRight className="w-4 h-4" /> 
-                )}CheckOut
-            </Button>
             </div>
+            <Button className="mt-2 px-10" disabled={isPending}
+              onClick={() => startTransition(() => router.push('/shipping-address'))}>
+              {isPending ? (
+                <Loader className="w-4 h-4" />
+              ) : (
+                <ArrowRight className="w-4 h-4" />
+              )}CheckOut
+            </Button>
           </div>
         </div>
       )}

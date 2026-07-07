@@ -30,15 +30,16 @@ import * as z from "zod";
 const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
-    
+
     const form = useForm<z.infer<typeof shippingAddressSchema>>({
         resolver: zodResolver(shippingAddressSchema),
         defaultValues: address || shippingAdressDefaultValue,
     });
 
 
+
     // 3. Destructure + isSubmit Successful then reset
-    const { reset, formState: { isSubmitSuccessful } } = form;
+    const { reset, handleSubmit, formState: { isSubmitSuccessful } } = form;
 
     // 4. Trigger reset when submission succeeds
     useEffect(() => {
@@ -48,6 +49,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
     }, [isSubmitSuccessful, reset]);
 
     function onSubmit(data: z.infer<typeof shippingAddressSchema>) {
+
         startTransition(async () => {
             const res = await updateUserAddress(data);
 
@@ -56,10 +58,11 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
                     <code>{res.message}</code>
                 </pre>);
             }
-                return;
+            return;
         });
-        router.push('/payment-method')
+        router.push('/payment-method');
     }
+
     return (
         <Card className="w-full sm:max-w-md  mx-auto ">
             <CardHeader>
@@ -70,7 +73,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
             </CardHeader>
 
             <CardContent>
-                <form method="post" onSubmit={form.handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <FieldGroup>
                         <Controller
                             name="fullName"
@@ -148,13 +151,13 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
                             )}
                         />
 
-                             {/* button */}
+                        {/* button */}
                         <Field orientation="responsive">
-                            <Button type="submit" disabled={isPending} form="form-rhf-demo" >
+                            <Button type="submit" disabled={isPending} >
                                 {isPending ? (
                                     <Loader className="w-4 h-4 animate-spin" />
                                 ) : (
-                                    <ArrowRight w-4 h-4 />
+                                    <ArrowRight className="w-4 h-4" />
                                 )} Continue
                             </Button>
                         </Field>
