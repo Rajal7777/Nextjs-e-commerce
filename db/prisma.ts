@@ -7,7 +7,13 @@ import ws from "ws"; // WebSocket support package
 // Choose adapter: prefer Neon when NEON env var is set, otherwise use Postgres adapter.
 const connectionString = process.env.DATABASE_URL;
 
-let adapter: any;
+if (!connectionString) {
+  throw new Error("DATABASE_URL is missing");
+}
+
+type PrismaAdapter = PrismaPg | PrismaNeon;
+let adapter: PrismaAdapter;
+
 if (process.env.NEON === "1" || process.env.NEON === "true") {
   neonConfig.webSocketConstructor = ws;
   adapter = new PrismaNeon({ connectionString });
@@ -21,13 +27,20 @@ function createPrismaClient() {
     result: {
       product: {
         price: {
-          compute({ price }) {
-            return price.toString();
+          needs: {
+            price: true,
+          },
+          compute(product) {
+            return product.price.toString();
           },
         },
+
         rating: {
-          compute({ rating }) {
-            return rating.toString();
+          needs: {
+            rating: true,
+          },
+          compute(product) {
+            return product.rating.toString();
           },
         },
       },
@@ -62,13 +75,43 @@ function createPrismaClient() {
         },
       },
 
+      order: {
+        itemsPrice: {
+          needs: { itemsPrice: true },
+          compute(order) {
+            return order.itemsPrice.toString();
+          },
+        },
+
+        shippingPrice: {
+          needs: { shippingPrice: true },
+          compute(order) {
+            return order.shippingPrice.toString();
+          },
+        },
+
+        taxPrice: {
+          needs: { taxPrice: true },
+          compute(order) {
+            return order.taxPrice.toString();
+          },
+        },
+
+        totalPrice: {
+          needs: { totalPrice: true },
+          compute(order) {
+            return order.totalPrice.toString();
+          },
+        },
+      },
+
       orderItem: {
         price: {
-          compute(cart){
-            return cart.price.toString()
-          }
-        }
-      }
+          compute(orderItem) {
+            return orderItem.price.toString();
+          },
+        },
+      },
     },
   });
 }
