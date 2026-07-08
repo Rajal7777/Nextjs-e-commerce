@@ -5,7 +5,7 @@ import { APP_NAME } from "@/lib/constants";
 
 const Navbar = () => {
   return (
-    <nav className="w-full border-b">
+    <nav className="w-full border-b h-20">
       <div className="wrapper flex-between">
         <div className="flex-start ">
           <Link href="/" className="flex-start">

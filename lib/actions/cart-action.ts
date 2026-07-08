@@ -15,8 +15,8 @@ const calcPrice = (items: CartItem[]) => {
   const itemsPrice = roundDecimal(
     items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0),
   );
- console.log("items", itemsPrice)
-  const shippingPrice = roundDecimal(itemsPrice >= 1000 ? 0 : 100);
+  console.log("items", itemsPrice);
+  const shippingPrice = roundDecimal(itemsPrice >= 1000 ? 100 : 0);
   const taxPrice = roundDecimal(0.15 * itemsPrice);
   const totalPrice = roundDecimal(itemsPrice + taxPrice + shippingPrice);
 
@@ -158,7 +158,7 @@ export async function removeItemsFromCart(data: CartItem) {
 
     // Check if item exists in cart
     const existingItem = cart.items.find(
-      (cartItem) => cartItem.productId === item.productId
+      (cartItem) => cartItem.productId === item.productId,
     );
 
     if (!existingItem) {
@@ -167,7 +167,7 @@ export async function removeItemsFromCart(data: CartItem) {
 
     // Remove the item completely
     cart.items = cart.items.filter(
-      (cartItem) => cartItem.productId !== item.productId
+      (cartItem) => cartItem.productId !== item.productId,
     );
 
     // Update database

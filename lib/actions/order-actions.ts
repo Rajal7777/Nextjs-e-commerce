@@ -11,7 +11,7 @@ import { CartItem } from "@/types";
 
 //Create order and create order items
 export async function createOrder() {
-  console.log('createorder funciton')
+  console.log("createorder funciton");
   try {
     const session = await auth();
     if (!session) throw new Error("User is not authenticated");
@@ -87,13 +87,13 @@ export async function createOrder() {
         },
       });
 
-     return insertedOrder.id;
+      return insertedOrder.id;
     });
 
     //incase some thing went wrong throw error instead of continue with invalid data
     if (!insertOrderId) throw new Error("Order not found");
 
-    console.log('insertOrderId',insertOrderId);
+    console.log("insertOrderId", insertOrderId);
     return {
       success: true,
       message: "Order created",
@@ -104,4 +104,17 @@ export async function createOrder() {
     if (isRedirectError(error)) throw error;
     return { success: false, message: formatError(error) };
   }
+}
+
+//Get order by id
+export async function getOrderById(orderId: string) {
+  const data = await prisma.order.findFirst({
+    where: { id: orderId },
+    include: {
+      orderItems: true,
+      user: { select: { name: true , email: true }},
+    },
+  });
+
+  return data;
 }

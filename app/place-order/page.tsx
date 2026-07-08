@@ -130,7 +130,7 @@ const PlaceOrderPage = async () => {
                                     
                                <div className="flex-between">
                                     <div>Shipping-Price</div>
-                                    <div className="px-4 bg-red-400">{formatCurrency(cart.shippingPrice)}</div>
+                                    <div className="px-4 rounded-md bg-red-400">{formatCurrency(cart.shippingPrice)}</div>
                                 </div>
                        
 

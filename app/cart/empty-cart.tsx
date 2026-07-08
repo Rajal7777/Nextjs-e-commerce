@@ -15,8 +15,8 @@ const EmptyCart = () => {
                 </h2>
 
                 <p className="mt-2 text-sm text-muted-foreground">
-                    Looks like you haven&apos;t added anything to your cart yet.
-                    Discover our products and find something you&apos;ll love.
+                    Looks like you haven&apos;t added anything to your cart yet. <br />
+                    Go to shopping page.
                 </p>
 
                 <Button asChild className="mt-8 w-full">

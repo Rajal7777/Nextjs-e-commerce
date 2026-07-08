@@ -27,7 +27,6 @@ const CartTable = ({ cart }: { cart?: Cart; }) => {
 
   return (
     <>
-      <h1 className="py-4 h2-bold">Shopping Cart</h1>
       {!cart || cart.items.length === 0 ? (
         <EmptyCart />
       ) : (
