@@ -35,19 +35,27 @@ export const paypal = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorizaion: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
-    handleResponse(response);
+    return handleResponse(response);
   },
 };
 
 //Generate paypal access token so that paypal will check the  access token{userID:secret}and return the bearer token
 async function generateAccessToken() {
-  const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET } = process.env;
+  const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET, PAYPAL_CLIENT_SECRET } =
+    process.env;
+  const clientSecret = PAYPAL_APP_SECRET ?? PAYPAL_CLIENT_SECRET;
 
-  const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_APP_SECRET}`).toString(
+  if (!PAYPAL_CLIENT_ID || !clientSecret) {
+    throw new Error(
+      "Missing PayPal credentials. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET or PAYPAL_APP_SECRET.",
+    );
+  }
+
+  const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${clientSecret}`).toString(
     "base64",
   );
 

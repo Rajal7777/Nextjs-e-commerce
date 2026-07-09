@@ -18,7 +18,9 @@ const OrderDetailsPage = async ({params}: {params: Promise<{id: string}>}) => {
     <OrderDetailsTable order={{
         ...order,
         shippingAddress: order.shippingAddress as ShippingAddress,
-    }} />
+       }}
+       paypalClientId={process.env.PAYPAL_CLIENT_ID || 'sb'}
+        />
      );
 }
  
