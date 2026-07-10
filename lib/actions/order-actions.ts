@@ -10,6 +10,7 @@ import { prisma } from "@/db/prisma";
 import { CartItem, PaymentResult } from "@/types";
 import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
+import { PAGE_SIZE } from "../constants";
 
 //Create order and create order items
 export async function createOrder() {
@@ -185,15 +186,16 @@ export async function approvePayPalOrder(
     }
 
     //Update order to paid
-     await updateOrderToPaid({
+    await updateOrderToPaid({
       orderId,
       paymentResult: {
         id: captureData.id,
         status: captureData.status,
         email_address: captureData.payer.email_address,
-        pricePaid: captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value,
-      }
-    })
+        pricePaid:
+          captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value,
+      },
+    });
 
     revalidatePath(`/order/${orderId}`);
 
@@ -205,7 +207,6 @@ export async function approvePayPalOrder(
     return { success: false, message: formatError(error) };
   }
 }
-
 
 //Update order to paid
 async function updateOrderToPaid({
@@ -239,24 +240,53 @@ async function updateOrderToPaid({
 
     //Set the order to paid
     await tx.order.update({
-      where: { id: orderId},
+      where: { id: orderId },
       data: {
         isPaid: true,
         paidAt: new Date(),
         paymentMethod: order.paymentMethod,
         paymentResult,
-      }
-    })
+      },
+    });
   });
 
   //Get updated order after transaction
   const updatedOrder = await prisma.order.findFirst({
-    where: {id: orderId},
+    where: { id: orderId },
     include: {
       orderItems: true,
-      user: {select: { name: true, email: true}}
-    }
-  })
+      user: { select: { name: true, email: true } },
+    },
+  });
 
-  if(!updatedOrder) throw new Error('Order not Found')
+  if (!updatedOrder) throw new Error("Order not Found");
+}
+
+//Get user's orders
+export async function getMyOrders({
+  limit = PAGE_SIZE,
+  page,
+}: {
+  limit?: number;
+  page: number;
+}) {
+  const session = await auth();
+
+  if (!session) throw new Error("User is not Authorized");
+
+  const data = await prisma.order.findMany({
+    where: { userId: session?.user?.id },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    skip: (page - 1) * limit,
+  });
+
+  const dataCount = await prisma.order.count({
+    where: { userId: session?.user?.id },
+  });
+
+  return {
+    data,
+    totalPages: Math.ceil(dataCount / limit),  //reoound up to closest decimal
+  };
 }
