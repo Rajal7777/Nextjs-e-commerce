@@ -78,7 +78,7 @@ const OrderDetailsTable = ({ order, paypalClientId }: { order: Order; paypalClie
   return (
     <>
       <div className="grid gap-4 md:grid-cols-3 md:gap-5">
-        <div className="col-span-2 space-y-4 overflow-x-auto">
+        <div className=" col-span-1 md:col-span-2 space-y-4 overflow-x-auto">
           <Card className="border">
             <CardHeader>
               <CardTitle className="text-xl pb-4">Payment Method</CardTitle>

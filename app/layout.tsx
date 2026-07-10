@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
-import { cn } from "@/lib/utils";
-import Navbar from "@/components/shared/header";
-import Footer from "@/components/Footer";
-import { ThemeProvider } from "@/components/provider/ThemeProvider";
-import { Toaster } from "@/components/ui/sonner";
+import './globals.css';
 import { APP_NAME, SERVER_URL } from "@/lib/constants";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,39 +15,16 @@ export const metadata: Metadata = {
   metadataBase: new URL(SERVER_URL),
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={cn("h-full", "antialiased", inter.className, "font-sans")}
-    >
-      <body className="h-screen flex flex-col ">
-        <ThemeProvider
-          attribute="class"
-          enableSystem
-          defaultTheme="system"
-          disableTransitionOnChange
-        >
-          <Navbar />
-          <main className="wrapper flex-1">{children}</main>
-          <Footer />
-          <Toaster
-            toastOptions={{
-              unstyled: true,
-              classNames: {
-                toast:
-                  "bg-background border border-border p-4 rounded-lg flex items-center gap-2",
-                success: "text-green-600",
-                error: "text-destructive",
-              },
-            }}
-          />
-        </ThemeProvider>
+    <html lang="en">
+      <body className={`${inter.className} antialiased`}>
+        {children}
       </body>
     </html>
   );
