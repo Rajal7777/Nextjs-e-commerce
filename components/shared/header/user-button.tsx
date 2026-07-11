@@ -20,7 +20,7 @@ const UserButton = async () => {
         );
     }
 
-    //?? means if every thing in the left is null || undefine then use 'U'
+    //?? means if every thing in the left is null || undefine then use right side value
     const firstInitial = session.user?.name?.charAt(0).toUpperCase() ?? 'Z';
 
     return (

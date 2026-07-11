@@ -7,8 +7,7 @@ export default function UserLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <>
-      <div className="w-full flex flex-col">
+   <div className="w-full flex flex-col">
         <div className="h-20 border-b wrapper mx-auto">
           <div className="flex items-center h-16 px-4">
             <Link href="/" className="w-22">
@@ -31,6 +30,5 @@ export default function UserLayout({
 
         <div className="wrapper flex-1">{children}</div>
       </div>
-    </>
   );
 }

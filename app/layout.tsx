@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import './globals.css';
+import "./globals.css";
 import { APP_NAME, SERVER_URL } from "@/lib/constants";
-
+import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/components/provider/ThemeProvider";
+import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,16 +17,26 @@ export const metadata: Metadata = {
   metadataBase: new URL(SERVER_URL),
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={cn("h-full", "antialiased", inter.className, "font-sans")}
+    >
       <body className={`${inter.className} antialiased`}>
-        {children}
+        <ThemeProvider
+          attribute="class"
+          enableSystem
+          defaultTheme="system"
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
