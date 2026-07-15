@@ -7,13 +7,10 @@ import { signUpUser } from "@/lib/actions/user.actions";
 import { useSearchParams } from "next/navigation";
 import { signUpDefaultValues } from "@/lib/utils";
 
-const initialState = {
-  success: false,
-  message: "",
-};
+
 
 const SignUpForm = () => {
-  const [data, action, pending] = useActionState(signUpUser, initialState);
+  const [data, action, pending] = useActionState(signUpUser, signUpDefaultValues);
 
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
