@@ -33,9 +33,9 @@ export async function signInWithCredentials(
     //const [state] = useActionState(...)  here my state expects a success and message
     return { success: true, message: "Signed in successfully" };
   } catch (error) {
-    //after successful login{login redirect dashboard} nextjs throws a special errors after redirect so we tell next js that is not a real error continue redirect
+    //redirect() works by throwing a secret error.try...catch accidentally traps that secret error.throw error forwards the secret error back to Next.js so the page transition actually happens
     if (isRedirectError(error)) {
-      throw error;
+      throw error; // rethrow error
     }
 
     return { success: false, message: "Invalid email or password" };
@@ -52,7 +52,6 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       confirmPassword: formData.get("confirmPassword"),
     });
 
-    console.log("user", user);
     //Plain password before hashed
     const plainPassword = user.password;
 
@@ -68,7 +67,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       },
     });
 
-    //Sign in user to home page
+    //Sign in user to home page after sign up
     await signIn("credentials", {
       email: user.email,
       password: plainPassword,
@@ -76,7 +75,6 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
     return { success: true, message: "Signed in successufully!" };
   } catch (error) {
-    //case error thrown my next we move on to actual error
     if (isRedirectError(error)) {
       throw error;
     }
@@ -145,7 +143,7 @@ export async function updateUserPaymentMethod(
     });
 
     if (!currentUser) throw new Error("User not found");
- 
+
     //run time validation of payment type via zod
     const paymentMethod = paymentMethodSchema.parse(data);
 
@@ -158,6 +156,25 @@ export async function updateUserPaymentMethod(
       success: true,
       message: "User updated successfully",
     };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+//Update user profile
+export async function updateProfile(user: { name: string; email: string }) {
+  try {
+    const session = await auth();
+
+    const currentUser = await prisma.user.findFirst({
+      where: { id: session?.user?.id },
+    });
+    if (!currentUser) throw new Error("User not found");
+
+    await prisma.user.update({
+      where: { id: currentUser.id },
+      data: { name: user.name },
+    });
   } catch (error) {
     return { success: false, message: formatError(error) };
   }

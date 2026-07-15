@@ -14,8 +14,7 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    console.log('urlParamName', urlParamName);
-
+   
     const pageNumber = Number(page);
     const currentPage = Number.isFinite(pageNumber) && pageNumber > 0 ? pageNumber : 1;
 
