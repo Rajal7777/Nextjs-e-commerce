@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,10 +18,14 @@ import { useEffect, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
+
 
 const ProfileForm = () => {
     const { data: session, update } = useSession();
     const [isPending, startTransition] = useTransition();
+
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof updateProfileSchema>>({
         resolver: zodResolver(updateProfileSchema),
@@ -33,6 +37,7 @@ const ProfileForm = () => {
 
     const { handleSubmit, reset } = form;
 
+    //session may not be loaded at first render name & email might be empty
     useEffect(() => {
         reset({
             name: session?.user?.name ?? "",
@@ -42,13 +47,13 @@ const ProfileForm = () => {
 
     function onSubmit(data: z.infer<typeof updateProfileSchema>) {
         startTransition(async () => {
-            const result = await updateProfile({
-                name: data.name,
-                email: data.email,
-            });
+            const result = await updateProfile(data);
 
             if (!result?.success) {
-                toast.error(result?.message ?? "Unable to update profile");
+                console.log('inside btn');
+                <Button
+                    onClick={() => toast(result.message)}
+                ></Button>;
                 return;
             }
 
@@ -56,7 +61,13 @@ const ProfileForm = () => {
                 name: data.name,
                 email: data.email,
             });
-            toast.success("Profile updated successfully");
+            router.refresh();
+            <Button
+                variant="outline"
+                onClick={() => toast.success(result.message)}
+            >
+
+            </Button>;
         });
     }
 
@@ -66,6 +77,7 @@ const ProfileForm = () => {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <FieldGroup>
                         <p>{session?.user?.email}</p>
+
                         <Controller
                             control={form.control}
                             name="name"
@@ -80,29 +92,13 @@ const ProfileForm = () => {
                                 </Field>
                             )}
                         />
-{/* 
-                        <Controller
-                            control={form.control}
-                            name="email"
-                            render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="email">Email</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id="email"
-                                        disabled
-                                        placeholder="Enter your email"
-                                    />
-
-                                    {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]} />
-                                    )}
-                                </Field>
-                            )}
-                        /> */}
 
                         <Button type="submit" disabled={isPending}>
-                            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+                            {isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                "Save"
+                            )}
                         </Button>
                     </FieldGroup>
                 </form>

@@ -66,18 +66,15 @@ export const config = {
   callbacks: {
     async session({ session, user, trigger, token }: any) {
       //Set the user ID from the token
-      session.user.id = token.sub;
+      session.user.id = token.id;
       session.user.role = token.role;
       session.user.name = token.name;
 
-      //If there is an update, set the user name
-      if (trigger === "update") {
-        session.user.name = user.name;
-      }
-
       return session;
     },
-    async jwt({ token, user, trigger}: any) {
+    async jwt({ token, user, trigger, session }: any) {
+      console.log("JWT callback");
+
       //Add extra field to token
       if (user) {
         token.id = user.id;
@@ -119,6 +116,18 @@ export const config = {
           }
         }
       }
+
+      // Handle session updates {user name}
+      if (trigger === "update") {
+        if (session?.name) {
+          token.name = session.name;
+        }
+
+        if (session?.email) {
+          token.email = session.email;
+        }
+      }
+      console.log({ trigger, session, token, user });
       return token;
     },
     authorized({ request }: any) {
@@ -137,7 +146,8 @@ export const config = {
       const { pathname } = request.nextUrl;
 
       //check if user is authenticated
-      if (!auth && protectedPaths.some((path) => path.test(pathname))) return false;
+      if (!auth && protectedPaths.some((path) => path.test(pathname)))
+        return false;
 
       if (!request.cookies.get("sessionCartId")) {
         const response = NextResponse.next();
@@ -156,4 +166,4 @@ export const config = {
   },
 };
 
-export const { auth, signIn, signOut } = NextAuth(config);
+export const { auth, signIn, signOut, handlers } = NextAuth(config);

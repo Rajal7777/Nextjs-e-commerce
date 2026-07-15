@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 
 const UserProfile = async () => {
     const session = await auth();
+  
 
     //SessionProvider is required to pass session to client component
     return (

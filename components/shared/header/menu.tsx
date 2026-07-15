@@ -6,7 +6,9 @@ import Link from "next/link";
 import UserButton from "./user-button";
 
 //SideBar menu in md screen
-const Menu = () => {
+const Menu = async () => {
+    
+
     return (
         <div className="flex justify-end gap-3">
             <nav className="hidden md:flex w-full max-w-xs gap-1">
@@ -36,9 +38,8 @@ const Menu = () => {
                                 <ShoppingCart /> cart
                             </Link>
                         </Button>
-
-                        <UserButton />
-                    </SheetContent>
+                            <UserButton />
+                   </SheetContent>
                 </Sheet>
             </nav>
         </div>
