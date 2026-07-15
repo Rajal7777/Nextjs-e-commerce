@@ -263,41 +263,6 @@ async function updateOrderToPaid({
 }
 
 //Get user's orders
-/*
-export async function getMyOrders({
-  limit = PAGE_SIZE,
-  page,
-}: {
-  limit?: number;
-  page: number;
-}) {
-  const session = await auth();
-
-  if (!session) throw new Error("User is not Authorized");
-
-  const safeLimit = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : PAGE_SIZE;
-  const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
-  const skip = (safePage - 1) * safeLimit;
-
-  const data = await prisma.order.findMany({
-    where: { userId: session?.user?.id },
-    orderBy: { createdAt: "desc" },
-    take: safeLimit,
-    skip,
-  });
-
-  const dataCount = await prisma.order.count({
-    where: { userId: session?.user?.id },
-  });
-
-  return {
-    data,
-    totalPages: Math.max(1, Math.ceil(dataCount / safeLimit)),
-  };
-}
-*/
-
-//Get user's orders
 export async function getMyOrders({
   limit = PAGE_SIZE,
   page = 1,

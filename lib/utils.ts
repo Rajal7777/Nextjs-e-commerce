@@ -147,27 +147,36 @@ export function formUrlQuery({
   key: string;
   value: string | null;
 }) {
-  const parsedQuery = qs.parse(params) as Record<
+  const query = qs.parse(params) as Record<
     string,
     string | string[] | null | undefined
   >;
-  const normalizedValue = value && value !== "NaN" ? value : null;
 
-  const newQuery = Object.fromEntries(
-    Object.entries({
-      ...parsedQuery,
-      [key]: normalizedValue,
-    }).filter(
-      ([, entryValue]) =>
-        entryValue !== null &&
-        entryValue !== undefined &&
-        entryValue !== "" &&
-        entryValue !== "NaN",
-    ),
+  // Don't keep invalid values
+  const validValue = value && value !== "NaN" ? value : null;
+
+  // Update the query
+  query[key] = validValue;
+
+  // Remove empty values
+  for (const key in query) {
+    if (
+      query[key] === null ||
+      query[key] === undefined ||
+      query[key] === "" ||
+      query[key] === "NaN"
+    ) {
+      delete query[key];
+    }
+  }
+
+  return qs.stringifyUrl(
+    {
+      url: window.location.pathname,
+      query,
+    },
+    {
+      skipNull: true,
+    },
   );
-
-  return qs.stringifyUrl({
-    url: window.location.pathname,
-    query: newQuery,
-  });
 }
