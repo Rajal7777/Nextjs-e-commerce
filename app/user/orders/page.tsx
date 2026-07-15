@@ -1,3 +1,4 @@
+import Pagination from "@/components/shared/pagintaion";
 import {
   Table,
   TableBody,
@@ -15,19 +16,21 @@ export const metadata: Metadata = {
   title: "Customer orders",
 };
 
-//props.searchParams hunxa ra serachParams obj vitra {page= '2'} destructuring matra garya ho
+
 const OrdersPage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ page: string }>;
+  searchParams: Promise<{ page?: string; }>;
 }) => {
   const { page } = await searchParams;
+  const pageNumber = Number(page);
+
+  const currentPage = pageNumber > 0 ? pageNumber : 1;
 
   const orders = await getMyOrders({
-    page: Number(page) || 1,
+    page: currentPage,
   });
 
-  console.log(orders);
   return (
     <div className="space-y-2">
       <h2 className="h2-bold">Order Details</h2>
@@ -59,19 +62,24 @@ const OrdersPage = async ({
                     : "Not Paid"}
                 </TableCell>
                 <TableCell>
-                    {order.isDelivered 
+                  {order.isDelivered
                     ? 'order Delivered'
                     : "Not Delivered"}
                 </TableCell>
                 <TableCell>
-                    <Link href={`/order/${order.id}`}>
+                  <Link href={`/order/${order.id}`}>
                     <span className="px-2">Order-Details</span>
-                    </Link>
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+
+        {/* Pagination btn */}
+        {orders.totalPages > 1 && (
+          <Pagination page={currentPage} totalPages={orders.totalPages} />
+        )}
       </div>
     </div>
   );

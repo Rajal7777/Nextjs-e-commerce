@@ -263,6 +263,7 @@ async function updateOrderToPaid({
 }
 
 //Get user's orders
+/*
 export async function getMyOrders({
   limit = PAGE_SIZE,
   page,
@@ -274,11 +275,15 @@ export async function getMyOrders({
 
   if (!session) throw new Error("User is not Authorized");
 
+  const safeLimit = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : PAGE_SIZE;
+  const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+  const skip = (safePage - 1) * safeLimit;
+
   const data = await prisma.order.findMany({
     where: { userId: session?.user?.id },
     orderBy: { createdAt: "desc" },
-    take: limit,
-    skip: (page - 1) * limit,
+    take: safeLimit,
+    skip,
   });
 
   const dataCount = await prisma.order.count({
@@ -287,6 +292,42 @@ export async function getMyOrders({
 
   return {
     data,
-    totalPages: Math.ceil(dataCount / limit),  //reoound up to closest decimal
+    totalPages: Math.max(1, Math.ceil(dataCount / safeLimit)),
+  };
+}
+*/
+
+//Get user's orders
+export async function getMyOrders({
+  limit = PAGE_SIZE,
+  page = 1,
+}: {
+  limit?: number;
+  page?: number;
+}) {
+  const session = await auth();
+
+  if (!session) {
+    throw new Error("User is not authorized");
+  }
+
+  const skip = (page - 1) * limit;
+
+  const [orders, totalCount] = await Promise.all([
+    prisma.order.findMany({
+      where: { userId: session?.user?.id },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      skip,
+    }),
+    prisma.order.count({
+      where: { userId: session?.user?.id },
+    }),
+  ]);
+
+ 
+  return {
+    data: orders,
+    totalPages: Math.ceil(totalCount / limit),
   };
 }

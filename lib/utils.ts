@@ -2,18 +2,26 @@ import { ZodError } from "zod";
 
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import qs from "query-string";
 
 //Format error message for zod validation errors & prisma error
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function formatError(error: any) {
+export function formatError(error: unknown) {
   //handle zod validation error
   if (error instanceof ZodError) {
     return error.issues.map((issue) => issue.message).join(". ");
   }
 
   //Prisma error handling(email already exists)
-  if (typeof error === "object" && error !== null && "code" in error) {
-    const prismaError = error as any;
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof (error as { code?: unknown }).code === "string"
+  ) {
+    const prismaError = error as {
+      code?: string;
+      meta?: { target?: string | string[] };
+    };
 
     if (prismaError.code === "P2002") {
       const target = prismaError.meta?.target;
@@ -33,7 +41,12 @@ export function formatError(error: any) {
     return error;
   }
 
-  return JSON.stringify(error?.message ?? error);
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    return typeof message === "string" ? message : JSON.stringify(error);
+  }
+
+  return JSON.stringify(error);
 }
 
 export function cn(...inputs: ClassValue[]) {
@@ -79,44 +92,43 @@ export function formatCurrency(amount: number | string | null) {
   }
 }
 
-
 //Shorten UUid
-export function formatId(id: string){
-  return `..${id.substring(id.length - 6)}`
+export function formatId(id: string) {
+  return `..${id.substring(id.length - 6)}`;
 }
 
 //Format date and times
 export const formatDateTime = (dateString: Date) => {
   const dateTimeOptions: Intl.DateTimeFormatOptions = {
-    month: 'short', // abbreviated month name (e.g., 'Oct')
-    year: 'numeric', // abbreviated year name (e.g., '25')
-    day: 'numeric', // numeric day of the month (e.g., '25')
-    hour: 'numeric', // numeric hour (e.g., '8')
-    minute: 'numeric', // numeric minute (e.g., '30')
+    month: "short", // abbreviated month name (e.g., 'Oct')
+    year: "numeric", // abbreviated year name (e.g., '25')
+    day: "numeric", // numeric day of the month (e.g., '25')
+    hour: "numeric", // numeric hour (e.g., '8')
+    minute: "numeric", // numeric minute (e.g., '30')
     hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
   };
   const dateOptions: Intl.DateTimeFormatOptions = {
-    weekday: 'short', // abbreviated weekday name (e.g., 'Mon')
-    month: 'short', // abbreviated month name (e.g., 'Oct')
-    year: 'numeric', // numeric year (e.g., '2023')
-    day: 'numeric', // numeric day of the month (e.g., '25')
+    weekday: "short", // abbreviated weekday name (e.g., 'Mon')
+    month: "short", // abbreviated month name (e.g., 'Oct')
+    year: "numeric", // numeric year (e.g., '2023')
+    day: "numeric", // numeric day of the month (e.g., '25')
   };
   const timeOptions: Intl.DateTimeFormatOptions = {
-    hour: 'numeric', // numeric hour (e.g., '8')
-    minute: 'numeric', // numeric minute (e.g., '30')
+    hour: "numeric", // numeric hour (e.g., '8')
+    minute: "numeric", // numeric minute (e.g., '30')
     hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
   };
   const formattedDateTime: string = new Date(dateString).toLocaleString(
-    'en-US',
-    dateTimeOptions
+    "en-US",
+    dateTimeOptions,
   );
   const formattedDate: string = new Date(dateString).toLocaleString(
-    'en-US',
-    dateOptions
+    "en-US",
+    dateOptions,
   );
   const formattedTime: string = new Date(dateString).toLocaleString(
-    'en-US',
-    timeOptions
+    "en-US",
+    timeOptions,
   );
   return {
     dateTime: formattedDateTime,
@@ -124,3 +136,38 @@ export const formatDateTime = (dateString: Date) => {
     timeOnly: formattedTime,
   };
 };
+
+//Form the pagination links
+export function formUrlQuery({
+  params,
+  key,
+  value,
+}: {
+  params: string;
+  key: string;
+  value: string | null;
+}) {
+  const parsedQuery = qs.parse(params) as Record<
+    string,
+    string | string[] | null | undefined
+  >;
+  const normalizedValue = value && value !== "NaN" ? value : null;
+
+  const newQuery = Object.fromEntries(
+    Object.entries({
+      ...parsedQuery,
+      [key]: normalizedValue,
+    }).filter(
+      ([, entryValue]) =>
+        entryValue !== null &&
+        entryValue !== undefined &&
+        entryValue !== "" &&
+        entryValue !== "NaN",
+    ),
+  );
+
+  return qs.stringifyUrl({
+    url: window.location.pathname,
+    query: newQuery,
+  });
+}
