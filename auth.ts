@@ -145,7 +145,7 @@ export const config = {
           token.email = updateSession.email;
         }
       }
-      console.log({ trigger, session, token, user });
+    
       return token;
     },
     authorized({

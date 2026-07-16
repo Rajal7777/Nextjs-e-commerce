@@ -308,7 +308,7 @@ export async function getOrderSummary() {
   //Get counts foreach resource
   const ordersCount = await prisma.order.count();
   const productsCount = await prisma.product.count();
-  const UsersCount = await prisma.user.count();
+  const usersCount = await prisma.user.count();
 
   //Calculate the total sales
   const totalSales = await prisma.order.aggregate({
@@ -338,7 +338,7 @@ export async function getOrderSummary() {
   return {
     ordersCount,
     productsCount,
-    UsersCount,
+    usersCount,
     totalSales,
     latestSales,
     salesData,
