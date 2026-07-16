@@ -1,17 +1,27 @@
-//PrismaAdapter is bridge auth logic and database:
+//PrismaAdapter is bridge auth logic and prisma{database}:
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
+import  { NextRequest } from "next/server";
+
 
 import { prisma } from "./db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials"; //determine how user logIn eg:- github,email
-import { compareSync } from "bcryptjs";
+import { compare } from "bcryptjs";
 import { cookies } from "next/headers";
+import type { Session, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
+
+//type for useSession()
+// type UpdateSession = {
+//   name?: string;
+//   email?: string;
+// };
 
 export const config = {
   pages: {
     signIn: "/sign-in",
-    error: "/sign-in",
+    error: "/error",
   },
   session: {
     strategy: "jwt" as const,
@@ -31,7 +41,7 @@ export const config = {
         if (credentials == null) return null;
 
         //Find user in database
-        const user = await prisma.user.findFirst({
+        const user = await prisma.user.findUnique({
           where: {
             email: credentials.email as string,
           },
@@ -39,7 +49,7 @@ export const config = {
 
         //Check if user exists and if the password matches
         if (user && user.password) {
-          const isMatch = compareSync(
+          const isMatch = await compare(
             credentials.password as string,
             user.password,
           );
@@ -62,39 +72,42 @@ export const config = {
   ],
 
   //callbacks let you customize what Auth.js does at different stages
-  //modifies session and return it.
   callbacks: {
-    async session({ session, user, trigger, token }: any) {
+    //This callback runs whenever someone calls:useSession(),auth,getServerSession
+    async session({ session, token }: { session: Session; token: JWT }) {
       //Set the user ID from the token
       session.user.id = token.id;
       session.user.role = token.role;
       session.user.name = token.name;
+      session.user.email = token.email;
 
       return session;
     },
-    async jwt({ token, user, trigger, session }: any) {
-      console.log("JWT callback");
-
-      //Add extra field to token
+    async jwt({
+      token,
+      user,
+      trigger,
+      session,
+    }: {
+      token: JWT;
+      user?: User;
+      trigger: "signIn" | "signUp" | "update";
+      session: any;
+    }) {
+      //only runs once after the successful login
+      //sotring extra data to jwt token
       if (user) {
         token.id = user.id;
         token.role = user.role;
 
         //use Email name incase no name is set
-        if (user.name === "NO_NAME") {
+        if (user.name === "NO_NAME" && user.email) {
           token.name = user.email.split("@")[0];
         }
-
-        //reflect update to db
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { name: token.name },
-        });
       }
 
-      if (trigger === "signIn" || trigger === "signUp") {
+      if ((trigger === "signIn" || trigger === "signUp") && user) {
         const cookiesObject = await cookies();
-        console.log("cookiesObject", cookiesObject);
         const sessionCartId = cookiesObject.get("sessionCartId")?.value;
 
         if (sessionCartId) {
@@ -102,8 +115,8 @@ export const config = {
             where: { sessionCartId },
           });
 
+          //Delete current user cart
           if (sessionCart) {
-            //Delete current user cart
             await prisma.cart.deleteMany({
               where: { userId: user.id },
             });
@@ -119,18 +132,29 @@ export const config = {
 
       // Handle session updates {user name}
       if (trigger === "update") {
-        if (session?.name) {
-          token.name = session.name;
+        const updateSession = session as {
+          name?: string;
+          email?: string;
+        };
+
+        if (updateSession.name) {
+          token.name = updateSession.name;
         }
 
-        if (session?.email) {
-          token.email = session.email;
+        if (updateSession.email) {
+          token.email = updateSession.email;
         }
       }
       console.log({ trigger, session, token, user });
       return token;
     },
-    authorized({ request }: any) {
+    authorized({
+      auth,
+      request,
+    }: {
+      auth: Session | null;
+      request: NextRequest;
+    }) {
       //Array of regex patterns for path protected
       const protectedPaths = [
         /\/shipping-address/,
@@ -145,7 +169,7 @@ export const config = {
       //Get pathname from the req URL obj
       const { pathname } = request.nextUrl;
 
-      //check if user is authenticated
+      //if user is not authenticated and check if user trying to access the protected path then return
       if (!auth && protectedPaths.some((path) => path.test(pathname)))
         return false;
 

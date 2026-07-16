@@ -23,6 +23,8 @@ import { useRouter } from "next/navigation";
 
 const ProfileForm = () => {
     const { data: session, update } = useSession();
+    //same as isLoading state upadte takes certain time so
+    //tells react this part is not urgent keep the ui responsive
     const [isPending, startTransition] = useTransition();
 
     const router = useRouter();
@@ -37,7 +39,7 @@ const ProfileForm = () => {
 
     const { handleSubmit, reset } = form;
 
-    //session may not be loaded at first render name & email might be empty
+    //session may not be loaded at first render name & email might be empty{undefined}
     useEffect(() => {
         reset({
             name: session?.user?.name ?? "",
@@ -49,11 +51,12 @@ const ProfileForm = () => {
         startTransition(async () => {
             const result = await updateProfile(data);
 
-            if (!result?.success) {
-                console.log('inside btn');
-                <Button
-                    onClick={() => toast(result.message)}
-                ></Button>;
+            if (!result.success) {
+                toast.error(
+                    <pre className="mt-2 w-[320px] overflow-x-auto rounded-md p-4 bg-card text-card-foreground">
+                        <code>{result.message}</code>
+                    </pre>,
+                );
                 return;
             }
 
@@ -62,12 +65,7 @@ const ProfileForm = () => {
                 email: data.email,
             });
             router.refresh();
-            <Button
-                variant="outline"
-                onClick={() => toast.success(result.message)}
-            >
-
-            </Button>;
+          toast.success(result.message)
         });
     }
 

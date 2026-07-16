@@ -4,7 +4,8 @@ import "./globals.css";
 import { APP_NAME, SERVER_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/provider/ThemeProvider";
-import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/sonner";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,6 +38,7 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );
