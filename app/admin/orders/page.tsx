@@ -11,6 +11,7 @@ import { getMyOrders } from "@/lib/actions/order-actions";
 import { formatCurrency, formatDateTime, formatId } from "@/lib/utils";
 import { Metadata } from "next";
 import Link from "next/link";
+import { requireAdmin } from '@/lib/actions/auth-guard';
 
 export const metadata: Metadata = {
   title: "Customer orders",
@@ -22,6 +23,7 @@ const OrdersPage = async ({
 }: {
   searchParams: Promise<{ page?: string; }>;
 }) => {
+  await requireAdmin()
   const { page } = await searchParams;
   const pageNumber = Number(page);
 

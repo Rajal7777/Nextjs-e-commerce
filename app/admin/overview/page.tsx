@@ -10,21 +10,20 @@ import {
 } from "@/components/ui/table";
 import { getOrderSummary } from "@/lib/actions/order-actions";
 import { formatCurrency, formatDateTime, formatNumber } from "@/lib/utils";
-import {
-    BadgeDollarSign,
-    Barcode,
-    CreditCard,
-    Users,
-} from "lucide-react";
+import { BadgeDollarSign, Barcode, CreditCard, Users } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 import Charts from "./charts";
+import { requireAdmin } from '@/lib/actions/auth-guard';
 
 export const metadata: Metadata = {
     title: "Admin Dashboard",
 };
 
 const AdminOverViewPage = async () => {
+    //safe guard
+    await requireAdmin();
+
     const session = await auth();
 
     if (session?.user?.role !== "admin") {
@@ -95,9 +94,8 @@ const AdminOverViewPage = async () => {
                         <CardTitle>Overview</CardTitle>
                     </CardHeader>
                     <CardContent>
-                         <Charts data={{salesData: summary.salesData}}/>
+                        <Charts data={{ salesData: summary.salesData }} />
                     </CardContent>
-                   
                 </Card>
 
                 <Card className="col-span-3">
@@ -115,17 +113,15 @@ const AdminOverViewPage = async () => {
                             {summary.latestSales.map((order) => (
                                 <TableRow key={order.id}>
                                     <TableCell>
-                                        {order?.user?.name ? order.user.name : 'Deleted User'}
+                                        {order?.user?.name ? order.user.name : "Deleted User"}
                                     </TableCell>
                                     <TableCell>
                                         {formatDateTime(order.createdAt).dateOnly}
                                     </TableCell>
-                                    <TableCell>
-                                        {formatCurrency(order.totalPrice)}
-                                    </TableCell>
+                                    <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
                                     <TableCell>
                                         <Link href={`/order/${order.id}`}>
-                                        <span>Details</span>
+                                            <span>Details</span>
                                         </Link>
                                     </TableCell>
                                 </TableRow>
