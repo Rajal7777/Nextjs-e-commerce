@@ -1,6 +1,4 @@
-import { auth } from "@/auth";
 import Pagination from "@/components/shared/pagintaion";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -9,31 +7,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAllOrders } from "@/lib/actions/order-actions";
+import { getMyOrders } from "@/lib/actions/order-actions";
 import { formatCurrency, formatDateTime, formatId } from "@/lib/utils";
 import { Metadata } from "next";
 import Link from "next/link";
+import { requireAdmin } from '@/lib/actions/auth-guard';
 
 export const metadata: Metadata = {
-  title: "Admin orders",
+  title: "Customer orders",
 };
 
-const AdminOrdersPage = async (props: {
-  searchParams: Promise<{ page: string }>;
+
+const OrdersPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; }>;
 }) => {
-  const { page = 1 } = await props.searchParams;
+  await requireAdmin()
+  const { page } = await searchParams;
+  const pageNumber = Number(page);
 
-  const session = await auth();
+  const currentPage = pageNumber > 0 ? pageNumber : 1;
 
-  if (session?.user?.role !== "admin") {
-    throw new Error("User not authorized!");
-  }
-
-  const orders = await getAllOrders({
-    page: Number(page),
-    limit: 2,
+  const orders = await getMyOrders({
+    page: currentPage,
   });
-  console.log(orders);
+
   return (
     <div className="space-y-2">
       <h2 className="h2-bold">Order Details</h2>
@@ -65,12 +64,14 @@ const AdminOrdersPage = async (props: {
                     : "Not Paid"}
                 </TableCell>
                 <TableCell>
-                  {order.isDelivered ? "order Delivered" : "Not Delivered"}
+                  {order.isDelivered
+                    ? 'order Delivered'
+                    : "Not Delivered"}
                 </TableCell>
                 <TableCell>
-                  <Button asChild variant="outline" size='sm'>
-                    <Link href={`/order/${order.id}`}>order detail</Link>
-                  </Button>
+                  <Link href={`/order/${order.id}`}>
+                    <span className="px-2">Order-Details</span>
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}
@@ -79,11 +80,11 @@ const AdminOrdersPage = async (props: {
 
         {/* Pagination btn */}
         {orders.totalPages > 1 && (
-          <Pagination page={Number(page) || 1} totalPages={orders?.totalPages} />
+          <Pagination page={currentPage} totalPages={orders.totalPages} />
         )}
       </div>
     </div>
   );
 };
 
-export default AdminOrdersPage;
+export default OrdersPage;
