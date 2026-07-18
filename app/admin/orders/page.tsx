@@ -1,89 +1,91 @@
 import { auth } from "@/auth";
+import DeleteDialog from "@/components/shared/delete-dialog";
 import Pagination from "@/components/shared/pagintaion";
 import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
-import { getAllOrders } from "@/lib/actions/order-actions";
+import { getAllOrders, deleteOrder } from "@/lib/actions/order-actions";
 import { formatCurrency, formatDateTime, formatId } from "@/lib/utils";
 import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Admin orders",
+    title: "Admin orders",
 };
 
 const AdminOrdersPage = async (props: {
-  searchParams: Promise<{ page: string }>;
+    searchParams: Promise<{ page: string; }>;
 }) => {
-  const { page = 1 } = await props.searchParams;
+    const { page = 1 } = await props.searchParams;
 
-  const session = await auth();
+    const session = await auth();
 
-  if (session?.user?.role !== "admin") {
-    throw new Error("User not authorized!");
-  }
+    if (session?.user?.role !== "admin") {
+        throw new Error("User not authorized!");
+    }
 
-  const orders = await getAllOrders({
-    page: Number(page),
-    limit: 2,
-  });
-  console.log(orders);
-  return (
-    <div className="space-y-2">
-      <h2 className="h2-bold">Order Details</h2>
+    const orders = await getAllOrders({
+        page: Number(page),
+        limit: 10,
+    });
 
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Paid</TableHead>
-              <TableHead>Delivered</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+    return (
+        <div className="space-y-2">
+            <h2 className="h2-bold">Order Details</h2>
 
-          <TableBody>
-            {orders.data.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell>{formatId(order.id)}</TableCell>
-                <TableCell>
-                  {formatDateTime(order.createdAt).dateTime}
-                </TableCell>
-                <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
-                <TableCell>
-                  {order.isPaid && order.paidAt
-                    ? formatDateTime(order.paidAt).dateTime
-                    : "Not Paid"}
-                </TableCell>
-                <TableCell>
-                  {order.isDelivered ? "order Delivered" : "Not Delivered"}
-                </TableCell>
-                <TableCell>
-                  <Button asChild variant="outline" size='sm'>
-                    <Link href={`/order/${order.id}`}>order detail</Link>
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            <div className="overflow-x-auto">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>ID</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Total</TableHead>
+                            <TableHead>Paid</TableHead>
+                            <TableHead>Delivered</TableHead>
+                            <TableHead>Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
 
-        {/* Pagination btn */}
-        {orders.totalPages > 1 && (
-          <Pagination page={Number(page) || 1} totalPages={orders?.totalPages} />
-        )}
-      </div>
-    </div>
-  );
+                    <TableBody>
+                        {orders.data.map((order) => (
+                            <TableRow key={order.id}>
+                                <TableCell>{formatId(order.id)}</TableCell>
+                                <TableCell>
+                                    {formatDateTime(order.createdAt).dateTime}
+                                </TableCell>
+                                <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
+                                <TableCell>
+                                    {order.isPaid && order.paidAt
+                                        ? formatDateTime(order.paidAt).dateTime
+                                        : "Not Paid"}
+                                </TableCell>
+                                <TableCell>
+                                    {order.isDelivered ? "order Delivered" : "Not Delivered"}
+                                </TableCell>
+                                <TableCell>
+                                    <Button asChild variant="outline" size='sm'>
+                                        <Link href={`/order/${order.id}`}>order detail</Link>
+                                    </Button>
+                                    <DeleteDialog id={order.id} action={deleteOrder} />
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+
+                {/* Pagination btn */}
+                {orders.totalPages > 1 && (
+                    <Pagination page={Number(page) || 1} totalPages={orders?.totalPages} />
+                )}
+            </div>
+        </div>
+    );
 };
 
 export default AdminOrdersPage;

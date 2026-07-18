@@ -12,10 +12,10 @@ import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "../generated/prisma/client";
+import { success } from "zod";
 
 //Create order and create order items
 export async function createOrder() {
-  console.log("createorder funciton");
   try {
     const session = await auth();
     if (!session) throw new Error("User is not authenticated");
@@ -360,10 +360,31 @@ export async function getAllOrders({
     include: { user: { select: { name: true } } },
   });
 
-  const dataCount =await prisma.order.count();
-
+  const dataCount = await prisma.order.count();
+  console.log({
+    page,
+    limit,
+    dataCount,
+    totalPages: Math.ceil(dataCount / limit),
+    ordersReturned: data.length,
+  });
   return {
     data,
-    totalPages: Math.ceil(dataCount / limit)
+    totalPages: Math.ceil(dataCount / limit),
+  };
+}
+
+//Delete order
+export async function deleteOrder(id: string) {
+  try {
+    await prisma.order.delete({
+      where: { id },
+    });
+
+    revalidatePath("/admin/orders");
+
+    return { success: true, message: "Deleted order successfully." };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
   }
 }
