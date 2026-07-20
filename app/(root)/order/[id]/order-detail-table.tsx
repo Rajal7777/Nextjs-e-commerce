@@ -25,25 +25,97 @@ import {
   PayPalButtons,
   PayPalScriptProvider,
   usePayPalScriptReducer,
-} from '@paypal/react-paypal-js';
-import { createPayPalOrder, approvePayPalOrder } from "@/lib/actions/order-actions";
+} from "@paypal/react-paypal-js";
+import {
+  createPayPalOrder,
+  approvePayPalOrder,
+  deliverOrder,
+  updateOrderToPaidCOD,
+} from "@/lib/actions/order-actions";
 import { toast } from "sonner";
+import { useTransition } from "react";
+import { Button } from "@/components/ui/button";
 
+//paypal payment
 const PayPalStatus = () => {
   const [{ isPending, isRejected }] = usePayPalScriptReducer();
 
   if (isPending) {
-    return <div className="mb-2 text-sm text-muted-foreground">Loading PayPal...</div>;
+    return (
+      <div className="mb-2 text-sm text-muted-foreground">
+        Loading PayPal...
+      </div>
+    );
   }
 
   if (isRejected) {
-    return <div className="mb-2 text-sm text-destructive">Error loading PayPal</div>;
+    return (
+      <div className="mb-2 text-sm text-destructive">Error loading PayPal</div>
+    );
   }
 
   return null;
 };
 
-const OrderDetailsTable = ({ order, paypalClientId }: { order: Order; paypalClientId: string; }) => {
+//Button to mark order as paid
+const MarkAsPaidButton = ({ orderId }: { orderId: string; }) => {
+  const [isPending, startTransition] = useTransition();
+
+  return (
+    <Button
+      type="button"
+      disabled={isPending}
+      onClick={() =>
+        startTransition(async () => {
+          const res = await updateOrderToPaidCOD(orderId);
+          console.log("mark to paid");
+          if (res.success) {
+            toast.success(res.message);
+          } else {
+            toast.error(res.message);
+          }
+        })
+      }
+    >
+      {isPending ? "Processing..." : "Mark To Paid"}
+    </Button>
+  );
+};
+
+//Button to mark order to delivered
+const MarkAsDeliveredButton = ({ orderId }: { orderId: string; }) => {
+  const [isPending, startTransition] = useTransition();
+
+  return (
+    <Button
+      type="button"
+      disabled={isPending}
+      onClick={() =>
+        startTransition(async () => {
+          const res = await deliverOrder(orderId);
+          console.log("marked to delivered");
+          if (res.success) {
+            toast.success(res.message);
+          } else {
+            toast.error(res.message);
+          }
+        })
+      }
+    >
+      {isPending ? "Processing..." : "Mark to Delivered"}
+    </Button>
+  );
+};
+
+const OrderDetailsTable = ({
+  order,
+  paypalClientId,
+  isAdmin,
+}: {
+  order: Order;
+  paypalClientId: string;
+  isAdmin: boolean;
+}) => {
   const {
     shippingAddress,
     orderItems,
@@ -74,6 +146,35 @@ const OrderDetailsTable = ({ order, paypalClientId }: { order: Order; paypalClie
 
     toast(res.message);
   };
+
+  // async function handleChange({
+  //   btnType,
+  //   orderId,
+  // }: {
+  //   btnType: string;
+  //   orderId: string;
+  // }) {
+  //   console.log('i am form switch');
+  //   switch (btnType) {
+  //     case "payment":
+  //       const res = await updateOrderToPaidCOD(orderId);
+  //       if (res.success) {
+  //         toast.success(res.message);
+  //       } else {
+  //         toast.error(res.message);
+  //       }
+  //       break;
+
+  //     case "address":
+  //       const res2 = await deliverOrder(orderId);
+  //       if (res2.success) {
+  //         toast.success(res2.message);
+  //       } else {
+  //         toast.error(res2.message);
+  //       }
+  //       break;
+  //   }
+  // }
 
   return (
     <>
@@ -178,13 +279,26 @@ const OrderDetailsTable = ({ order, paypalClientId }: { order: Order; paypalClie
               </div>
 
               {/* Paypal payment */}
-              {!isPaid && paymentMethod === 'PayPal' && (
+              {!isPaid && paymentMethod === "PayPal" && (
                 <div>
                   <PayPalScriptProvider options={{ clientId: paypalClientId }}>
                     <PayPalStatus />
-                    <PayPalButtons createOrder={handleCreatePayPalOrder} onApprove={handleApprovePayPalOrder} />
+                    <PayPalButtons
+                      createOrder={handleCreatePayPalOrder}
+                      onApprove={handleApprovePayPalOrder}
+                    />
                   </PayPalScriptProvider>
                 </div>
+              )}
+
+              {/* Cash on delivery */}
+            
+              {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
+                <MarkAsPaidButton orderId={order.id} />
+              )}
+
+              {isAdmin && isPaid && !isDelivered && (
+                <MarkAsDeliveredButton orderId={order.id} />
               )}
             </CardContent>
           </Card>
