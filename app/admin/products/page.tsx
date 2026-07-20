@@ -1,0 +1,31 @@
+import { getAllProducts } from "@/lib/actions/product-actions";
+
+const AdminProductPage = async (props: {
+    searchParams: Promise<{
+        page: string;
+        query: string;
+        category: string;
+    }>;
+}) => {
+    const searchParams = await props.searchParams;
+
+    const page = Number(searchParams.page) || 1;
+    const searchText = searchParams.query || '';
+    const category = searchParams.category || '';
+
+    const products = await getAllProducts({
+        query: searchText,
+        page,
+        category
+    });
+    console.log(products)
+    return (
+        <main className="space-y-2">
+            <header className="flex-between">
+                <h1>products</h1>
+            </header>
+        </main>
+    );
+};
+
+export default AdminProductPage;
