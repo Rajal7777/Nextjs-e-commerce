@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, type MouseEvent } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -23,24 +23,31 @@ const DeleteDialog = ({
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const handleDelte = () => {
+  const handleDelete = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();  // Prevent dialog close by default behavior of button click
+
     startTransition(async () => {
       const res = await action(id);
 
-      console.log("deleted from handle delete");
       if (!res.success) {
         toast.error(res.message);
-      } else {
-        setOpen(false);
-        toast.success(res.message);
+        return;
       }
+
+      setOpen(false);
+      toast.success(res.message);
     });
   };
 
-  //toast.error(res.message, { duration: 3000, className: 'bg-red-600'})
-
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialog
+      open={open}
+      onOpenChange={(value) => {
+        if (!isPending) {
+          setOpen(value);
+        }
+      }}
+    >
       <AlertDialogTrigger asChild>
         <Button variant="destructive" size="sm" className="ml-2">
           Delete
@@ -51,10 +58,15 @@ const DeleteDialog = ({
         <AlertDialogTitle>Do you want to delete?</AlertDialogTitle>
 
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
 
           <AlertDialogAction asChild>
-            <Button onClick={handleDelte} className="bg-red-500" size="sm">
+            <Button
+              onClick={handleDelete}
+              disabled={isPending}
+              className="bg-red-500"
+              size="sm"
+            >
               {isPending ? "Deleting..." : "Continue"}
             </Button>
           </AlertDialogAction>
