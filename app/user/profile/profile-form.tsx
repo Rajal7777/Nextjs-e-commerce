@@ -29,7 +29,7 @@ const ProfileForm = () => {
 
     const router = useRouter();
 
-    const form = useForm<z.infer<typeof updateProfileSchema>>({
+    const { handleSubmit, reset } = useForm<z.infer<typeof updateProfileSchema>>({
         resolver: zodResolver(updateProfileSchema),
         defaultValues: {
             name: session?.user?.name ?? "",
@@ -37,7 +37,6 @@ const ProfileForm = () => {
         },
     });
 
-    const { handleSubmit, reset } = form;
 
     //session may not be loaded at first render name & email might be empty{undefined}
     useEffect(() => {
@@ -65,7 +64,7 @@ const ProfileForm = () => {
                 email: data.email,
             });
             router.refresh();
-          toast.success(result.message)
+            toast.success(result.message);
         });
     }
 
@@ -77,7 +76,7 @@ const ProfileForm = () => {
                         <p>{session?.user?.email}</p>
 
                         <Controller
-                            control={form.control}
+                            control={control}
                             name="name"
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>

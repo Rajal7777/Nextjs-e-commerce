@@ -40,7 +40,7 @@ const AdminProductPage = async (props: {
             <header className="flex-between">
                 <h1>products</h1>
                 <Button asChild>
-                    <Link href="/admin/create">Create Product</Link>
+                    <Link href="/admin/products/create">Create Product</Link>
                 </Button>
             </header>
 
@@ -56,7 +56,7 @@ const AdminProductPage = async (props: {
                         <TableHead>actions </TableHead>
                     </TableRow>
                 </TableHeader>
-                
+
                 <TableBody>
                     {products.data.map((product) => (
                         <TableRow key={product.id}>
