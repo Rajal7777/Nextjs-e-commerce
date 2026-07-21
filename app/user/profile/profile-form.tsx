@@ -29,7 +29,7 @@ const ProfileForm = () => {
 
     const router = useRouter();
 
-    const { handleSubmit, reset } = useForm<z.infer<typeof updateProfileSchema>>({
+    const { handleSubmit, reset, control } = useForm<z.infer<typeof updateProfileSchema>>({
         resolver: zodResolver(updateProfileSchema),
         defaultValues: {
             name: session?.user?.name ?? "",
