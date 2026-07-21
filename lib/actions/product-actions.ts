@@ -5,6 +5,7 @@ import { PAGE_SIZE } from "./../constants/index";
 import { prisma } from "@/db/prisma";
 import { convertToPlainObject } from "../utils";
 import { LATEST_PRODUCTS_LIMIT } from "../constants";
+import { getTotalPages } from "../pagination";
 
 //Get latest products
 export async function getLatestProducts() {
@@ -26,7 +27,7 @@ export async function getProductBySLug(slug: string) {
 //Get all products
 export async function getAllProducts({
   query,
-  limit= PAGE_SIZE,
+  limit = PAGE_SIZE,
   page,
   category,
 }: {
@@ -42,9 +43,14 @@ export async function getAllProducts({
 
   
   const dataCount = await prisma.product.count();
-
+  console.log(
+    'page', page,
+    'limit', limit,
+    'dataCount', dataCount,
+    data
+  )
   return {
     data,
-    totalPages: Math.ceil(dataCount / limit)
+    totalPages: getTotalPages(dataCount, limit),
   }
 }

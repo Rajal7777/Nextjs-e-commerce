@@ -4,6 +4,8 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import qs from "query-string";
 
+export { getTotalPages } from "./pagination";
+
 //Format error message for zod validation errors & prisma error
 export function formatError(error: unknown) {
   //handle zod validation error

@@ -18,6 +18,8 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
     const pageNumber = Number(page);
     const currentPage = Number.isFinite(pageNumber) && pageNumber > 0 ? pageNumber : 1;
 
+    console.log('currentpage', currentPage)
+
     function handleClick(btnType: string) {
         const pageValue = btnType === "next" ? currentPage + 1 : currentPage - 1;
         const newUrl = formUrlQuery({
