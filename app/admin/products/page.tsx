@@ -56,6 +56,7 @@ const AdminProductPage = async (props: {
                         <TableHead>actions </TableHead>
                     </TableRow>
                 </TableHeader>
+                
                 <TableBody>
                     {products.data.map((product) => (
                         <TableRow key={product.id}>

@@ -32,3 +32,19 @@ export const DEFAULT_PAYMENT_METHOD =
   process.env.NEXT_PUBLIC_DEFAULT_PAYMENT_METHOD ?? "CashOnDelivery";
 
 export const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 10;
+
+export const productDefaultValues = {
+  id: "",
+  name: "",
+  slug: "",
+  category: "",
+  brand: "",
+  description: "",
+  images: [],
+  isFeatured: false,
+  banner: "",
+  price: "0",
+  stock: 0,
+  rating: 0,
+  numReviews: 0,
+};
