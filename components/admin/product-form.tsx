@@ -7,14 +7,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { productDefaultValues } from "@/lib/constants";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "@/components/ui/input";
-import { useForm, Controller, useFormState, SubmitHandler } from "react-hook-form";
+import {
+    useForm,
+    Controller,
+    useFormState,
+    SubmitHandler,
+} from "react-hook-form";
 import slugify from "slugify";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import {z} from 'zod';
+import { z } from "zod";
 import { createProduct, updateProduct } from "@/lib/actions/product-actions";
+import { UploadButton } from "@/lib/uploadthing";
 import { toast } from "sonner";
-
+import { Card } from "../ui/card";
+import Image from "next/image";
 
 const ProductForm = ({
     type,
@@ -27,13 +34,7 @@ const ProductForm = ({
 }) => {
     const router = useRouter();
 
-
-    const {
-        watch,
-        setValue,
-        handleSubmit,
-        control,
-    } = useForm({
+    const { watch, setValue, handleSubmit, control } = useForm({
         resolver: zodResolver(
             type === "create" ? insertProductSchema : updateProductSchema,
         ),
@@ -41,37 +42,39 @@ const ProductForm = ({
             product && type === "update" ? productDefaultValues : undefined,
     });
 
-    console.log(useFormState({ control }));
+    const images = watch("images") || [];
 
-   const onSubmit:SubmitHandler<z.infer<typeof insertProductSchema>> = async (values) => {
-        if(type === 'create'){
+    const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
+        values,
+    ) => {
+        if (type === "create") {
             const res = await createProduct(values);
 
-            if(!res.success){
-                toast.error(res.message)
+            if (!res.success) {
+                toast.error(res.message);
             }
 
             toast.success(res.message);
-            router.push('/admin/products');
+            router.push("/admin/products");
         }
 
         //update
-           if(type === 'update'){
-            if(!productId) {
-                router.push('/admin/products');
+        if (type === "update") {
+            if (!productId) {
+                router.push("/admin/products");
                 return;
             }
 
-            const res = await updateProduct({...values, id: productId});
+            const res = await updateProduct({ ...values, id: productId });
 
-            if(!res.success){
-                toast.error(res.message)
+            if (!res.success) {
+                toast.error(res.message);
             }
 
             toast.success(res.message);
-            router.push('/admin/products');
+            router.push("/admin/products");
         }
-   }
+    };
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 mt-4">
             <div className="flex flex-col md:flex-row gap-4">
@@ -194,12 +197,49 @@ const ProductForm = ({
             </div>
 
             <div className="upload-field flex flex-col md:flex-row gap-4">
-
+                <FieldGroup>
+                    <Controller
+                        name="images"
+                        control={control}
+                        render={({ fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor="images">Product Images</FieldLabel>
+                                <Card>
+                                    <div className="flex-start space-x-2 p-2">
+                                        {images.map((image: string) => (
+                                            <Image
+                                                key={image}
+                                                src={image}
+                                                alt="Product image"
+                                                width={80}
+                                                height={80}
+                                                className="w-20 h-20 object-cover object-center rounded-sm"
+                                            />
+                                        ))}
+                                        <UploadButton
+                                            endpoint="imageUploader"
+                                            onClientUploadComplete={(res: { url: string; }[]) => {
+                                                setValue("images", [
+                                                    ...images,
+                                                    ...res.map((r) => r.url),
+                                                ]);
+                                            }}
+                                            onUploadError={(error) => {
+                                                alert(`ERROR! ${error.message}`);
+                                            }}
+                                        />
+                                    </div>
+                                </Card>
+                                {fieldState.invalid && (
+                                    <FieldError errors={[fieldState.error]} />
+                                )}
+                            </Field>
+                        )}
+                    />
+                </FieldGroup>
             </div>
 
-            <div className="upload-field">
-                {/* isFeatured */}
-            </div>
+            <div className="upload-field">{/* isFeatured */}</div>
 
             {/* description  */}
             <div>
@@ -210,7 +250,11 @@ const ProductForm = ({
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor="description">Description</FieldLabel>
-                                <Textarea {...field} id="description" placeholder="Enter product description" />
+                                <Textarea
+                                    {...field}
+                                    id="description"
+                                    placeholder="Enter product description"
+                                />
                                 {fieldState.invalid && (
                                     <FieldError errors={[fieldState.error]} />
                                 )}
@@ -223,7 +267,11 @@ const ProductForm = ({
             {/* Submit button */}
             <div>
                 <Button type="submit" disabled={useFormState({ control }).isSubmitting}>
-                    {useFormState({ control }).isSubmitting ? "Submitting..." : type === "create" ? "Create Product" : "Update Product"}
+                    {useFormState({ control }).isSubmitting
+                        ? "Submitting..."
+                        : type === "create"
+                            ? "Create Product"
+                            : "Update Product"}
                 </Button>
             </div>
         </form>

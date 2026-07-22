@@ -46,7 +46,7 @@ export async function getAllProducts({
   });
 
   const dataCount = await prisma.product.count();
-  console.log("page", page, "limit", limit, "dataCount", dataCount, data);
+
   return {
     data,
     totalPages: getTotalPages(dataCount, limit),
