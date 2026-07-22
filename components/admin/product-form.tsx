@@ -22,6 +22,7 @@ import { UploadButton } from "@/lib/uploadThing";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
 import Image from "next/image";
+import { Checkbox } from "../ui/checkbox";
 
 const ProductForm = ({
     type,
@@ -44,6 +45,8 @@ const ProductForm = ({
 
     //get the images from  images form field{form state}.
     const images = watch("images") || [];
+    const isFeatured = watch("isFeatured") || false;
+    const banner = watch("banner") || null;
 
     const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
         values,
@@ -76,6 +79,7 @@ const ProductForm = ({
             router.push("/admin/products");
         }
     };
+
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 mt-4">
             <div className="flex flex-col md:flex-row gap-4">
@@ -240,7 +244,53 @@ const ProductForm = ({
                 </FieldGroup>
             </div>
 
-            <div className="upload-field">{/* isFeatured */}</div>
+            <div className="upload-field">
+                {/* isFeatured */}
+                Featured Product
+                <Card className="space-y-2 p-2 mt-2">
+                    <FieldGroup >
+                        <Controller
+                            name="isFeatured"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid} >
+                                    <div className="flex items-center gap-2">
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                        {fieldState.invalid && (
+                                            <FieldError errors={[fieldState.error]} />
+                                        )}
+                                        <FieldLabel htmlFor="isFeatured">isFeatured?</FieldLabel>
+                                    </div>
+                                </Field>
+                            )}
+                        />
+                        {isFeatured && banner && (
+                            <Image
+                                src={banner}
+                                alt='Banner image'
+                                width={1920}
+                                height={680}
+                                className="w-full h-auto object-cover object-center rounded-sm"
+                            />
+                        )}
+                        {isFeatured && !banner && (
+                            <UploadButton
+                            className="pl-8"
+                                endpoint='imageUploader'
+                                onClientUploadComplete={(res: { url: string; }[]) => {
+                                    setValue('banner', res[0].url);
+                                }}
+                                onUploadError={(error) => {
+                                    alert(`ERROR! ${error.message}`);
+                                }}
+                            />
+                        )}
+                    </FieldGroup>
+                </Card>
+            </div>
 
             {/* description  */}
             <div>
