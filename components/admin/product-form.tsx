@@ -18,7 +18,7 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { z } from "zod";
 import { createProduct, updateProduct } from "@/lib/actions/product-actions";
-import { UploadButton } from "@/lib/uploadthing";
+import { UploadButton } from "@/lib/uploadThing";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
 import Image from "next/image";
@@ -42,6 +42,7 @@ const ProductForm = ({
             product && type === "update" ? productDefaultValues : undefined,
     });
 
+    //get the images from  images form field{form state}.
     const images = watch("images") || [];
 
     const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
