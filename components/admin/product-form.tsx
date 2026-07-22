@@ -1,7 +1,6 @@
 "use client";
 
-import { insertProductSchema, updateProductSchema } from "@/lib/validators";
-import { Product } from "@/types";
+import { insertProductSchema } from "@/lib/validators";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productDefaultValues } from "@/lib/constants";
@@ -12,6 +11,7 @@ import {
     Controller,
     useFormState,
     SubmitHandler,
+    useWatch,
 } from "react-hook-form";
 import slugify from "slugify";
 import { Textarea } from "../ui/textarea";
@@ -24,31 +24,38 @@ import { Card } from "../ui/card";
 import Image from "next/image";
 import { Checkbox } from "../ui/checkbox";
 
+type ProductFormInput = z.input<typeof insertProductSchema>;
+type ProductFormValues = z.output<typeof insertProductSchema>;
+
 const ProductForm = ({
     type,
     product,
     productId,
 }: {
     type: "create" | "update";
-    product?: Product;
+    product?: ProductFormInput;
     productId?: string;
 }) => {
     const router = useRouter();
 
-    const { watch, setValue, handleSubmit, control } = useForm({
-        resolver: zodResolver(
-            type === "create" ? insertProductSchema : updateProductSchema,
-        ),
+    const { getValues, setValue, handleSubmit, control } = useForm<
+        ProductFormInput,
+        undefined,
+        ProductFormValues
+    >({
+        resolver: zodResolver(insertProductSchema),
         defaultValues:
-            product && type === "update" ? productDefaultValues : undefined,
+            type === "update" ? product ?? productDefaultValues : productDefaultValues,
     });
 
-    //get the images from  images form field{form state}.
-    const images = watch("images") || [];
-    const isFeatured = watch("isFeatured") || false;
-    const banner = watch("banner") || null;
+    const { isSubmitting } = useFormState({ control });
 
-    const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
+    //get the images from  images form field{form state}.
+    const images = useWatch({ control, name: "images" }) || [];
+    const isFeatured = useWatch({ control, name: "isFeatured" }) || false;
+    const banner = useWatch({ control, name: "banner" }) || null;
+
+    const onSubmit: SubmitHandler<ProductFormValues> = async (
         values,
     ) => {
         if (type === "create") {
@@ -120,7 +127,7 @@ const ProductForm = ({
                             type="button"
                             className="bg-gray-600 mt-2 px-2 py-1 rounded text-sm hover:bg-gray-500  text-white"
                             onClick={() => {
-                                setValue("slug", slugify(watch("name"), { lower: true }));
+                                setValue("slug", slugify(getValues("name"), { lower: true }));
                             }}
                         >
                             Generate slug
@@ -191,7 +198,12 @@ const ProductForm = ({
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor="stock">Stock</FieldLabel>
-                                <Input {...field} id="stock" placeholder="Enter Stock" />
+                                <Input
+                                    {...field}
+                                    id="stock"
+                                    placeholder="Enter Stock"
+                                    value={typeof field.value === "number" ? field.value : ""}
+                                />
                                 {fieldState.invalid && (
                                     <FieldError errors={[fieldState.error]} />
                                 )}
@@ -317,8 +329,8 @@ const ProductForm = ({
 
             {/* Submit button */}
             <div>
-                <Button type="submit" disabled={useFormState({ control }).isSubmitting}>
-                    {useFormState({ control }).isSubmitting
+                <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting
                         ? "Submitting..."
                         : type === "create"
                             ? "Create Product"

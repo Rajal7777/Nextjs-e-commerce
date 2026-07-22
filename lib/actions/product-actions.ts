@@ -9,6 +9,7 @@ import { convertToPlainObject, formatError } from "../utils";
 import { LATEST_PRODUCTS_LIMIT } from "../constants";
 import { getTotalPages } from "../pagination";
 import { insertProductSchema, updateProductSchema } from "../validators";
+import { notFound } from "next/navigation";
 
 //Get latest products
 export async function getLatestProducts() {
@@ -20,6 +21,20 @@ export async function getLatestProducts() {
   return convertToPlainObject(data);
 }
 
+//Get product by id
+export async function getProductById(productId: string) {
+  const product = await prisma.product.findFirst({
+    where: { id: productId },
+  });
+  if (!product) return notFound();
+
+  return convertToPlainObject({
+    ...product,
+    price: Number(product.price),
+    rating: Number(product.rating),
+  });
+}
+
 //Get single product by it's slug
 export async function getProductBySLug(slug: string) {
   return await prisma.product.findFirst({
@@ -29,18 +44,18 @@ export async function getProductBySLug(slug: string) {
 
 //Get all products
 export async function getAllProducts({
-  query,
   limit = PAGE_SIZE,
   page,
+  query,
   category,
 }: {
-  query: string;
   limit?: number;
   page: number;
   category: string;
+  query: string;
 }) {
   const data = await prisma.product.findMany({
-   orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "desc" },
     skip: (page - 1) * limit,
     take: limit,
   });
