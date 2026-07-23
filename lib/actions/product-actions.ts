@@ -28,11 +28,7 @@ export async function getProductById(productId: string) {
   });
   if (!product) return notFound();
 
-  return convertToPlainObject({
-    ...product,
-    price: Number(product.price),
-    rating: Number(product.rating),
-  });
+  return convertToPlainObject(product);
 }
 
 //Get single product by it's slug

@@ -45,7 +45,7 @@ const ProductForm = ({
     >({
         resolver: zodResolver(insertProductSchema),
         defaultValues:
-            type === "update" ? product ?? productDefaultValues : productDefaultValues,
+            type === "update" ? product ?? productDefaultValues : productDefaultValues,  // ?? ->use product if exists, otherwise use default values
     });
 
     const { isSubmitting } = useFormState({ control });
