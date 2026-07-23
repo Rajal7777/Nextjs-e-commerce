@@ -13,8 +13,9 @@ import { prisma } from "@/db/prisma";
 import { hashSync } from "bcryptjs";
 import { formatError } from "../utils";
 import { ShippingAddress } from "@/types";
-import { z } from "zod";
+import { success, z } from "zod";
 import { PAGE_SIZE } from "../constants";
+import { revalidatePath } from "next/cache";
 
 //Sign in the user with credentials
 //useActionState, React automatically passes two arguments prevState, formdata
@@ -214,4 +215,22 @@ export async function getAllUsers({
     data,
     totalPages: Math.ceil(dataCount / limit),
   };
+}
+
+//delete user
+export async function deleteUser(id: string) {
+  try {
+    await prisma.user.delete({ where: { id } });
+
+    revalidatePath("/admin/users");
+    return {
+      success: true,
+      message: "Successfully deleted user",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
