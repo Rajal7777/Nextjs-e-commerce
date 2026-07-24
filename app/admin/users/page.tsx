@@ -20,12 +20,14 @@ export const metadata: Metadata = {
 };
 
 const AdminUserPage = async (props: {
-  searchParams: Promise<{ page: string; }>;
+  searchParams: Promise<{ page?: string; query?: string }>;
 }) => {
-  const { page = "1" } = await props.searchParams;
+  const { page = "1", query = "" } = await props.searchParams;
 
-
-  const users = await getAllUsers({ page: Number(page) });
+  const users = await getAllUsers({
+    page: Number(page),
+    query,
+  });
 
   return (
     <div className="space-y-2">

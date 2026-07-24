@@ -20,9 +20,9 @@ export const metadata: Metadata = {
 };
 
 const AdminOrdersPage = async (props: {
-    searchParams: Promise<{ page: string; }>;
+    searchParams: Promise<{ page?: string; query?: string }>;
 }) => {
-    const { page = 1 } = await props.searchParams;
+    const { page = "1", query = "" } = await props.searchParams;
 
     const session = await auth();
 
@@ -33,6 +33,7 @@ const AdminOrdersPage = async (props: {
     const orders = await getAllOrders({
         page: Number(page),
         limit: 10,
+        query,
     });
 
 

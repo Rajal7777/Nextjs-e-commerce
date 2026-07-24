@@ -13,7 +13,6 @@ import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "../generated/prisma/client";
 
-
 //Create order and create order items
 export async function createOrder() {
   try {
@@ -349,18 +348,36 @@ export async function getOrderSummary() {
 export async function getAllOrders({
   limit = PAGE_SIZE,
   page,
+  query,
 }: {
   limit?: number;
   page: number;
+  query?: string;
 }) {
+  const searchText = query?.trim();
+
+  const where = searchText
+    ? {
+        OR: [
+          { id: { contains: searchText, mode: "insensitive" as const } },
+          {
+            user: {
+              name: { contains: searchText, mode: "insensitive" as const },
+            },
+          },
+        ],
+      }
+    : undefined;
+
   const data = await prisma.order.findMany({
+    where,
     orderBy: { createdAt: "desc" },
     take: limit,
     skip: (page - 1) * limit,
     include: { user: { select: { name: true } } },
   });
 
-  const dataCount = await prisma.order.count();
+  const dataCount = await prisma.order.count({ where });
   console.log({
     page,
     limit,
@@ -435,8 +452,8 @@ export async function deliverOrder(orderId: string) {
 
     return {
       success: false,
-      message: 'Order has been marked delivered'
-    }
+      message: "Order has been marked delivered",
+    };
   } catch (error) {
     return {
       success: false,

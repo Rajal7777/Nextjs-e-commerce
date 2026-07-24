@@ -50,13 +50,26 @@ export async function getAllProducts({
   category: string;
   query: string;
 }) {
+  const searchText = query.trim();
+  const categoryText = category.trim();
+
+  const where = {
+    ...(searchText
+      ? { name: { contains: searchText, mode: "insensitive" as const } }
+      : {}),
+    ...(categoryText
+      ? { category: { contains: categoryText, mode: "insensitive" as const } }
+      : {}),
+  };
+
   const data = await prisma.product.findMany({
+    where,
     orderBy: { createdAt: "desc" },
     skip: (page - 1) * limit,
     take: limit,
   });
 
-  const dataCount = await prisma.product.count();
+  const dataCount = await prisma.product.count({ where });
 
   return {
     data,

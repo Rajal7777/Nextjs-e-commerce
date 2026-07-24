@@ -2,7 +2,7 @@ import Menu from "@/components/shared/header/menu";
 import Image from "next/image";
 import Link from "next/link";
 import MainNav from "./main-nav";
-import { Input } from "@/components/ui/input";
+import AdminSearch from "@/components/admin/admin-search-form";
 
 export default function AdminLayout({
   children,
@@ -24,13 +24,7 @@ export default function AdminLayout({
           <MainNav className="mx-2" />
 
           <div className="ml-auto items-center flex space-x-4">
-            <div>
-              <Input
-                type="search"
-                placeholder="Search..."
-                className="hidden md:flex md:w-50 lg:w-100"
-              />
-            </div>
+            <AdminSearch />
             <Menu />
           </div>
         </div>
