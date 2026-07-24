@@ -49,4 +49,4 @@ export const productDefaultValues = {
   numReviews: 0,
 };
 
-export const userDefaultValues = ["admin", "user"];
+export const USER_ROLES = ["admin", "user"];

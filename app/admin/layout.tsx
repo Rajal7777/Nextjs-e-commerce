@@ -28,7 +28,7 @@ export default function AdminLayout({
               <Input
                 type="search"
                 placeholder="Search..."
-                className="md:w-50 lg:w-100"
+                className="hidden md:flex md:w-50 lg:w-100"
               />
             </div>
             <Menu />
