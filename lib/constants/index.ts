@@ -48,3 +48,5 @@ export const productDefaultValues = {
   rating: 0,
   numReviews: 0,
 };
+
+export const userDefaultValues = ["admin", "user"];

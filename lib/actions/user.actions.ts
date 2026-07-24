@@ -13,7 +13,7 @@ import { prisma } from "@/db/prisma";
 import { hashSync } from "bcryptjs";
 import { formatError } from "../utils";
 import { ShippingAddress } from "@/types";
-import { success, z } from "zod";
+import {  z } from "zod";
 import { PAGE_SIZE } from "../constants";
 import { revalidatePath } from "next/cache";
 
@@ -210,7 +210,7 @@ export async function getAllUsers({
   });
 
   const dataCount = await prisma.user.count();
-  console.log("dataCount", dataCount);
+
   return {
     data,
     totalPages: Math.ceil(dataCount / limit),
@@ -223,6 +223,7 @@ export async function deleteUser(id: string) {
     await prisma.user.delete({ where: { id } });
 
     revalidatePath("/admin/users");
+
     return {
       success: true,
       message: "Successfully deleted user",

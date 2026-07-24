@@ -20,12 +20,13 @@ export const metadata: Metadata = {
 };
 
 const AdminUserPage = async (props: {
-  searchParams: Promise<{ page: string }>;
+  searchParams: Promise<{ page: string; }>;
 }) => {
   const { page = "1" } = await props.searchParams;
 
+
   const users = await getAllUsers({ page: Number(page) });
-  console.log(users);
+
   return (
     <div className="space-y-2">
       <h2 className="h2-bold">Order Details</h2>
@@ -58,7 +59,7 @@ const AdminUserPage = async (props: {
 
                 <TableCell>
                   <Button asChild variant="outline" size="sm">
-                    <Link href={`/users/${user.id}`}>Edit</Link>
+                    <Link href={`/admin/users/${user.id}`}>Edit</Link>
                   </Button>
                   <DeleteDialog id={user.id} action={deleteUser} />
                 </TableCell>

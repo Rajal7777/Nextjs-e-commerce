@@ -178,11 +178,12 @@ export function formUrlQuery({
       delete query[key];
     }
   }
-
+ 
+  //convert object back to query string and return the new url with updated query string{conert to jSON string}{ page: "4",sort: "name"} -> /admin/users?page=4&sort=name
   return qs.stringifyUrl(
     {
-      url: window.location.pathname,
-      query,
+      url: window.location.pathname,  // "/admin/users"
+      query,  // 'page=4&sort=name'
     },
     {
       skipNull: true,

@@ -5,53 +5,52 @@ import { Button } from "../ui/button";
 import { formUrlQuery } from "@/lib/utils";
 
 type PaginationProps = {
-    page: number | string;
-    totalPages: number;
-    urlParamName?: string;
+  page: number | string;
+  totalPages: number;
+  urlParamName?: string;
 };
 
 const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
-    const router = useRouter();
-    const searchParams = useSearchParams();
+  const router = useRouter();
+  const searchParams = useSearchParams(); 
+  
 
-   
-    const pageNumber = Number(page);
-    const currentPage = Number.isFinite(pageNumber) && pageNumber > 0 ? pageNumber : 1;
+  const pageNumber = Number(page);
+  const currentPage =
+    Number.isFinite(pageNumber) && pageNumber > 0 ? pageNumber : 1;
 
-    console.log('currentpage', currentPage)
+  function handleClick(btnType: string) {
+    const pageValue = btnType === "next" ? currentPage + 1 : currentPage - 1;
+    const newUrl = formUrlQuery({
+      params: searchParams.toString(),  //output "page=1&limit=10"
+      key: urlParamName || "page",
+      value: pageValue.toString(),
+    });
+    console.log("newUrl", newUrl);
+    router.push(newUrl, { scroll: false });
+  }
 
-    function handleClick(btnType: string) {
-        const pageValue = btnType === "next" ? currentPage + 1 : currentPage - 1;
-        const newUrl = formUrlQuery({
-            params: searchParams.toString(),
-            key: urlParamName || "page",
-            value: pageValue.toString(),
-        });
+  return (
+    <div className="flex gap-2">
+      <Button
+        size="lg"
+        variant="outline"
+        disabled={currentPage <= 1}
+        onClick={() => handleClick("prev")}
+      >
+        Previous
+      </Button>
 
-        router.push(newUrl, { scroll: false});
-    }
-
-    return (
-        <div className="flex gap-2">
-            <Button
-                size="lg"
-                variant="outline"
-                disabled={currentPage <= 1}
-                onClick={() => handleClick("prev")}
-            >
-                Previous
-            </Button>
-
-            <Button
-                size="lg"
-                variant="outline"
-                disabled={currentPage >= totalPages}
-                onClick={() => handleClick("next")}
-            >
-                Next
-            </Button>
-        </div>
-    );
+      <Button
+        size="lg"
+        variant="outline"
+        disabled={currentPage >= totalPages}
+        onClick={() => handleClick("next")}
+      >
+        Next
+      </Button>
+    </div>
+  );
 };
 
 export default Pagination;

@@ -1,7 +1,6 @@
-import {  z } from "zod";
+import { z } from "zod";
 import { formatNumberWithDecimal } from "./utils";
 import { PAYMENT_METHODS } from "./constants";
-
 
 //refine() lets you create your own custom validation rule.
 //syntax refine(conditon, 'Error message)
@@ -121,4 +120,10 @@ export const paymentResultSchema = z.object({
 export const updateProfileSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   email: z.email().min(3, "Email must be at least 3 charcters"),
+});
+
+//update user schema
+export const updateUserSchema = updateProfileSchema.extend({
+  id: z.string().min(1, "User id is required"),
+  role: z.string().min(1, "User role is required"),
 });
