@@ -1,11 +1,50 @@
-import { ClientProduct } from '@/types';
+'use client';
 
-const ProductCarousel = ({products} : {
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
+import { ClientProduct } from '@/types';
+import Link from 'next/link';
+import Image from 'next/image';
+
+const ProductCarousel = ({ products }: {
     products: ClientProduct[];
 }) => {
-    return ( 
-        <p>{products.length} featured products</p>
-     );
-}
- 
+    return (
+        <Carousel className='w-full h-full' opts={{ loop: true, }}
+            plugins={[
+                Autoplay({
+                    delay: 10000,
+                    stopOnInteraction: true,
+                    stopOnMouseEnter: true,
+                }),
+            ]}
+        >
+
+            <CarouselContent>
+                {products.map((product) => (
+                    <CarouselItem key={product.id} >
+                        <Link href={`/product/${product.slug}`}>
+                            <div className='relative mx-auto'>
+                                <Image
+                                    src={product.banner}
+                                    alt={product.description}
+                                    height='0'
+                                    width='0'
+                                    sizes='100vw'
+                                    className='h-120 w-full'
+                                />
+                                <div className='absolute inset-0 flex items-end justify-center'>
+                                    <h2 className='bg-gray-800/80 bg-opacity-50 text-2xl font-bold px-2 text-white'>{product.name}</h2>
+                                </div>
+                            </div>
+                        </Link>
+                    </CarouselItem>
+                ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+        </Carousel>
+    );
+};
+
 export default ProductCarousel;

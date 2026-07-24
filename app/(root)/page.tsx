@@ -9,8 +9,8 @@ const Homepage = async () => {
 
   return (
     <div>
-      <ProductList products={latestProducts} title='Products for this weekend' />
       <ProductCarousel products={featuredProducts} />
+      <ProductList products={latestProducts} title='Products for this weekend' />
     </div>
   );
 };
