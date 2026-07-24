@@ -30,6 +30,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "proxy.ts"  ],
+, "proxy.ts", "docs/guide/product-action.text"  ],
   "exclude": ["node_modules"]
 }

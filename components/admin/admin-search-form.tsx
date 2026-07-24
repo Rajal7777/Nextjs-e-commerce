@@ -1,46 +1,38 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 
 const AdminSearch = () => {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
 
+    let formActionUrl = "";
 
-  let formActionUrl = "";
+    if (pathname.includes("/admin/orders")) {
+        formActionUrl = "/admin/orders";
+    } else if (pathname.includes("/admin/users")) {
+        formActionUrl = "/admin/users";
+    } else {
+        formActionUrl = "/admin/products";
+    }
 
-  if (pathname.includes("/admin/orders")) {
-    formActionUrl = "/admin/orders";
-  } else if (pathname.includes("/admin/users")) {
-    formActionUrl = "/admin/users";
-  } else {
-    formActionUrl = "/admin/products";
-  }
+    const queryValue = searchParams.get("query") || "";
 
-  const [queryValue, setQueryValue] = useState(searchParams.get("query") || "");
-
-  console.log(queryValue);
-  useEffect(() => {
-    setQueryValue(searchParams.get("query") || "");
-  }, [searchParams]);
-
-  return (
-    <form action={formActionUrl} method="GET">
-      <Input
-        type="text"
-        placeholder="Search..."
-        name="query"
-        value={queryValue}
-        onChange={(e) => setQueryValue(e.target.value)}
-        className="w-20 md:w-70  lg:w-100"
-      />
-      <button className="sr-only" type="submit">
-        Search
-      </button>
-    </form>
-  );
+    return (
+        <form action={formActionUrl} method="GET">
+            <Input
+                type="text"
+                placeholder="Search..."
+                name="query"
+                defaultValue={queryValue}
+                className="w-20 md:w-70  lg:w-100"
+            />
+            <button className="sr-only" type="submit">
+                Search
+            </button>
+        </form>
+    );
 };
 
 export default AdminSearch;
