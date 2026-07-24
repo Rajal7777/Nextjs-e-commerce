@@ -10,15 +10,33 @@ import { LATEST_PRODUCTS_LIMIT } from "../constants";
 import { getTotalPages } from "../pagination";
 import { insertProductSchema, updateProductSchema } from "../validators";
 import { notFound } from "next/navigation";
+import type { ClientProduct } from "@/types";
+
+type ProductRecord = Awaited<ReturnType<typeof prisma.product.findMany>>[number];
+type SerializableProduct = Omit<ClientProduct, "rating"> & {
+  rating: string | number;
+};
+
+function toClientProduct(product: ProductRecord): ClientProduct {
+  const plainProduct =
+    convertToPlainObject(product) as unknown as SerializableProduct;
+
+  return {
+    ...plainProduct,
+    rating: Number(plainProduct.rating),
+  };
+}
 
 //Get latest products
-export async function getLatestProducts() {
+export async function getLatestProducts(): Promise<ClientProduct[]> {
   const data = await prisma.product.findMany({
     take: LATEST_PRODUCTS_LIMIT,
-    orderBy: { createdAt: "desc" },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
-  return convertToPlainObject(data);
+  return data.map(toClientProduct);
 }
 
 //Get product by id
@@ -164,4 +182,15 @@ export async function getAllCategories() {
     _count: true,
   });
   return data;
+}
+
+//Get featured products
+export async function getFeaturedProducts(): Promise<ClientProduct[]> {
+  const data = await prisma.product.findMany({
+    where: { isFeatured: true },
+    orderBy: { createdAt: "desc" },
+    take: 4,
+  });
+
+  return data.map(toClientProduct);
 }

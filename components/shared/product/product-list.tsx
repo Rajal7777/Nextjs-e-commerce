@@ -1,10 +1,10 @@
 'use client';
 
 import ProductCart from "./product-cart";
-import { Product } from "@/types";
+import { ClientProduct } from "@/types";
 
 const ProductList = ({ products, title, limit }: {
-    products: Product[];
+    products: ClientProduct[];
     title?: string;
     limit?: number;
 }) => {
@@ -15,10 +15,10 @@ const ProductList = ({ products, title, limit }: {
             <h2 className="h2-bold mb-4">
                 {title}
             </h2>
-            {products.length < 0 && <p>No Products found</p>}
+            {products.length === 0 && <p>No Products found</p>}
             {products.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                    {limitedData.map((product: Product) => (
+                    {limitedData.map((product) => (
                         <ProductCart product={product} key={product.slug} />
                     ))}
                 </div>
