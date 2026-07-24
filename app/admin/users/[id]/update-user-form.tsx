@@ -2,12 +2,21 @@
 
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem,
+} from "@/components/ui/select";
 import { USER_ROLES } from "@/lib/constants";
 import { updateUserSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+import { toast } from "sonner";
+import { updateUser } from "@/lib/actions/user.actions";
+import { useRouter } from "next/navigation";
 
 //use the form form shadcn
 const UpdateUserForm = ({
@@ -15,19 +24,35 @@ const UpdateUserForm = ({
 }: {
     user: z.infer<typeof updateUserSchema>;
 }) => {
+    const router = useRouter();
+
     const form = useForm<z.infer<typeof updateUserSchema>>({
         resolver: zodResolver(updateUserSchema),
         defaultValues: user,
     });
 
-    function onSubmit(data: z.infer<typeof updateUserSchema>) {
-        // Handle form submission
+    async function onSubmit(data: z.infer<typeof updateUserSchema>) {
+        try {
+            const res = await updateUser(data);
+            if (!res.success) {
+                throw new Error(res.message);
+            }
+
+            toast.success(res.message);
+
+            form.reset();
+
+            router.push("/admin/users");
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            }
+        }
     }
 
     return (
         <div className="w-full max-w-md mx-auto border p-6 rounded-lg mt-4">
-
-            <form onSubmit={form.handleSubmit(onSubmit)} >
+            <form onSubmit={form.handleSubmit(onSubmit)}>
                 <FieldGroup className="space-y-2 p-2">
                     <Controller
                         name="email"
@@ -36,7 +61,12 @@ const UpdateUserForm = ({
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel>Email</FieldLabel>
 
-                                <input {...field} disabled={true} type="email" className="w-full border p-1 rounded-md" />
+                                <input
+                                    {...field}
+                                    disabled={true}
+                                    type="email"
+                                    className="w-full border p-1 rounded-md"
+                                />
 
                                 {fieldState.error && (
                                     <p className="text-red-500 text-sm mt-1">
@@ -54,7 +84,11 @@ const UpdateUserForm = ({
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel>Name</FieldLabel>
 
-                                <input {...field} type="text" className="w-full border p-1 rounded-md" />
+                                <input
+                                    {...field}
+                                    type="text"
+                                    className="w-full border p-1 rounded-md"
+                                />
 
                                 {fieldState.error && (
                                     <p className="text-red-500 text-sm mt-1">
@@ -79,7 +113,9 @@ const UpdateUserForm = ({
 
                                     <SelectContent position="popper" side="bottom">
                                         {USER_ROLES.map((role) => (
-                                            <SelectItem key={role} value={role}>{role.charAt(0).toLocaleUpperCase() + role.slice(1)}</SelectItem>
+                                            <SelectItem key={role} value={role}>
+                                                {role.charAt(0).toLocaleUpperCase() + role.slice(1)}
+                                            </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -93,12 +129,15 @@ const UpdateUserForm = ({
                     />
                 </FieldGroup>
                 <div className="flex-between mt-2">
-                    <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                        {form.formState.isSubmitting ? 'Submitting...' : 'Sumbit'}
+                    <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={form.formState.isSubmitting}
+                    >
+                        {form.formState.isSubmitting ? "Submitting..." : "Sumbit"}
                     </Button>
                 </div>
             </form>
-
         </div>
     );
 };
