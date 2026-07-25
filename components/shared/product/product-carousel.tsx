@@ -10,40 +10,48 @@ const ProductCarousel = ({ products }: {
     products: ClientProduct[];
 }) => {
     return (
-        <Carousel className='w-full h-full' opts={{ loop: true, }}
-            plugins={[
-                Autoplay({
-                    delay: 8000,
-                    stopOnInteraction: true,
-                    stopOnMouseEnter: true,
-                }),
-            ]}
-        >
+        <div className="flex">
+            <Carousel className="w-full max-w-7xl mx-auto overflow-hidden border"
+                opts={{ loop: true, }}
+                plugins={[
+                    Autoplay({
+                        delay: 8000,
+                        stopOnInteraction: true,
+                        stopOnMouseEnter: true,
+                    }),
+                ]}
+            >
 
-            <CarouselContent>
-                {products.map((product) => (
-                    <CarouselItem key={product.id} >
-                        <Link href={`/product/${product.slug}`}>
-                            <div className='relative mx-auto'>
-                                <Image
-                                    src={product.banner}
-                                    alt={product.description}
-                                    height='0'
-                                    width='0'
-                                    sizes='100vw'
-                                    className='h-120 w-full'
-                                />
-                                <div className='absolute inset-0 flex items-end justify-center'>
-                                    <h2 className='bg-gray-800/80 bg-opacity-50 text-2xl font-bold px-2 text-white'>{product.name}</h2>
+                <CarouselContent>
+                    {products.map((product) => (
+                        <CarouselItem key={product.id}>
+                            <Link href={`/product/${product.slug}`}>
+                                <div className="relative w-full h-[35vh] sm:h-[45vh] md:h-[55vh]">
+                                    <Image
+                                        src={product.banner!}
+                                        alt={product.description}
+                                        width={0}
+                                        height={0}
+                                        sizes="100vw"
+                                        className="w-full h-full object-cover"
+                                    />
+
+                                    <div className="absolute inset-0 flex items-end justify-center">
+                                        <p className="bg-gray-800/80 text-white font-medium px-2 py-1">
+                                            {product.name}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        </Link>
-                    </CarouselItem>
-                ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-        </Carousel>
+                            </Link>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+
+                <CarouselPrevious className="left-2 md:left-4" />
+                <CarouselNext className="right-2 md:right-4" />
+
+            </Carousel>
+        </div>
     );
 };
 

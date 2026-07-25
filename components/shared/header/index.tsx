@@ -3,6 +3,7 @@ import Image from "next/image";
 import Menu from "./menu";
 import { APP_NAME } from "@/lib/constants";
 import CategoryDrawer from "./category-drawer";
+import Search from "./Search";
 
 const Navbar = () => {
   return (
@@ -24,7 +25,9 @@ const Navbar = () => {
             </span>
           </Link>
         </div>
-
+        <div className="hidden md:block">
+          <Search />
+        </div>
         <div className="flex items-center gap-2">
           <Menu />
         </div>

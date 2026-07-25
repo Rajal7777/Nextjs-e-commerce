@@ -12,14 +12,20 @@ import { insertProductSchema, updateProductSchema } from "../validators";
 import { notFound } from "next/navigation";
 import type { ClientProduct } from "@/types";
 
-type ProductRecord = Awaited<ReturnType<typeof prisma.product.findMany>>[number];
+//Product[][number] is the type of a single product record from the database
+type ProductRecord = Awaited<
+  ReturnType<typeof prisma.product.findMany>
+>[number];
+
 type SerializableProduct = Omit<ClientProduct, "rating"> & {
   rating: string | number;
 };
 
+//take a product record from the database and convert it to a client product
 function toClientProduct(product: ProductRecord): ClientProduct {
-  const plainProduct =
-    convertToPlainObject(product) as unknown as SerializableProduct;
+  const plainProduct = convertToPlainObject(
+    product,
+  ) as unknown as SerializableProduct;
 
   return {
     ...plainProduct,
@@ -28,14 +34,14 @@ function toClientProduct(product: ProductRecord): ClientProduct {
 }
 
 //Get latest products
-export async function getLatestProducts(): Promise<ClientProduct[]> {
+export async function getLatestProducts() {
   const data = await prisma.product.findMany({
     take: LATEST_PRODUCTS_LIMIT,
     orderBy: {
       createdAt: "desc",
     },
   });
-
+  //pass every single product to toClientProduct function to convert it to a client product {rating: stirng -> number}
   return data.map(toClientProduct);
 }
 
@@ -121,7 +127,7 @@ export async function deleteProductById(id: string) {
   }
 }
 
-//create product
+//create new product
 export async function createProduct(data: z.infer<typeof insertProductSchema>) {
   try {
     //sanitize data
