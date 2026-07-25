@@ -64,18 +64,79 @@ export async function getProductBySLug(slug: string) {
 
 //Get all products
 export async function getAllProducts({
+  query,
   limit = PAGE_SIZE,
   page,
-  query,
   category,
+  price,
+  rating,
+  sort,
 }: {
+  query?: string;
   limit?: number;
   page: number;
-  category: string;
-  query: string;
+  category?: string;
+  price?: string;
+  rating?: string;
+  sort?: string;
 }) {
-  const searchText = query.trim();
-  const categoryText = category.trim();
+  const normalizeFilterValue = (value?: string) => {
+    const text = value?.trim() ?? "";
+    return text.toLowerCase() === "all" ? "" : text;
+  };
+
+  const searchText = normalizeFilterValue(query);
+  const categoryText = normalizeFilterValue(category);
+  const priceText = normalizeFilterValue(price);
+  const ratingText = normalizeFilterValue(rating);
+  const sortText = normalizeFilterValue(sort);
+
+  const safeLimit = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : PAGE_SIZE;
+  const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+
+  const ratingValue = Number(ratingText);
+  const hasRatingFilter = Number.isFinite(ratingValue) && ratingValue > 0;
+
+  const priceFilter = (() => {
+    if (!priceText) return {};
+
+    const exactOrMin = Number(priceText);
+    if (Number.isFinite(exactOrMin) && exactOrMin >= 0) {
+      return { price: { gte: exactOrMin } };
+    }
+
+    const boundedRange = priceText.match(/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/);
+    if (boundedRange) {
+      const min = Number(boundedRange[1]);
+      const max = Number(boundedRange[2]);
+      if (Number.isFinite(min) && Number.isFinite(max)) {
+        return { price: { gte: min, lte: max } };
+      }
+    }
+
+    const lowerBound = priceText.match(/^(\d+(?:\.\d+)?)\+$/);
+    if (lowerBound) {
+      const min = Number(lowerBound[1]);
+      if (Number.isFinite(min)) {
+        return { price: { gte: min } };
+      }
+    }
+
+    return {};
+  })();
+
+  const orderBy = (() => {
+    switch (sortText.toLowerCase()) {
+      case "lowest":
+        return { price: "asc" as const };
+      case "highest":
+        return { price: "desc" as const };
+      case "rating":
+        return { rating: "desc" as const };
+      default:
+        return { createdAt: "desc" as const };
+    }
+  })();
 
   const where = {
     ...(searchText
@@ -84,20 +145,22 @@ export async function getAllProducts({
     ...(categoryText
       ? { category: { contains: categoryText, mode: "insensitive" as const } }
       : {}),
+    ...priceFilter,
+    ...(hasRatingFilter ? { rating: { gte: ratingValue } } : {}),
   };
 
   const data = await prisma.product.findMany({
     where,
-    orderBy: { createdAt: "desc" },
-    skip: (page - 1) * limit,
-    take: limit,
+    orderBy,
+    skip: (safePage - 1) * safeLimit,
+    take: safeLimit,
   });
 
   const dataCount = await prisma.product.count({ where });
 
   return {
-    data,
-    totalPages: getTotalPages(dataCount, limit),
+    data: data.map(toClientProduct),
+    totalPages: getTotalPages(dataCount, safeLimit),
   };
 }
 
