@@ -7,6 +7,47 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
+
+//Dynamic metadata
+export async function generateMetadata(props: {
+    searchParams: {
+        q?: string;
+        category?: string;
+        price?: string;
+        rating?: string;
+        sort?: string;
+        page?: string;
+    };
+}) {
+    const {
+        q = "",
+        category = "all",
+        price = "all",
+        rating = "all",
+        sort = "newest",
+        page = "1",
+    } =await props.searchParams;
+
+  const isQuery = q && q !== 'all' && q.trim()!== '';
+  const isCategory = category && category !== 'all' && category.trim() !== '';
+  const isPrice = price && price !== 'all' && price.trim() !== '';
+  const isRating = rating && rating !== 'all' && rating.trim() !== '';
+
+   if(isQuery || isCategory || isPrice || isRating){
+    const titleParts = [];
+    if(isQuery) titleParts.push(`Search results for "${q}"`);
+    if(isCategory) titleParts.push(`Category: ${category}`);
+    if(isPrice) titleParts.push(`Price: ${price}`);
+    if(isRating) titleParts.push(`Rating: ${rating} stars & up`);
+    return {
+        title: titleParts.join(" | "),
+    };
+   }
+   return {
+       title: "Search",
+   };
+}
+
 const Search = async (props: {
     searchParams: Promise<{
         q?: string;
@@ -211,15 +252,15 @@ const Search = async (props: {
                     <div>
                         {/* Sorting */}
                         Sort by:{" "}
-                     {sortItems.map((item) => (
-                        <Link
-                        key={item}
-                        href={getFilterUrl({ s: item })}
-                        className={`mx-2 ${sort === item ? 'font-bold' : ''}`}
-                        >
-                        {item}
-                        </Link>
-                     ))}
+                        {sortItems.map((item) => (
+                            <Link
+                                key={item}
+                                href={getFilterUrl({ s: item })}
+                                className={`mx-2 ${sort === item ? 'font-bold' : ''}`}
+                            >
+                                {item}
+                            </Link>
+                        ))}
                     </div>
 
                 </div>
