@@ -109,26 +109,25 @@ export async function getAllProducts({
   const ratingFilter =
     rating && rating !== "all" ? { rating: { gte: Number(rating) } } : {};
 
-  const searchText = query?.trim() ?? "";
-  const categoryText = category?.trim() ?? "";
-
-  const where = {
-    ...(searchText
-      ? { name: { contains: searchText, mode: "insensitive" as const } }
-      : {}),
-    ...(categoryText
-      ? { category: { contains: categoryText, mode: "insensitive" as const } }
-      : {}),
+  const where: Prisma.ProductWhereInput = {
+    ...queryFilter,
+    ...categoryFilter,
+    ...priceFilter,
+    ...ratingFilter,
   };
 
+  const orderBy: Prisma.ProductOrderByWithRelationInput =
+    sort === "lowest"
+      ? { price: "asc" }
+      : sort === "highest"
+        ? { price: "desc" }
+        : sort === "rating"
+          ? { rating: "desc" }
+          : { createdAt: "desc" };
+
   const data = await prisma.product.findMany({
-    where: {
-      ...queryFilter,
-      ...categoryFilter,
-      ...priceFilter,
-      ...ratingFilter,
-    },
-    orderBy: { createdAt: "desc" },
+    where,
+    orderBy,
     skip: (page - 1) * limit,
     take: limit,
   });
@@ -136,7 +135,7 @@ export async function getAllProducts({
   const dataCount = await prisma.product.count({ where });
 
   return {
-    data,
+    data: data.map(toClientProduct),
     totalPages: getTotalPages(dataCount, limit),
   };
 }
