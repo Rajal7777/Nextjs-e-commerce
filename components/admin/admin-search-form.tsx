@@ -7,17 +7,17 @@ const AdminSearch = () => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    let formActionUrl = "";
+    const routes = [
+        "/admin/orders",
+        "/admin/users",
+        "/admin/products",
+    ];
 
-    if (pathname.includes("/admin/orders")) {
-        formActionUrl = "/admin/orders";
-    } else if (pathname.includes("/admin/users")) {
-        formActionUrl = "/admin/users";
-    } else {
-        formActionUrl = "/admin/products";
-    }
+    const formActionUrl =
+        routes.find(route => pathname.includes(route)) ?? "/admin/products";
 
-    const queryValue = searchParams.get("query") || "";
+        //only keep empty sting if query param is null or undefined, otherwise use the query param value    
+    const queryValue = searchParams.get("query") ?? "";
 
     return (
         <form action={formActionUrl} method="GET">
