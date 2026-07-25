@@ -11,6 +11,18 @@ import { getTotalPages } from "../pagination";
 import { insertProductSchema, updateProductSchema } from "../validators";
 import { notFound } from "next/navigation";
 import type { ClientProduct } from "@/types";
+import { Prisma } from "../generated/prisma/client";
+
+//types for getAllProducts function
+type ProductQueryParams = {
+  query?: string;
+  limit?: number;
+  page: number;
+  category?: string;
+  price?: string;
+  rating?: string;
+  sort?: string;
+};
 
 //Product[][number] is the type of a single product record from the database
 type ProductRecord = Awaited<
@@ -71,72 +83,34 @@ export async function getAllProducts({
   price,
   rating,
   sort,
-}: {
-  query?: string;
-  limit?: number;
-  page: number;
-  category?: string;
-  price?: string;
-  rating?: string;
-  sort?: string;
-}) {
-  const normalizeFilterValue = (value?: string) => {
-    const text = value?.trim() ?? "";
-    return text.toLowerCase() === "all" ? "" : text;
-  };
+}: ProductQueryParams) {
+  const queryFilter: Prisma.ProductWhereInput =
+    query && query !== "all"
+      ? {
+          name: {
+            contains: query,
+            mode: "insensitive",
+          } as Prisma.StringFilter,
+        }
+      : {};
 
-  const searchText = normalizeFilterValue(query);
-  const categoryText = normalizeFilterValue(category);
-  const priceText = normalizeFilterValue(price);
-  const ratingText = normalizeFilterValue(rating);
-  const sortText = normalizeFilterValue(sort);
+  const categoryFilter = category && category !== "all" ? { category } : {};
 
-  const safeLimit = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : PAGE_SIZE;
-  const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+  const priceFilter: Prisma.ProductWhereInput =
+    price && price !== "all"
+      ? {
+          price: {
+            gte: Number(price.split("-")[0]),
+            lte: Number(price.split("-")[1]),
+          },
+        }
+      : {};
 
-  const ratingValue = Number(ratingText);
-  const hasRatingFilter = Number.isFinite(ratingValue) && ratingValue > 0;
+  const ratingFilter =
+    rating && rating !== "all" ? { rating: { gte: Number(rating) } } : {};
 
-  const priceFilter = (() => {
-    if (!priceText) return {};
-
-    const exactOrMin = Number(priceText);
-    if (Number.isFinite(exactOrMin) && exactOrMin >= 0) {
-      return { price: { gte: exactOrMin } };
-    }
-
-    const boundedRange = priceText.match(/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/);
-    if (boundedRange) {
-      const min = Number(boundedRange[1]);
-      const max = Number(boundedRange[2]);
-      if (Number.isFinite(min) && Number.isFinite(max)) {
-        return { price: { gte: min, lte: max } };
-      }
-    }
-
-    const lowerBound = priceText.match(/^(\d+(?:\.\d+)?)\+$/);
-    if (lowerBound) {
-      const min = Number(lowerBound[1]);
-      if (Number.isFinite(min)) {
-        return { price: { gte: min } };
-      }
-    }
-
-    return {};
-  })();
-
-  const orderBy = (() => {
-    switch (sortText.toLowerCase()) {
-      case "lowest":
-        return { price: "asc" as const };
-      case "highest":
-        return { price: "desc" as const };
-      case "rating":
-        return { rating: "desc" as const };
-      default:
-        return { createdAt: "desc" as const };
-    }
-  })();
+  const searchText = query?.trim() ?? "";
+  const categoryText = category?.trim() ?? "";
 
   const where = {
     ...(searchText
@@ -145,22 +119,25 @@ export async function getAllProducts({
     ...(categoryText
       ? { category: { contains: categoryText, mode: "insensitive" as const } }
       : {}),
-    ...priceFilter,
-    ...(hasRatingFilter ? { rating: { gte: ratingValue } } : {}),
   };
 
   const data = await prisma.product.findMany({
-    where,
-    orderBy,
-    skip: (safePage - 1) * safeLimit,
-    take: safeLimit,
+    where: {
+      ...queryFilter,
+      ...categoryFilter,
+      ...priceFilter,
+      ...ratingFilter,
+    },
+    orderBy: { createdAt: "desc" },
+    skip: (page - 1) * limit,
+    take: limit,
   });
 
   const dataCount = await prisma.product.count({ where });
 
   return {
-    data: data.map(toClientProduct),
-    totalPages: getTotalPages(dataCount, safeLimit),
+    data,
+    totalPages: getTotalPages(dataCount, limit),
   };
 }
 
