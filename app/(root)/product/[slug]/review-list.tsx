@@ -1,84 +1,103 @@
-'use client';
-
+"use client";
+import { toast } from "sonner";
 import { Review } from "@/lib/generated/prisma/browser";
 import ReviewForm from "./review-form";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getAllReviews } from "@/lib/actions/review.actions";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { CalendarHeart, User } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 import Rating from "@/components/rating";
 
 const ReviewList = ({
-    userId,
-    productId,
-    productSlug,
+  userId,
+  productId,
+  productSlug,
 }: {
-    userId: string;
-    productId: string;
-    productSlug: string;
+  userId: string;
+  productId: string;
+  productSlug: string;
 }) => {
-    const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
 
-    useEffect(() => {
-        const loadReviews = async () => {
-            const re = await getAllReviews({ productId });
-            setReviews(re.data);
-        };
+  useEffect(() => {
+    const loadReviews = async () => {
+      const re = await getAllReviews({ productId });
+      setReviews(re.data);
+    };
 
-        loadReviews();
-    }, [productId]);
+    loadReviews();
+  }, [productId]);
 
-    const reload = () => { };
-    return (
-        <div className="space-y-4">
-            {reviews.length === 0 && <p>No reviews yet.</p>}
-            {userId ? (
-                <ReviewForm
-                    userId={userId}
-                    productId={productId}
-                    onReviewSubmitted={reload}
-                />
-            ) : (
-                <div>
-                    Please{" "}
-                    <Link href={`/api/auth/signin?callbackUrl=/product/${productSlug}`} className="text-blue-500 underline">
-                        sign in
-                    </Link>{" "}to write a review.
-                </div>
-            )}
-            <div className="flex flex-col gap-3">
-                {reviews.map((review) => (
-                    <Card key={review.id}>
-                        <CardHeader>
-                            <div className="flex-between">
-                                <CardTitle>
-                                    {review.title}
-                                </CardTitle>
-                            </div>
-                            <CardDescription>{review.description}</CardDescription>
-                        </CardHeader>
+  //reload reviews after a new review is submitted
+const fetchReviews = async () => {
+  try {
+    const { data } = await getAllReviews({ productId });
 
-                        <CardContent>
-                          <div className="flex flex-col space-y-2 text-sm text-muted-foreground">
-                            <Rating value={review.rating} />
-                              <div className='flex items-center'>
-                                <User className='mr-2 h-4 w-4' />
-                                {review.user ? review.user.name : "Deleted User"}
-                            </div>
+    setReviews(data);
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to load reviews");
+  }
+};
 
-                            <div className="flex items-center">
-                                <CalendarHeart className="mr-2 h-4 w-4" />
-                                {formatDateTime(review.createdAt).dateTime}
-                            </div>
-                          </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+  return (
+    <div className="space-y-4">
+      {reviews.length === 0 && <p>No reviews yet.</p>}
+      {userId ? (
+        <ReviewForm
+          userId={userId}
+          productId={productId}
+          onReviewSubmitted={fetchReviews}
+        />
+      ) : (
+        <div>
+          Please{" "}
+          <Link
+            href={`/api/auth/signin?callbackUrl=/product/${productSlug}`}
+            className="text-blue-500 underline"
+          >
+            sign in
+          </Link>{" "}
+          to write a review.
         </div>
-    );
+      )}
+      <div className="flex flex-col gap-3">
+        {reviews.map((review) => (
+          <Card key={review.id}>
+            <CardHeader>
+              <div className="flex-between">
+                <CardTitle>{review.title}</CardTitle>
+              </div>
+              <CardDescription>{review.description}</CardDescription>
+            </CardHeader>
+
+            <CardContent>
+              <div className="flex flex-col space-y-2 text-sm text-muted-foreground">
+                <Rating value={review.rating} />
+                <div className="flex items-center">
+                  <User className="mr-2 h-4 w-4" />
+                  {review.user ? review.user.name : "Deleted User"}
+                </div>
+
+                <div className="flex items-center">
+                  <CalendarHeart className="mr-2 h-4 w-4" />
+                  {formatDateTime(review.createdAt).dateTime}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default ReviewList;
