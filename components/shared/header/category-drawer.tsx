@@ -13,7 +13,7 @@ import Link from "next/link";
 
 const CategoryDrawer = async () => {
     const categories = await getAllCategories();
-    console.log("categories", categories);
+  
     
     return (
         <Drawer direction="left">

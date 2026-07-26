@@ -3,7 +3,7 @@ import CheckoutSteps from "@/components/shared/checkout-steps";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getMyCart } from "@/lib/actions/cart-action";
+import { getMyCart } from "@/lib/actions/cart-actions";
 import { getUserById } from "@/lib/actions/user.actions";
 import { formatCurrency } from "@/lib/utils";
 import { ShippingAddress } from "@/types";
@@ -127,18 +127,18 @@ const PlaceOrderPage = async () => {
                                 <div>Tax</div>
                                 <div>{formatCurrency(cart.taxPrice)}</div>
                             </div>
-                                    
-                               <div className="flex-between">
-                                    <div>Shipping-Price</div>
-                                    <div className="px-4 rounded-md bg-red-400">{formatCurrency(cart.shippingPrice)}</div>
-                                </div>
-                       
+
+                            <div className="flex-between">
+                                <div>Shipping-Price</div>
+                                <div className="px-4 rounded-md bg-red-400">{formatCurrency(cart.shippingPrice)}</div>
+                            </div>
+
 
                             <div className="flex-between">
                                 <div>Total-Price</div>
                                 <div className="px-4 rounded-md bg-green-500">{formatCurrency(cart.totalPrice)}</div>
                             </div>
-                
+
                         </CardContent>
                         <PlaceOrderForm />
                     </Card>

@@ -24,8 +24,8 @@ export async function generateMetadata(props: {
         category = "all",
         price = "all",
         rating = "all",
-        // sort = "newest",
-        // page = "1",
+        sort = "newest",
+        page = "1",
     } =await props.searchParams;
 
   const isQuery = q && q !== 'all' && q.trim()!== '';

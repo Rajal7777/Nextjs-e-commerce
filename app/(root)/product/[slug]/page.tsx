@@ -6,12 +6,12 @@ import ProductImages from "@/components/shared/product/product-image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import AddToCart from "@/components/shared/product/addToCartBtn";
-import { getMyCart } from "@/lib/actions/cart-action";
+import { getMyCart } from "@/lib/actions/cart-actions";
 import ReviewList from "./review-list";
 import { auth } from "@/auth";
 
 type ProductSlugProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; }>;
 };
 
 const ProductDetailsPage = async (props: ProductSlugProps) => {

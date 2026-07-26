@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { addItemToCart, removeItemFromCart, removeItemsFromCart } from "@/lib/actions/cart-action";
+import { addItemToCart, removeItemFromCart, removeItemsFromCart } from "@/lib/actions/cart-actions";
 import { Cart } from "@/types";
 import { ArrowRight, Loader, Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";

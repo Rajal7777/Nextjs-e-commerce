@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart-action";
+import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart-actions";
 import { Cart, CartItem } from "@/types";
 import { Minus, Plus } from "lucide-react";
 

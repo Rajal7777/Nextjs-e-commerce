@@ -28,6 +28,7 @@ import { StarIcon } from "lucide-react";
 
 type CustomerReviewInput = z.input<typeof insertReviewSchema>;
 type CustomerReview = z.output<typeof insertReviewSchema>;
+
 const ReviewForm = ({
     userId,
     productId,
@@ -113,8 +114,8 @@ const ReviewForm = ({
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel>Rating</FieldLabel>
                                         <Select
-                                            onValueChange={(value) => field.onChange(Number(value))}
                                             value={String(field.value ?? "")}
+                                            onValueChange={(value) => field.onChange(Number(value))}
                                         >
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select a rating" />
