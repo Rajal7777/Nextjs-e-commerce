@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertReviewSchema } from "@/lib/validators";
-import { z } from "zod";
+import { date, z } from "zod";
 import { reviewFormDefaultValues } from "@/lib/constants";
 import {
     Dialog,
@@ -23,8 +23,16 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { StarIcon } from "lucide-react";
+import { createUpdateReview } from "@/lib/actions/review.actions";
+import { toast } from "sonner";
 
 type CustomerReviewInput = z.input<typeof insertReviewSchema>;
 type CustomerReview = z.output<typeof insertReviewSchema>;
@@ -51,16 +59,32 @@ const ReviewForm = ({
         defaultValues: formDefaultValues,
     });
 
+    //handle dialog opener
     function handleOpenForm() {
+        form.setValue('productId', productId);
+        form.setValue('userId', userId);
+
         setOpen(true);
     }
 
-    function handleSubmitReview(values: CustomerReview) {
-        void values;
-        onReviewSubmitted();
-        setOpen(false);
-    }
+    const onSubmit: SubmitHandler<z.infer<typeof insertReviewSchema>> = async (
+        data: CustomerReview,
+    ) => {
+        const res = await createUpdateReview({
+            ...data,
+            productId,
+        });
 
+        if (!res.success) {
+            return toast.error(res.message);
+        }
+
+        setOpen(false);
+
+        onReviewSubmitted();
+
+        toast.success(res.message);
+    };
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <Button onClick={handleOpenForm} variant="default">
@@ -77,7 +101,7 @@ const ReviewForm = ({
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
-                    <form id="review-form" onSubmit={form.handleSubmit(handleSubmitReview)}>
+                    <form id="review-form" onSubmit={form.handleSubmit(onSubmit)}>
                         <FieldGroup>
                             <Controller
                                 name="title"
@@ -121,7 +145,7 @@ const ReviewForm = ({
                                                 <SelectValue placeholder="Select a rating" />
                                             </SelectTrigger>
 
-                                            <SelectContent position="popper" >
+                                            <SelectContent position="popper">
                                                 {Array.from({ length: 5 }).map((_, index) => (
                                                     <SelectItem
                                                         key={index}
@@ -144,13 +168,13 @@ const ReviewForm = ({
 
                 <DialogFooter>
                     <Button
-                        type='submit'
-                        form='review-form'
-                        size='lg'
-                        className='w-full'
+                        type="submit"
+                        form="review-form"
+                        size="lg"
+                        className="w-full"
                         disabled={form.formState.isSubmitting}
                     >
-                        {form.formState.isSubmitting ? 'Submitting...' : 'Submit'}
+                        {form.formState.isSubmitting ? "Submitting..." : "Submit"}
                     </Button>
                 </DialogFooter>
             </DialogContent>
