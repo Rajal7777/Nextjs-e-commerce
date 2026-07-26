@@ -9,6 +9,7 @@ import AddToCart from "@/components/shared/product/addToCartBtn";
 import { getMyCart } from "@/lib/actions/cart-actions";
 import ReviewList from "./review-list";
 import { auth } from "@/auth";
+import Rating from "@/components/rating";
 
 type ProductSlugProps = {
   params: Promise<{ slug: string; }>;
@@ -42,9 +43,8 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
           <div className="col-span-2 p-5">
             <div className="flex flex-col gap-6">
               <h1 className="h3-bold">{product.name}</h1>
-              <p>
-                {product.rating.toString()} of {product.numReviews} Reviews
-              </p>
+             <Rating value={Number(product.rating)} />
+             <p>{product.numReviews} Reviews</p>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <Price
                   value={Number(product.price)}
