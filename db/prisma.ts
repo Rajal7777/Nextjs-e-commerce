@@ -26,15 +26,6 @@ function createPrismaClient() {
   return new PrismaClient({ adapter }).$extends({
     result: {
       product: {
-        price: {
-          needs: {
-            price: true,
-          },
-          compute(product) {
-            return product.price.toString();
-          },
-        },
-
         rating: {
           needs: {
             rating: true,

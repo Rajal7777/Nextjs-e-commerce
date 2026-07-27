@@ -1,12 +1,11 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { CartItem } from "@/types";
 import { cookies } from "next/headers";
 import { auth } from "@/auth";
 import { convertToPlainObject, formatError } from "../utils";
 import { cartItemSchema, insertCartItemSchema } from "../validators";
-import { roundDecimal } from "../utils";
+import { calculateConsumptionTax, roundDecimal } from "../utils";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/db/prisma";
 
@@ -15,16 +14,15 @@ const calcPrice = (items: CartItem[]) => {
   const itemsPrice = roundDecimal(
     items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0),
   );
-  console.log("items", itemsPrice);
-  const shippingPrice = roundDecimal(itemsPrice >= 1000 ? 100 : 0);
-  const taxPrice = roundDecimal(0.15 * itemsPrice);
+  const shippingPrice = roundDecimal(itemsPrice >= 10000 ? 0 : 500);
+  const taxPrice = calculateConsumptionTax(itemsPrice);
   const totalPrice = roundDecimal(itemsPrice + taxPrice + shippingPrice);
 
   return {
-    itemsPrice: itemsPrice.toFixed(2),
-    shippingPrice: shippingPrice.toFixed(2),
-    taxPrice: taxPrice.toFixed(2),
-    totalPrice: totalPrice.toFixed(2),
+    itemsPrice: String(itemsPrice),
+    shippingPrice: String(shippingPrice),
+    taxPrice: String(taxPrice),
+    totalPrice: String(totalPrice),
   };
 };
 
@@ -276,7 +274,7 @@ export async function removeItemFromCart(productId: string) {
     await prisma.cart.update({
       where: { id: cart.id },
       data: {
-        items: cart.items as Prisma.CartUpdateitemsInput[],
+        items: cart.items,
         ...calcPrice(cart.items as CartItem[]),
       },
     });

@@ -116,8 +116,8 @@ const CartTable = ({ cart }: { cart?: Cart; }) => {
                     {/* Price */}
 
 
-                    <TableCell>{Number(item.price).toFixed(2)}</TableCell>
-                    <TableCell>{(Number(item.price) * Number(item.qty)).toFixed(2)} </TableCell>
+                    <TableCell>{formatCurrency(item.price)}</TableCell>
+                    <TableCell>{formatCurrency(Number(item.price) * Number(item.qty))} </TableCell>
 
                     <TableCell>
                       <Button

@@ -62,26 +62,31 @@ export function convertToPlainObject<T>(value: T): T {
 //Format number with decimal places
 //padEnd(length, character) adds characters to the end until the string reaches the specified length. used in sensitive number like account no 555*** ***
 export function formatNumberWithDecimal(num: number): string {
+  // Legacy helper kept for older USD-like decimal inputs. New JPY flows use whole yen values.
   const [int, decimal] = num.toString().split(".");
   return decimal ? `${int}.${decimal.padEnd(2, "0")}` : `${int}.00`;
 }
 
-//Round number to two decimal places
-export function roundDecimal(value: number | string) {
+//Round a number to a specific precision. For JPY totals, use the default (0 decimal places).
+export function roundDecimal(value: number | string, decimalPlaces = 0) {
   const num = Number(value);
 
   if (isNaN(num)) {
     throw new Error("Invalid number");
   }
 
-  return Math.round((num + Number.EPSILON) * 100) / 100;
+  const factor = 10 ** decimalPlaces;
+  return Math.round((num + Number.EPSILON) * factor) / factor;
 }
 
-//Format currecy
-const CURRENCY_FORMATTER = new Intl.NumberFormat("en-Us", {
-  currency: "USD",
+const JAPAN_CONSUMPTION_TAX_RATE = 0.1;
+
+//Format currency as Japanese Yen (whole-yen display)
+const CURRENCY_FORMATTER = new Intl.NumberFormat("ja-JP", {
+  currency: "JPY",
   style: "currency",
-  minimumFractionDigits: 2,
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
 });
 
 export function formatCurrency(amount: number | string | null) {
@@ -90,12 +95,17 @@ export function formatCurrency(amount: number | string | null) {
   } else if (typeof amount === "string") {
     return CURRENCY_FORMATTER.format(Number(amount));
   } else {
-    return NaN;
+    return CURRENCY_FORMATTER.format(0);
   }
 }
 
+//Calculate Japan consumption tax and round to whole yen.
+export function calculateConsumptionTax(subtotal: number | string) {
+  return roundDecimal(Number(subtotal) * JAPAN_CONSUMPTION_TAX_RATE);
+}
+
 //Format number returns "1,000"
-const NUMBER_FORMATTER = new Intl.NumberFormat('en-US');
+const NUMBER_FORMATTER = new Intl.NumberFormat('ja-JP');
 
 export function formatNumber(number: number){
   return NUMBER_FORMATTER.format(number);

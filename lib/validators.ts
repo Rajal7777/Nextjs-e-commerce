@@ -1,15 +1,17 @@
 import { z } from "zod";
-import { formatNumberWithDecimal } from "./utils";
 import { PAYMENT_METHODS } from "./constants";
 
 //refine() lets you create your own custom validation rule.
 //syntax refine(conditon, 'Error message)
-const currency = z
+const yenAmountString = z
   .string()
-  .refine(
-    (value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(Number(value))),
-    "Price must have exactly two decimal place",
-  );
+  .trim()
+  .regex(/^\d+$/, "Amount must be a non-negative whole yen value");
+
+const yenAmountNumber = z.coerce
+  .number()
+  .int("Price must be a whole yen amount")
+  .nonnegative("Price must be a non-negative whole yen amount");
 
 //Schema for inserting products
 export const insertProductSchema = z.object({
@@ -22,7 +24,7 @@ export const insertProductSchema = z.object({
   images: z.array(z.string()).min(1, "Product must have at least one image"),
   isFeatured: z.boolean(),
   banner: z.string().nullable(), //optional value
-  price: currency,
+  price: yenAmountNumber,
 });
 
 //Schema for updating products
@@ -58,15 +60,15 @@ export const cartItemSchema = z.object({
   slug: z.string().min(1, "Slug is required"),
   qty: z.number().int().nonnegative("Quantity must be a non-negative integer"),
   image: z.string().min(1, "Image is required"),
-  price: currency,
+  price: yenAmountString,
 });
 
 export const insertCartItemSchema = z.object({
   items: z.array(cartItemSchema),
-  itemsPrice: currency,
-  totalPrice: currency,
-  shippingPrice: currency,
-  taxPrice: currency,
+  itemsPrice: yenAmountString,
+  totalPrice: yenAmountString,
+  shippingPrice: yenAmountString,
+  taxPrice: yenAmountString,
   sessionCartId: z.string().min(1, "Session cart id is required"),
   userId: z.string().optional().nullable(),
 });
@@ -88,10 +90,10 @@ export const paymentMethodSchema = z.object({
 //Schema for inserting order
 export const insertOrderSchema = z.object({
   userId: z.string().min(1, "User is required"),
-  itemsPrice: currency,
-  shippingPrice: currency,
-  taxPrice: currency,
-  totalPrice: currency,
+  itemsPrice: yenAmountString,
+  shippingPrice: yenAmountString,
+  taxPrice: yenAmountString,
+  totalPrice: yenAmountString,
   paymentMethod: z.string().refine((data) => PAYMENT_METHODS.includes(data), {
     message: "Invalid payment method",
   }),
@@ -104,7 +106,7 @@ export const insertOrderItmeSchema = z.object({
   slug: z.string(),
   image: z.string(),
   name: z.string(),
-  price: currency,
+  price: yenAmountString,
   qty: z.number(),
 });
 

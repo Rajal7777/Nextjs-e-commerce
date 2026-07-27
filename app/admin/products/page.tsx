@@ -34,6 +34,7 @@ const AdminProductPage = async (props: {
         page,
         category,
     });
+    console.log("products", products);
     
     return (
         <main className="space-y-2">

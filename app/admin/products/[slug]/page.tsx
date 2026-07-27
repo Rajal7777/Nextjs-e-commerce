@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 };
 
 const AdminProductUpdatePage = async (props: {
-    params: Promise<{ id: string; }>;
+    params: Promise<{ slug: string; }>;
 }) => {
-    const { id } = await props.params;
+    const { slug } = await props.params;
 
-    const product = await getProductById(id);
+    const product = await getProductById(slug);
 
     if (!product) return notFound();
 
@@ -29,7 +29,7 @@ const AdminProductUpdatePage = async (props: {
         images: product.images,
         isFeatured: product.isFeatured,
         banner: product.banner,
-        price: String(product.price),
+        price: Number(product.price),
     };
 
     return (
@@ -38,7 +38,7 @@ const AdminProductUpdatePage = async (props: {
             <ProductForm
                 type="update"
                 product={productFormValues}
-                productId={id}
+                productId={slug}
             />
         </div>
     );

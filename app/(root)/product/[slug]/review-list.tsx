@@ -1,6 +1,5 @@
 "use client";
 import { toast } from "sonner";
-import { Review } from "@/lib/generated/prisma/browser";
 import ReviewForm from "./review-form";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -16,6 +15,10 @@ import { CalendarHeart, User } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 import Rating from "@/components/rating";
 
+type ReviewListItem = Awaited<
+  ReturnType<typeof getAllReviews>
+>["data"][number];
+
 const ReviewList = ({
   userId,
   productId,
@@ -25,7 +28,7 @@ const ReviewList = ({
   productId: string;
   productSlug: string;
 }) => {
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<ReviewListItem[]>([]);
 
   useEffect(() => {
     const loadReviews = async () => {
@@ -42,8 +45,7 @@ const fetchReviews = async () => {
     const { data } = await getAllReviews({ productId });
 
     setReviews(data);
-  } catch (error) {
-    console.error(error);
+  } catch {
     toast.error("Failed to load reviews");
   }
 };
@@ -84,7 +86,7 @@ const fetchReviews = async () => {
                 <Rating value={review.rating} />
                 <div className="flex items-center">
                   <User className="mr-2 h-4 w-4" />
-                  {review.user ? review.user.name : "Deleted User"}
+                  {review.userId}
                 </div>
 
                 <div className="flex items-center">

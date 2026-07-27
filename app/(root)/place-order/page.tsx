@@ -97,11 +97,11 @@ const PlaceOrderPage = async () => {
                                             </TableCell>
 
                                             <TableCell className="px-3">
-                                                <span>${item.price}</span>
+                                                <span>{formatCurrency(item.price)}</span>
                                             </TableCell>
 
                                             <TableCell className="px-3">
-                                                <span>${(Number(item.price) * Number(item.qty)).toFixed(2)}</span>
+                                                <span>{formatCurrency(Number(item.price) * Number(item.qty))}</span>
                                             </TableCell>
 
                                         </TableRow>

@@ -37,7 +37,7 @@ export async function createUpdateReview(
     });
 
     //If existingReview exists, update it, otherwise create a new review
-    //if failed Everything rolls back.
+    //if failed Everything roll back. case success change the product's rating and number of reviews
     await prisma.$transaction(async (tx) => {
       if (existingReview) {
         //update the current review
