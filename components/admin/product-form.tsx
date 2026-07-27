@@ -38,7 +38,7 @@ const ProductForm = ({
 }) => {
   const router = useRouter();
 
-// <Input, Context, Output>types
+  // <Input, Context, Output>types
   const { getValues, setValue, handleSubmit, control } = useForm<
     ProductFormInput,
     undefined,
@@ -182,7 +182,15 @@ const ProductForm = ({
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="price">Price</FieldLabel>
-                <Input {...field} id="price" placeholder="Price" />
+                <Input
+                  id="price"
+                  name={field.name}
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                  placeholder="Price"
+                  value={String(field.value ?? "")}
+                  onChange={(event) => field.onChange(event.target.value)}
+                />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -200,10 +208,13 @@ const ProductForm = ({
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="stock">Stock</FieldLabel>
                 <Input
-                  {...field}
                   id="stock"
+                  name={field.name}
+                  ref={field.ref}
+                  onBlur={field.onBlur}
                   placeholder="Enter Stock"
-                  value={typeof field.value === "number" ? field.value : ""}
+                  value={String(field.value ?? "")}
+                  onChange={(event) => field.onChange(event.target.value)}
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -213,7 +224,7 @@ const ProductForm = ({
           />
         </FieldGroup>
       </div>
-            {/* Images */}
+      {/* Images */}
       <div className="upload-field flex flex-col md:flex-row gap-4">
         <FieldGroup>
           <Controller
@@ -236,7 +247,7 @@ const ProductForm = ({
                     ))}
                     <UploadButton
                       endpoint="imageUploader"
-                      onClientUploadComplete={(res: { url: string }[]) => {
+                      onClientUploadComplete={(res: { url: string; }[]) => {
                         setValue("images", [
                           ...images,
                           ...res.map((r) => r.url),
@@ -257,7 +268,7 @@ const ProductForm = ({
         </FieldGroup>
       </div>
 
-        {/* isFeatured */}
+      {/* isFeatured */}
       <div className="upload-field">
         Featured Product
         <Card className="space-y-2 p-2 mt-2">
@@ -290,12 +301,12 @@ const ProductForm = ({
                 className="w-full h-auto object-cover object-center rounded-sm"
               />
             )}
-            
+
             {isFeatured && !banner && (
               <UploadButton
                 className="pl-8"
                 endpoint="imageUploader"
-                onClientUploadComplete={(res: { url: string }[]) => {
+                onClientUploadComplete={(res: { url: string; }[]) => {
                   setValue("banner", res[0].url);
                 }}
                 onUploadError={(error) => {
