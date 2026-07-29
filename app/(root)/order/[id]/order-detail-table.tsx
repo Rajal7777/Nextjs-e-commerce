@@ -69,7 +69,7 @@ const MarkAsPaidButton = ({ orderId }: { orderId: string; }) => {
       onClick={() =>
         startTransition(async () => {
           const res = await updateOrderToPaidCOD(orderId);
-          console.log("mark to paid");
+         
           if (res.success) {
             toast.success(res.message);
           } else {
@@ -94,7 +94,7 @@ const MarkAsDeliveredButton = ({ orderId }: { orderId: string; }) => {
       onClick={() =>
         startTransition(async () => {
           const res = await deliverOrder(orderId);
-          console.log("marked to delivered");
+       
           if (res.success) {
             toast.success(res.message);
           } else {

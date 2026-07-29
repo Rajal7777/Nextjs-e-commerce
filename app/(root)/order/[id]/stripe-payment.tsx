@@ -12,11 +12,17 @@ import { useTheme } from "next-themes";
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SERVER_URL } from "@/lib/constants";
-console.log("stipe component");
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+);
+
 
 //Stripe Form component
 const StripeForm = ({ orderId }: { orderId: string; }) => {
+  //get the stripe object which helps with payment processing
   const stripe = useStripe();
+  //send the payment information to stripe
   const elements = useElements();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +39,7 @@ const StripeForm = ({ orderId }: { orderId: string; }) => {
     }
     setIsLoading(true);
 
+    //confirmParams is the extra info that you want to send to stripe for processing the payment and send the user to the return_url after the payment is completed
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -48,7 +55,7 @@ const StripeForm = ({ orderId }: { orderId: string; }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="text-xl">Stipe Checkout</div>
+      <div className="text-xl">Stripe Checkout</div>
       {errorMessage && <div className="text-destructive">{errorMessage}</div>}
       <PaymentElement />
       <div>
@@ -66,7 +73,6 @@ const StripeForm = ({ orderId }: { orderId: string; }) => {
 };
 
 const StripePayment = ({
-  price,
   orderId,
   clientSecret,
 }: {
@@ -74,9 +80,7 @@ const StripePayment = ({
   orderId: string;
   clientSecret: string;
 }) => {
-  const stripePromise = loadStripe(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
-  );
+
 
   const { theme, systemTheme } = useTheme();
 
