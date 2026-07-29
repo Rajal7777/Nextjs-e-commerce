@@ -27,7 +27,7 @@ const ProductCart = ({ product }: { product: ClientProduct }) => {
                     {product.name}
                 </Link>
 
-                <div className="flex-between gap-4">
+                <div className="flex flex-col gap-2">
                 <Rating value={Number(product.rating)} />
                     {product.stock > 0 ? (
                         <Price value={Number(product.price)} />

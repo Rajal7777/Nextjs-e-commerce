@@ -35,6 +35,7 @@ import {
 import { toast } from "sonner";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import StripePayment from "./stripe-payment";
 
 //paypal payment
 const PayPalStatus = () => {
@@ -111,10 +112,12 @@ const OrderDetailsTable = ({
   order,
   paypalClientId,
   isAdmin,
+  stripeClientSecret,
 }: {
   order: Order;
   paypalClientId: string;
   isAdmin: boolean;
+  stripeClientSecret: string | null;
 }) => {
   const {
     shippingAddress,
@@ -291,8 +294,19 @@ const OrderDetailsTable = ({
                 </div>
               )}
 
-              {/* Cash on delivery */}
+               {/* Stripe payment */}
+              {!isPaid && paymentMethod === "stripe" && stripeClientSecret && (
+                <div>
+                  <StripePayment
+                    price={Number(totalPrice)}
+                    orderId={order.id}
+                    clientSecret={stripeClientSecret}
+                  />
+                </div>
+              )}
+
             
+              {/* Cash on delivery */}
               {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
                 <MarkAsPaidButton orderId={order.id} />
               )}
