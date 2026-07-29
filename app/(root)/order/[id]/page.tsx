@@ -19,11 +19,21 @@ const OrderDetailsPage = async ({ params }: { params: Promise<{ id: string; }>; 
     const session = await auth();
 
     let clientSecret: string | null = null;
+    const isStripePayment = order.paymentMethod?.toLowerCase() === "stripe";
 
     // Create a PaymentIntent only if the order is unpaid
     // and the selected payment method is Stripe.
-    if (!order.isPaid && order.paymentMethod === "stripe") {
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+    if (!order.isPaid && isStripePayment) {
+        const stripeSecretKey =
+            process.env.STRIPE_SECRET_KEY || process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
+
+        if (!stripeSecretKey) {
+            throw new Error(
+                "Missing STRIPE_SECRET_KEY (or NEXT_PUBLIC_STRIPE_SECRET_KEY fallback).",
+            );
+        }
+
+        const stripe = new Stripe(stripeSecretKey);
 
         const paymentIntent = await stripe.paymentIntents.create({
             amount: Math.round(Number(order.totalPrice)), // JPY is a zero-decimal currency
@@ -40,9 +50,9 @@ const OrderDetailsPage = async ({ params }: { params: Promise<{ id: string; }>; 
         <OrderDetailsTable order={{
             ...order,
             shippingAddress: order.shippingAddress as ShippingAddress,
-            
+
         }}
-        stripeClientSecret={clientSecret}
+            stripeClientSecret={clientSecret}
             paypalClientId={process.env.PAYPAL_CLIENT_ID || 'sb'}
             isAdmin={session?.user?.role === 'admin' || false}
         />

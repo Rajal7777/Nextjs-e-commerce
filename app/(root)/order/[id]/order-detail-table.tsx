@@ -132,6 +132,7 @@ const OrderDetailsTable = ({
     isDelivered,
     deliveredAt,
   } = order;
+  const normalizedPaymentMethod = paymentMethod?.toLowerCase();
 
   const handleCreatePayPalOrder = async () => {
     const res = await createPayPalOrder(order.id);
@@ -282,7 +283,7 @@ const OrderDetailsTable = ({
               </div>
 
               {/* Paypal payment */}
-              {!isPaid && paymentMethod === "PayPal" && (
+              {!isPaid && normalizedPaymentMethod === "paypal" && (
                 <div>
                   <PayPalScriptProvider options={{ clientId: paypalClientId }}>
                     <PayPalStatus />
@@ -295,7 +296,7 @@ const OrderDetailsTable = ({
               )}
 
                {/* Stripe payment */}
-              {!isPaid && paymentMethod === "stripe" && stripeClientSecret && (
+              {!isPaid && normalizedPaymentMethod === "stripe" && stripeClientSecret && (
                 <div>
                   <StripePayment
                     price={Number(totalPrice)}
