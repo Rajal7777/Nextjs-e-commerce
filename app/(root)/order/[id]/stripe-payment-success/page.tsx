@@ -33,9 +33,9 @@ const SuccessPage = async (props: {
     ) { return notFound(); }
 
     //check if the payment intent is successful
-    const isSucess = paymentIntent.status === "succeeded";
+    const isSuccess = paymentIntent.status === "succeeded";
 
-    if (!isSucess) {
+    if (!isSuccess) {
         return redirect(`/order/${id}`);
     }
 
