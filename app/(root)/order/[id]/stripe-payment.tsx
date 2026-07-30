@@ -8,14 +8,17 @@ import {
   useElements,
   LinkAuthenticationElement,
 } from "@stripe/react-stripe-js";
+import { FormEvent, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SERVER_URL } from "@/lib/constants";
 
+//initialize stripe with the publishable key from the environment variables
+//initializing stripe outside of the component to avoid re-initialization on every render use this same instance across the render cycles
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
 );
+
 
 
 //Stripe Form component
@@ -39,11 +42,11 @@ const StripeForm = ({ orderId }: { orderId: string; }) => {
     }
     setIsLoading(true);
 
-    //confirmParams is the extra info that you want to send to stripe for processing the payment and send the user to the return_url after the payment is completed
+    //confirmParams is the extra info that you want to send to stripe for processing  the payment and send the user to the return_url after the payment is completed
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${SERVER_URL}/order/${orderId}/stripe-payment`,
+        return_url: `${SERVER_URL}/order/${orderId}/stripe-payment-success`,
       },
     });
 
@@ -76,13 +79,27 @@ const StripePayment = ({
   orderId,
   clientSecret,
 }: {
-  price: number;
   orderId: string;
   clientSecret: string;
 }) => {
 
 
   const { theme, systemTheme } = useTheme();
+
+  const [mounted, setMounted] = useState(false);
+
+  //to stop hydration errors, we need to wait until the component is mounted before rendering the stripe elements
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="text-sm text-muted-foreground">
+        Loading Stripe...
+      </div>
+    );
+  }
 
   return (
     <Elements

@@ -299,7 +299,6 @@ const OrderDetailsTable = ({
               {!isPaid && normalizedPaymentMethod === "stripe" && stripeClientSecret && (
                 <div>
                   <StripePayment
-                    price={Number(totalPrice)}
                     orderId={order.id}
                     clientSecret={stripeClientSecret}
                   />
