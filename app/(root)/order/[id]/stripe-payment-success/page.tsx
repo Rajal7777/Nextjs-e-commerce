@@ -1,12 +1,21 @@
 import { Button } from "@/components/ui/button";
-import { getOrderById } from "@/lib/actions/order-actions";
+import { getOrderById, updateOrderToPaid } from "@/lib/actions/order-actions";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import Stripe from "stripe";
 
 
-const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY!);
+const stripeSecretKey =
+    process.env.STRIPE_SECRET_KEY || process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
+
+if (!stripeSecretKey) {
+    throw new Error(
+        "Missing STRIPE_SECRET_KEY (or NEXT_PUBLIC_STRIPE_SECRET_KEY fallback).",
+    );
+}
+
+const stripe = new Stripe(stripeSecretKey);
 
 export const metadata: Metadata = {
     title: "Stripe Payment Success",
@@ -37,6 +46,18 @@ const SuccessPage = async (props: {
 
     if (!isSuccess) {
         return redirect(`/order/${id}`);
+    }
+
+    if (!order.isPaid) {
+        await updateOrderToPaid({
+            orderId: order.id,
+            paymentResult: {
+                id: paymentIntent.id,
+                status: paymentIntent.status,
+                email_address: paymentIntent.receipt_email || order.user.email,
+                pricePaid: String(paymentIntent.amount_received || paymentIntent.amount),
+            },
+        });
     }
 
     return (

@@ -13,8 +13,9 @@ import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "../generated/prisma/client";
 
+import { sendOrderConfirmationEmail } from "@/email";
 
-import { sendPurchaseReceipt } from '@/email';
+
 
 //Create order and create order items
 export async function createOrder() {
@@ -266,13 +267,14 @@ export async function approvePayPalOrder(
 
 
   //send purchase receipt email to user
-  await sendPurchaseReceipt({
+  await sendOrderConfirmationEmail({
     order: {
       ...updatedOrder,
       shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
-      paymentResult: updatedOrder.paymentResult as PaymentResult,
-    }
-  })
+      paymentResult: paymentResult as PaymentResult,
+    },
+  });
+  console.log(order);
 }
 
 //Get user's orders

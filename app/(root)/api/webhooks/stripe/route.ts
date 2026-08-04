@@ -5,7 +5,16 @@ import Stripe from "stripe";
 import { updateOrderToPaid } from "@/lib/actions/order-actions";
 
 //intialize stripe
-const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY!);
+const stripeSecretKey =
+  process.env.STRIPE_SECRET_KEY || process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
+
+if (!stripeSecretKey) {
+  throw new Error(
+    "Missing STRIPE_SECRET_KEY (or NEXT_PUBLIC_STRIPE_SECRET_KEY fallback).",
+  );
+}
+
+const stripe = new Stripe(stripeSecretKey);
 
 //POST handler for stripe webhook
 export async function POST(req: NextRequest) {

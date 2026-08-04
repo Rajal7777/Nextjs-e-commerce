@@ -7,7 +7,7 @@ import {
   insertOrderSchema,
   insertOrderItmeSchema,
   paymentResultSchema,
-  insertReviewSchema
+  insertReviewSchema,
 } from "@/lib/validators";
 
 export type Product = z.infer<typeof insertProductSchema> & {
@@ -34,11 +34,12 @@ export type Order = z.infer<typeof insertOrderSchema> & {
   deliveredAt?: Date | null;
   orderItems: OrderItem[];
   user: { name: string; email: string };
+  paymentResult?: PaymentResult | null;
 };
 
 export type PaymentResult = z.infer<typeof paymentResultSchema>;
-export type Review = z.infer<typeof insertReviewSchema>& {
+export type Review = z.infer<typeof insertReviewSchema> & {
   id: string;
   createdAt: Date;
-  user?: {name: string}
+  user?: { name: string };
 };
