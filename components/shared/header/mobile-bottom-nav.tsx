@@ -10,7 +10,7 @@ const MobileBottomNav = () => {
           className="flex items-center justify-center text-muted-foreground"
           aria-label="Cart"
         >
-          <ShoppingCart className="h-4 w-4" />
+          <ShoppingCart className="h-5 w-5" />
         </Link>
 
         <Link
@@ -18,7 +18,7 @@ const MobileBottomNav = () => {
           className="flex items-center justify-center text-muted-foreground"
           aria-label="Wishlist"
         >
-          <Heart className="h-4 w-4" />
+          <Heart className="h-5 w-5" />
         </Link>
 
         <Link
@@ -26,7 +26,7 @@ const MobileBottomNav = () => {
           className="flex items-center justify-center text-muted-foreground"
           aria-label="User"
         >
-          <UserIcon className="h-4 w-4" />
+          <UserIcon className="h-5 w-5" />
         </Link>
       </div>
     </nav>

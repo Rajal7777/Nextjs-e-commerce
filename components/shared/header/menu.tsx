@@ -16,12 +16,16 @@ const Menu = async () => {
           className="flex items-center justify-center text-red-500 hover:text-red-600 transition-colors duration-300"
           aria-label="Wishlist"
         >
-          <Heart className="h-4 w-4" />
+          <Heart className="h-5 w-5" />
         </Link>
 
-        <Button asChild variant="ghost">
+        <Button
+          variant="ghost"
+          size="icon-lg"
+          className="focus-visible:ring-0 focus-visible:ring-offset-0"
+        >
           <Link href="/cart" aria-label="Cart" className="flex items-center justify-center  text-muted-foreground">
-            <ShoppingCart className="h-4 w-4" />
+            <ShoppingCart className="size-5" />
           </Link>
         </Button>
 

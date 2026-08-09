@@ -18,9 +18,13 @@ const UserButton = async () => {
 
   if (!session) {
     return (
-      <Button asChild variant="ghost">
+       <Button
+    variant="ghost"
+    size="icon-lg"
+    className="focus-visible:ring-0 focus-visible:ring-offset-0 text-muted-foreground"
+  >
         <Link href="/sign-in">
-          <UserIcon /> 
+          <UserIcon  className="size-5" /> 
         </Link>
       </Button>
     );
