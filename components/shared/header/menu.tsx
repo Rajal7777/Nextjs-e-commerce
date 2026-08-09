@@ -1,12 +1,6 @@
 import ModeToggle from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { EllipsisVertical, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import UserButton from "./user-button";
 
@@ -16,34 +10,22 @@ const Menu = async () => {
     <div className="flex justify-end gap-3">
       <nav className="hidden md:flex w-full max-w-xs gap-1">
         <ModeToggle />
+
+        <Link
+          href="/wishlist"
+          className="flex items-center justify-center text-red-500 hover:text-red-600 transition-colors duration-300"
+          aria-label="Wishlist"
+        >
+          <Heart className="h-4 w-4" />
+        </Link>
+
         <Button asChild variant="ghost">
-          <Link href="/cart">
-            <ShoppingCart /> Cart
+          <Link href="/cart" aria-label="Cart" className="flex items-center justify-center  text-muted-foreground">
+            <ShoppingCart className="h-4 w-4" />
           </Link>
         </Button>
 
         <UserButton />
-      </nav>
-
-      {/* md screen */}
-      <nav className="md:hidden">
-        <Sheet>
-          <SheetTrigger className="align-middle">
-            <EllipsisVertical />
-          </SheetTrigger>
-
-          <SheetContent className="flex flex-col items-start pl-6">
-            <SheetTitle>Menu</SheetTitle>
-            <ModeToggle />
-
-            <Button asChild variant="ghost">
-              <Link href="/cart">
-                <ShoppingCart /> cart
-              </Link>
-            </Button>
-            <UserButton />
-          </SheetContent>
-        </Sheet>
       </nav>
     </div>
   );

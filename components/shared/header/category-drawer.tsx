@@ -13,12 +13,13 @@ import Link from "next/link";
 
 const CategoryDrawer = async () => {
     const categories = await getAllCategories();
-  
-    
+
+
     return (
         <Drawer direction="left">
             <DrawerTrigger asChild>
-                <Button variant="outline">
+                <Button variant="outline"
+                    className="hidden md:block" >
                     <MenuIcon />
                 </Button>
             </DrawerTrigger>
@@ -31,8 +32,8 @@ const CategoryDrawer = async () => {
                             <Button
                                 key={item.category}
                                 variant="ghost"
-                                 className="w-full justify-start"
-                                 asChild
+                                className="w-full justify-start"
+                                asChild
                             >
                                 <DrawerClose asChild>
                                     <Link href={`/search?category=${item.category}`}>

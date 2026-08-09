@@ -2,6 +2,7 @@ import Navbar from "@/components/shared/header";
 import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/provider/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
+import MobileBottomNav from "@/components/shared/header/mobile-bottom-nav";
 
 export default function RootLayout({
   children,
@@ -17,7 +18,8 @@ export default function RootLayout({
         disableTransitionOnChange
       >
         <Navbar />
-        <main className="wrapper flex-1">{children}</main>
+        <main className="wrapper flex-1 pb-20 md:pb-0">{children}</main>
+        <MobileBottomNav />
         <Footer />
         <Toaster
         position="top-right"
