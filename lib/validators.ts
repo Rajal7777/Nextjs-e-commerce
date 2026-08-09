@@ -139,3 +139,10 @@ export const insertReviewSchema = z.object({
   userId: z.string().min(1, "User id is required"),
   rating: z.coerce.number().int().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5"),
 })
+
+
+//wishList schema
+export const wishListSchema = z.object({
+  userId: z.string().min(1, "User id is required"),
+  productId: z.string().min(1, "Product id is required"),
+})
