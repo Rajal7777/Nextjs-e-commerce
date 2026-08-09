@@ -39,6 +39,7 @@ export default function RootLayout({
           {children}
         </ThemeProvider>
         <Toaster
+        position="top-right"
           toastOptions={{
             classNames: {
               toast:

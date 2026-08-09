@@ -20,6 +20,7 @@ export default function RootLayout({
         <main className="wrapper flex-1">{children}</main>
         <Footer />
         <Toaster
+        position="top-right"
           toastOptions={{
             classNames: {
               toast:
