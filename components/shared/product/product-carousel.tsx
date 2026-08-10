@@ -10,7 +10,7 @@ const ProductCarousel = ({ products }: {
     products: ClientProduct[];
 }) => {
     return (
-        <div className="flex">
+        <div className="flex my-2 md:my-4 lg:my-6">
             <Carousel className="w-full max-w-7xl mx-auto overflow-hidden border"
                 opts={{ loop: true, }}
                 plugins={[
@@ -26,7 +26,7 @@ const ProductCarousel = ({ products }: {
                     {products.map((product) => (
                         <CarouselItem key={product.id}>
                             <Link href={`/product/${product.slug}`}>
-                                <div className="relative w-full h-[35vh] sm:h-[45vh] md:h-[55vh]">
+                                <div className="relative w-full h-[20vh] sm:h-[25vh] md:h-[30vh] lg:h-[60vh]">
                                     <Image
                                         src={product.banner!}
                                         alt={product.description}

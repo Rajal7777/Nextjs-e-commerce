@@ -10,7 +10,7 @@ const ProductCart = ({ product }: { product: ClientProduct }) => {
   return (
     <Card
       size="sm"
-      className=" group flex h-full w-45  sm:w-60 flex-col overflow-hidden rounded-2xl border bg-white  p-0 shadow-sm transition-all  duration-300 ease-in-out :-translate-y-1 :shadow-lg 
+      className=" group flex h-full w-[45vw] sm:w-full flex-col overflow-hidden rounded-2xl border bg-white  p-0 shadow-sm transition-all  duration-300 ease-in-out :-translate-y-1 :shadow-lg 
   "
     >
       <CardHeader className="p-0 border">
@@ -40,7 +40,7 @@ const ProductCart = ({ product }: { product: ClientProduct }) => {
           <button
             type="button"
             aria-label="Add to cart"
-            className="absolute bottom-2 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-black px-3 py-2 text-white opacity-100 shadow-lg transition-all duration-300 hover:bg-gray-700 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 sm:bottom-3 sm:px-4"
+            className="absolute bottom-2 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-black px-3 py-2 text-white opacity-0 group-hover:opacity-100 shadow-lg transition-all duration-300 hover:bg-gray-700 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 sm:bottom-3 sm:px-4"
           >
             <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>

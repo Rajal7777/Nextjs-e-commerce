@@ -3,8 +3,8 @@ import { Card, CardContent } from "./ui/card";
 
 const IconBox = () => {
   return (
-    <Card>
-      <CardContent className="grid md:grid-cols-4 gap-4 p-4">
+    <Card className="my-8">
+      <CardContent className="grid md:grid-cols-4 gap-4 p-4 ">
         <div className="space-y-2">
           <ShoppingBag />
           <p className="text-sm font-bold">Free Shipping</p>

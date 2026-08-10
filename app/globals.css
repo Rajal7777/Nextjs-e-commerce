@@ -115,9 +115,13 @@
   .wrapper {
     width: 100%;
     max-width: 80rem;
-    padding: 1.25rem;
+    padding-inline: 0.8rem;
 
-    @media (width >= 48rem) {
+    @media (width >= 38rem) {
+      padding-inline: 1.25rem;
+    }
+
+    @media (width >= 56rem) {
       padding-inline: 2.5rem;
     }
 
@@ -164,10 +168,10 @@
 }
 
 /*uploadthing button text override */
-html.dark .upload-field .text-white{
+html.dark .upload-field .text-white {
   color: #ffffff !important;
 }
 
-.upload-field .text-white{
+.upload-field .text-white {
   color: #000000 !important;
 }

@@ -29,25 +29,30 @@ function calculateTimeLeft(targetDate: Date) {
 }
 
 const DealCountdown = () => {
-  const [time, setTime] = useState<ReturnType<typeof calculateTimeLeft>>(() =>
-    calculateTimeLeft(TARGET_DATE),
-  );
+  const [time, setTime] = useState<ReturnType<typeof calculateTimeLeft>>({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   useEffect(() => {
-    const timeInterval = setInterval(() => {
-      const newTimeLeft = calculateTimeLeft(TARGET_DATE);
-      setTime(newTimeLeft);
+    //count the time left
+    const updateTimeLeft = () => {
+      setTime(calculateTimeLeft(TARGET_DATE));
+    };
 
-      //clear when countdown reaches zero
-      if (
-        newTimeLeft.days === 0 &&
-        newTimeLeft.hours === 0 &&
-        newTimeLeft.minutes === 0 &&
-        newTimeLeft.seconds === 0
-      ) {
-        clearInterval(timeInterval);
-      }
-    }, 1000);
+    const timeInterval = setInterval(updateTimeLeft, 1000);
+
+    //clear when countdown reaches zero
+    if (
+      time.days === 0 &&
+      time.hours === 0 &&
+      time.minutes === 0 &&
+      time.seconds === 0
+    ) {
+      clearInterval(timeInterval);
+    }
 
     //cleanup function to clear the interval when the component unmounts
     return () => clearInterval(timeInterval);
@@ -104,7 +109,7 @@ const DealCountdown = () => {
         </div>
 
         <ul className="grid grid-cols-4">
-          <StatBox label="Days" value={time.days}  />
+          <StatBox label="Days" value={time.days} />
           <StatBox label="Hours" value={time.hours} />
           <StatBox label="Minutes" value={time.minutes} />
           <StatBox label="Seconds" value={time.seconds} />
@@ -124,11 +129,11 @@ const DealCountdown = () => {
 
 export default DealCountdown;
 
-function StatBox({ value, label }: { value: number; label: string }) {
+function StatBox({ value, label }: { value: number; label: string; }) {
   return (
     <li className="p-2 w-full text-center bg-accent">
-      <p className="text-xl font-bold">{value}</p>
-      <p>{label}</p>
+      <p className="text-sm md:text-base font-bold">{value}</p>
+      <p className="text-xs md:text-sm">{label}</p>
     </li>
   );
 }

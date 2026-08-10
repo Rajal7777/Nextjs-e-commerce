@@ -17,7 +17,7 @@ const ProductList = ({ products, title, limit }: {
             </h2>
             {products.length === 0 && <p>No Products found</p>}
             {products.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 md:gap-4 place-items-center">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 md:gap-4 place-items-center">
                     {limitedData.map((product) => (
                         <ProductCart product={product} key={product.slug} />
                     ))}

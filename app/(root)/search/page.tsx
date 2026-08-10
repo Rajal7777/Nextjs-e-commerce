@@ -26,26 +26,26 @@ export async function generateMetadata(props: {
         rating = "all",
         sort = "newest",
         page = "1",
-    } =await props.searchParams;
+    } = await props.searchParams;
 
-  const isQuery = q && q !== 'all' && q.trim()!== '';
-  const isCategory = category && category !== 'all' && category.trim() !== '';
-  const isPrice = price && price !== 'all' && price.trim() !== '';
-  const isRating = rating && rating !== 'all' && rating.trim() !== '';
+    const isQuery = q && q !== 'all' && q.trim() !== '';
+    const isCategory = category && category !== 'all' && category.trim() !== '';
+    const isPrice = price && price !== 'all' && price.trim() !== '';
+    const isRating = rating && rating !== 'all' && rating.trim() !== '';
 
-   if(isQuery || isCategory || isPrice || isRating){
-    const titleParts = [];
-    if(isQuery) titleParts.push(`Search results for "${q}"`);
-    if(isCategory) titleParts.push(`Category: ${category}`);
-    if(isPrice) titleParts.push(`Price: ${price}`);
-    if(isRating) titleParts.push(`Rating: ${rating} stars & up`);
+    if (isQuery || isCategory || isPrice || isRating) {
+        const titleParts = [];
+        if (isQuery) titleParts.push(`Search results for "${q}"`);
+        if (isCategory) titleParts.push(`Category: ${category}`);
+        if (isPrice) titleParts.push(`Price: ${price}`);
+        if (isRating) titleParts.push(`Rating: ${rating} stars & up`);
+        return {
+            title: titleParts.join(" | "),
+        };
+    }
     return {
-        title: titleParts.join(" | "),
+        title: "Search",
     };
-   }
-   return {
-       title: "Search",
-   };
 }
 
 const Search = async (props: {
@@ -264,7 +264,7 @@ const Search = async (props: {
                     </div>
 
                 </div>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-4 place-items-center">
                     {products.data.length === 0 && <div>No products found</div>}
                     {products.data.map((product) => (
                         <ProductCart key={product.id} product={product} />
