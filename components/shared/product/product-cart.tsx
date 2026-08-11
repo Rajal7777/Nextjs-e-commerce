@@ -4,12 +4,10 @@ import Link from "next/link";
 import Price from "./price";
 import { ClientProduct } from "@/types";
 import Rating from "@/components/rating";
-import {  ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import WishlistButton from "../wishlist/wishlist-button";
 
-
 const ProductCart = ({ product }: { product: ClientProduct }) => {
-  console.log(product)
   return (
     <Card
       size="sm"
@@ -31,8 +29,11 @@ const ProductCart = ({ product }: { product: ClientProduct }) => {
               priority
             />
           </Link>
-{/* in case of undefined the value will be false */}
-  <WishlistButton productId={product.id} initialIsFavorite={product.isFavorite ?? false} />
+          {/* in case of undefined the value will be false */}
+          <WishlistButton
+            productId={product.id}
+            initialIsFavorite={product.isFavorite ?? false}
+          />
 
           <button
             type="button"
