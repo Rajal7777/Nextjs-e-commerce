@@ -37,24 +37,23 @@ const DealCountdown = () => {
   });
 
   useEffect(() => {
-    //count the time left
-    const updateTimeLeft = () => {
-      setTime(calculateTimeLeft(TARGET_DATE));
-    };
+    //calculate time left every second
+    const timeInterval = setInterval(() => {
+      const newTime = calculateTimeLeft(TARGET_DATE);
 
-    const timeInterval = setInterval(updateTimeLeft, 1000);
+      setTime(newTime);
 
-    //clear when countdown reaches zero
-    if (
-      time.days === 0 &&
-      time.hours === 0 &&
-      time.minutes === 0 &&
-      time.seconds === 0
-    ) {
-      clearInterval(timeInterval);
-    }
+      //clear the interval when countdown reaches zero to prevent unnecessary updates
+      if (
+        newTime.days === 0 &&
+        newTime.hours === 0 &&
+        newTime.minutes === 0 &&
+        newTime.seconds === 0
+      ) {
+        clearInterval(timeInterval);
+      }
+    }, 1000);
 
-    //cleanup function to clear the interval when the component unmounts
     return () => clearInterval(timeInterval);
   }, []);
 
@@ -89,6 +88,7 @@ const DealCountdown = () => {
             alt="promotion"
             width={300}
             height={200}
+            className="w-auto h-auto"
           />
         </div>
       </section>

@@ -28,14 +28,14 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
 
   return (
     <>
-      <section>
-        <div className="grid grid-cols-1 md:grid-cols-5">
+      <section className="container mx-auto mt-10 p-2">
+        <div className="grid grid-cols-1 md:grid-cols-5 p-2">
           {/* Images column */}
           <div className="col-span-2 border">
             <ProductImages images={product.images} />
-            <div className="space-x-4">
-              <span className="text-lg font-semibold">{product.brand}</span>
-              <span className="text-sm text-gray-500"> {product.category}</span>
+            <div className="space-x-4 text-center pb-4">
+              <span className="text-md text-gray-500"> {product.category}</span>
+              <span className="text-sm font-semibold">{product.brand}</span>
             </div>
           </div>
 

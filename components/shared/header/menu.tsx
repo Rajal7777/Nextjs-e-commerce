@@ -29,8 +29,8 @@ const Menu = async () => {
           </Link>
         </Button>
 
-        <UserButton />
       </nav>
+        <UserButton />
     </div>
   );
 };

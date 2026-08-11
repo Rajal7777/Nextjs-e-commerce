@@ -19,6 +19,7 @@ export type Product = z.infer<typeof insertProductSchema> & {
 
 export type ClientProduct = Omit<Product, "createdAt"> & {
   createdAt: string;
+  isFavorite: boolean;
 };
 
 export type Cart = z.infer<typeof insertCartItemSchema>;

@@ -1,3 +1,5 @@
+'use server';
+
 import { auth } from "@/auth";
 import { prisma } from "@/db/prisma";
 import { convertToPlainObject, formatError } from "@/lib/utils";
@@ -170,6 +172,7 @@ export async function toggleWishlist(productId: string) {
       success: false,
       message: "You must be signed in.",
     };
+
   }
 
   const existing = await prisma.wishlist.findUnique({

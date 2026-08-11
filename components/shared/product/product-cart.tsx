@@ -4,20 +4,23 @@ import Link from "next/link";
 import Price from "./price";
 import { ClientProduct } from "@/types";
 import Rating from "@/components/rating";
-import { Heart, ShoppingCart } from "lucide-react";
+import {  ShoppingCart } from "lucide-react";
+import WishlistButton from "../wishlist/wishlist-button";
+
 
 const ProductCart = ({ product }: { product: ClientProduct }) => {
+  console.log(product)
   return (
     <Card
       size="sm"
       className=" group flex h-full w-[45vw] sm:w-full flex-col overflow-hidden rounded-2xl border bg-white  p-0 shadow-sm transition-all  duration-300 ease-in-out :-translate-y-1 :shadow-lg 
-  "
+ my-10 "
     >
       <CardHeader className="p-0 border">
         <div className="relative h-44 w-full overflow-hidden bg-gray-50 sm:h-52 lg:h-56">
           <Link
             href={`/product/${product.slug}`}
-            className="block h-full w-full"
+            className="relative block aspect-square w-full"
           >
             <Image
               src={product.images[0]}
@@ -28,19 +31,13 @@ const ProductCart = ({ product }: { product: ClientProduct }) => {
               priority
             />
           </Link>
-
-          <button
-            type="button"
-            aria-label="Add to wishlist"
-            className="absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full border bg-white/95 text-gray-700 shadow-sm transition-colors hover:bg-red-400 sm:left-3 sm:top-3 sm:h-9 sm:w-9"
-          >
-            <Heart className="h-3 w-3 sm:h-4 sm:w-4" />
-          </button>
+{/* in case of undefined the value will be false */}
+  <WishlistButton productId={product.id} initialIsFavorite={product.isFavorite ?? false} />
 
           <button
             type="button"
             aria-label="Add to cart"
-            className="absolute bottom-2 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-black px-3 py-2 text-white opacity-0 group-hover:opacity-100 shadow-lg transition-all duration-300 hover:bg-gray-700 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 sm:bottom-3 sm:px-4"
+            className="absolute bottom-2 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-gray-600 px-3 py-2 text-white opacity-100 shadow-lg transition-all duration-300 hover:bg-gray-700 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 sm:bottom-3 sm:px-4"
           >
             <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
