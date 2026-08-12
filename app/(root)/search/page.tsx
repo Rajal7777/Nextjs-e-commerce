@@ -15,8 +15,6 @@ export async function generateMetadata(props: {
     category?: string;
     price?: string;
     rating?: string;
-    sort?: string;
-    page?: string;
   };
 }) {
   const {
@@ -24,8 +22,6 @@ export async function generateMetadata(props: {
     category = "all",
     price = "all",
     rating = "all",
-    sort = "newest",
-    page = "1",
   } = await props.searchParams;
 
   const isQuery = q && q !== "all" && q.trim() !== "";

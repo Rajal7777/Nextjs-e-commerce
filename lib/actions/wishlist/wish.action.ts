@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/db/prisma";
 import { convertToPlainObject, formatError } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { toClientProduct } from "@/lib/helpers/product";
 
 
 //get productIds from the logged in user's wishlist
@@ -43,7 +44,10 @@ export async function getWishlistProducts() {
       createdAt: "desc",
     },
   });
-  return convertToPlainObject(data);
+  return data.map((item) => ({
+    ...convertToPlainObject(item),
+    product: toClientProduct(item.product),
+  }));
 }
 
 //check if a poduct is already in the wish list

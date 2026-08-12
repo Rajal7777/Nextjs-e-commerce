@@ -13,7 +13,7 @@ const Menu = async () => {
 
         <Link
           href="/wishlist"
-          className="flex items-center justify-center text-red-500 hover:text-red-600 transition-colors duration-300"
+          className="flex items-center justify-center text-red-500 hover:text-red-600 transition-colors duration-300 hover:bg-accent rounded-full p-2"
           aria-label="Wishlist"
         >
           <Heart className="h-5 w-5" />

@@ -15,6 +15,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Charts from "./charts";
 import { requireAdmin } from "@/lib/actions/auth-guard";
+import MobileBottomNav from "@/components/shared/header/mobile-bottom-nav";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",
@@ -25,7 +26,7 @@ const AdminOverViewPage = async () => {
   await requireAdmin();
 
   const session = await auth();
-  console.log(session);
+
 
   if (session?.user?.role !== "admin") {
     throw new Error("User is not authorized");
@@ -34,7 +35,7 @@ const AdminOverViewPage = async () => {
   const summary = await getOrderSummary();
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4 mt-2">
       <h1 className="h2-bold">Dashboard</h1>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -131,6 +132,7 @@ const AdminOverViewPage = async () => {
           </Table>
         </Card>
       </div>
+      <MobileBottomNav />
     </div>
   );
 };

@@ -9,11 +9,11 @@ export default function AdminLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div className="w-full flex flex-col">
-      <div className="h-20 border-b wrapper mx-auto">
-        <div className="flex items-center h-16 px-4">
-          <Link href="/" className="w-22">
+      <div className="h-20 border-b sm:wrapper mx-auto ">
+        <div className="flex items-center h-16 ">
+          <Link href="/" className="w-22 hidden sm:block">
             <Image
-              src="/images/logo.svg"
+              src="/images/store-icon.jpg"
               alt="logo"
               loading="eager"
               height={48}

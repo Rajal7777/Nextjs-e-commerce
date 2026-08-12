@@ -12,6 +12,7 @@ import { insertProductSchema, updateProductSchema } from "../validators";
 import { notFound } from "next/navigation";
 import type { ClientProduct } from "@/types";
 import { Prisma } from "../generated/prisma/client";
+import { toClientProduct } from "@/lib/helpers/product";
 
 //types for getAllProducts function
 type ProductQueryParams = {
@@ -23,27 +24,6 @@ type ProductQueryParams = {
   rating?: string;
   sort?: string;
 };
-
-//Product[][number] is the type of a single product record from the database
-type ProductRecord = Awaited<
-  ReturnType<typeof prisma.product.findMany>
->[number];
-
-type SerializableProduct = Omit<ClientProduct, "rating"> & {
-  rating: string | number;
-};
-
-//take a product record from the database and convert it to a client product
-function toClientProduct(product: ProductRecord): ClientProduct {
-  const plainProduct = convertToPlainObject(
-    product,
-  ) as unknown as SerializableProduct;
-
-  return {
-    ...plainProduct,
-    rating: Number(plainProduct.rating),
-  };
-}
 
 //Get latest products
 export async function getLatestProducts() {
