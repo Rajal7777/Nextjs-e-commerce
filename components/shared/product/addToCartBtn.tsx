@@ -5,9 +5,17 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart-actions";
 import { Cart, CartItem } from "@/types";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, ShoppingCart } from "lucide-react";
 
-const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem; }) => {
+const AddToCart = ({
+  cart,
+  item,
+  iconOnly = false,
+}: {
+  cart?: Cart;
+  item: CartItem;
+  iconOnly?: boolean;
+}) => {
   const router = useRouter();
 
   const handleAddToCart = async () => {
@@ -50,11 +58,27 @@ const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem; }) => {
       </Button>
     </div>
   ) : (
-    <div>
-      <Button type="button" variant="default" onClick={handleAddToCart}>
-        <Plus className="h-4 w-4" /> Add To Cart
-      </Button>
-    </div>
+    <Button
+      type="button"
+      variant="default"
+      onClick={handleAddToCart}
+      aria-label="Add to cart"
+      title="Add to cart"
+      className={
+        iconOnly
+          ? "absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100"
+          : undefined
+      }
+    >
+      {iconOnly ? (
+        <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+      ) : (
+        <>
+          <Plus className="h-4 w-4" />
+          Add To Cart
+        </>
+      )}
+    </Button>
   );
 };
 

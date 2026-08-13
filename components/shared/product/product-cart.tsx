@@ -4,10 +4,11 @@ import Link from "next/link";
 import Price from "./price";
 import { ClientProduct } from "@/types";
 import Rating from "@/components/rating";
-import { ShoppingCart } from "lucide-react";
 import WishlistButton from "../wishlist/wishlist-button";
+import AddToCart from "./addToCartBtn";
 
-const ProductCart = ({ product }: { product: ClientProduct }) => {
+const ProductCart = ({ product }: { product: ClientProduct; }) => {
+
   return (
     <Card
       size="sm"
@@ -15,32 +16,39 @@ const ProductCart = ({ product }: { product: ClientProduct }) => {
     >
       <CardHeader className="p-0 shrink-0">
         <div className="relative aspect-square w-full overflow-hidden rounded-t-2xl bg-gray-100 sm:aspect-4/3">
-             <Link
-        href={`/product/${product.slug}`}
-        className="relative block h-full w-full"
-      >
-        <Image
-          src={product.images[0]}
-          alt={product.name}
-          fill
-          className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          priority
-        />
-      </Link>
+          <Link
+            href={`/product/${product.slug}`}
+            className="relative block h-full w-full"
+          >
+            <Image
+              src={product.images[0]}
+              alt={product.name}
+              fill
+              className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              priority
+            />
+          </Link>
+
           {/* in case of undefined the value will be false */}
           <WishlistButton
             productId={product.id}
             initialIsFavorite={product.isFavorite ?? false}
           />
 
-          <button
-            type="button"
-            aria-label="Add to cart"
-            className="absolute bottom-2 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-gray-600 px-3 py-2 text-white opacity-100 shadow-lg transition-all duration-300 hover:bg-gray-700 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 sm:bottom-3 sm:px-4"
-          >
-            <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </button>
+          {/* Add to cart button */}
+
+          <AddToCart
+            iconOnly
+            item={{
+              productId: product.id,
+              name: product.name,
+              slug: product.slug,
+              price: String(product.price),
+              image: product.images[0],
+              qty: 1,
+            }}
+          />
         </div>
       </CardHeader>
 
