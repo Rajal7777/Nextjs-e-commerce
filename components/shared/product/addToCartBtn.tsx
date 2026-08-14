@@ -39,6 +39,7 @@ const AddToCart = ({
   const handleRemoveFromCart = async () => {
     const res = await removeItemFromCart(item.productId);
     if (res.success) {
+      router.refresh();
       toast.success(res.message);
     } else {
       toast.error(res.message);

@@ -1,0 +1,73 @@
+the architectural sequence diagram illustrating the complete end-to-end "Forgot Password" flow across the Client UI, Next.js Server Actions, Prisma Database, and Resend API.
+       [ CLIENT / FRONTEND ]               [ NEXT.JS BACKEND ]            [ EXTERNAL SERVICES ]
+  Forms & Browser Query Parameters           Server Actions            Database & Email Providers
+         
+         ( FORGOT PASSWORD FORM )        ( requestPasswordReset )            ( PRISMA DB )
+
+                  |                                 |                             |
+  1. Submits Email ------------(Post Request)-----> |                             |
+
+                  |                                 | 2. Check if user exists?    |
+                  |                                 | --------------------------> |
+                  |                                 | <-- [User Row or Null] ---- |
+                  |                                 |                             |
+                  |                                 | 3. Cryptographically generate
+                  |                                 |    Token Hash + 20m ExpTime |
+                  |                                 |                             |
+                  |                                 | 4. Save token metadata      |
+                  |                                 | --------------------------> |
+                  |                                 |                             |   ( RESEND API )
+                  |                                 | 5. Dispatch URL Link        |         |
+                  |                                 | ------------------------------------> |
+                  |                                 |                             |         | [Sends Email
+                  | <--- Generic Success Message -- |                             |         |  to User Inbox]
+                  v                                 v                             v         v
+                  
+======================= USER OPENS EMAIL INBOX AND CLICKS THE URL LINK =======================
+
+         ( RESET PASSWORD FORM )             ( resetPassword )               ( PRISMA DB )
+
+                  |                                 |                             |
+  6. Loads page with URL Query Params               |                             |
+     (?token=RAW_TOKEN&email=...)                   |                             |
+
+                  |                                 |                             |
+  7. Enters New Password & Submits Form ----------> |                             |
+
+                  |                                 | 8. Fetch user's active tokens|
+                  |                                 | --------------------------> |
+                  |                                 | <-- [Array of Tokens] ----- |
+                  |                                 |                             |
+                  |                                 | 9. Loop-compare bcrypt hashes
+                  |                                 |    & validate expiration    |
+                  |                                 |                             |
+                  |                                 | 10. Execute Transaction:    |
+                  |                                 |     - Update Password Hash  |
+                  |                                 |     - Delete used tokens    |
+                  |                                 | --------------------------> |
+                  |                                 | <-- [DB Commit Success] --- |
+                  |                                 |                             |
+                  | <--- Password Reset Success! -- |                             |
+                  |                                 v                             v
+                  |
+  11. Redirects Client to /login
+                  v
+Key Flow Security Checkpoints
+Step 2 & Step 5 (Generic Masking): The server returns the exact same success notification to the UI regardless of whether the email was found. This halts malicious bot attacks attempting to scrape registered user lists.
+Step 3 & Step 9 (Token Disconnect): The plaintext RAW_TOKEN travels exclusively to the user's inbox. The Database only receives and stores the cryptographically secure bcrypt hash of that token. This setup ensures that even a total database compromise does not expose active password-override links.
+Step 10 (Atomicity): Updating the target profile password and scrubbing the token registry are bundled into a single Prisma database transaction block. If either step stumbles, the whole operation rolls back to preserve security integrity.
+Would you like to explore adding rate-limiting middleware to your Next.js configuration to prevent bot scripts from spamming your Resend email quotas?
+
+
+
+
+
+sequenceDiagram
+    User->>App: "Forgot Password" click garcha, email dincha
+    App->>DB: User email search garcha
+    App->>DB: Random reset token generate ra store garcha
+    App->>Resend: Reset link sahit email pathaucha
+    User->>Email: Link click garcha
+    App->>DB: Token valid cha ki chaina check garcha
+    User->>App: Naya password submit garcha
+    App->>DB: Password hash update garcha, token delete garcha
