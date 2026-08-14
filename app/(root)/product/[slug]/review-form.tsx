@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertReviewSchema } from "@/lib/validators";
-import {  z } from "zod";
+import { z } from "zod";
 import { reviewFormDefaultValues } from "@/lib/constants";
 import {
     Dialog,
@@ -31,7 +31,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { StarIcon } from "lucide-react";
-import { createUpdateReview, getSingleReview } from "@/lib/actions/review.actions";
+import { createUpdateReview, getSingleReview } from "@/lib/actions/review-actions";
 import { toast } from "sonner";
 
 type CustomerReviewInput = z.input<typeof insertReviewSchema>;
@@ -66,13 +66,13 @@ const ReviewForm = ({
 
         const res = await getSingleReview({ productId });
 
-        if(res){
+        if (res) {
             form.setValue('title', res.title);
             form.setValue('description', res.description);
             form.setValue('rating', res.rating);
         }
         setOpen(true);
-}
+    }
 
     const onSubmit: SubmitHandler<z.infer<typeof insertReviewSchema>> = async (
         data: CustomerReview,

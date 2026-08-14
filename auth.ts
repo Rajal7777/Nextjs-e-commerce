@@ -12,11 +12,7 @@ import { cookies } from "next/headers";
 import type { Session, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 
-//type for useSession()
-// type UpdateSession = {
-//   name?: string;
-//   email?: string;
-// };
+
 
 export const config = {
   pages: {

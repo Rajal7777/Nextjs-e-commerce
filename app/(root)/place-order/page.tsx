@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getMyCart } from "@/lib/actions/cart-actions";
-import { getUserById } from "@/lib/actions/user.actions";
+import { getUserById } from "@/lib/actions/user-actions";
 import { formatCurrency } from "@/lib/utils";
 import { ShippingAddress } from "@/types";
 import { Metadata } from "next";

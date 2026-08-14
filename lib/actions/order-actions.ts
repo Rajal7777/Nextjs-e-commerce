@@ -4,18 +4,16 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { convertToPlainObject, formatError } from "../utils";
 import { auth } from "@/auth";
 import { getMyCart } from "./cart-actions";
-import { getUserById } from "./user.actions";
+import { getUserById } from "./user-actions";
 import { insertOrderSchema } from "../validators";
 import { prisma } from "@/db/prisma";
-import { CartItem, PaymentResult,ShippingAddress } from "@/types";
+import { CartItem, PaymentResult, ShippingAddress } from "@/types";
 import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "../generated/prisma/client";
 
 import { sendOrderConfirmationEmail } from "@/email";
-
-
 
 //Create order and create order items
 export async function createOrder() {
@@ -213,7 +211,7 @@ export async function approvePayPalOrder(
 }
 
 //Update order to paid
- export async function updateOrderToPaid({
+export async function updateOrderToPaid({
   orderId,
   paymentResult,
 }: {
@@ -264,7 +262,6 @@ export async function approvePayPalOrder(
   });
 
   if (!updatedOrder) throw new Error("Order not Found");
-
 
   //send purchase receipt email to user
   await sendOrderConfirmationEmail({

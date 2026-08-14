@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { signoutUser } from "@/lib/actions/user.actions";
+import { signoutUser } from "@/lib/actions/user-actions";
 import { UserIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -18,13 +18,13 @@ const UserButton = async () => {
 
   if (!session) {
     return (
-       <Button
-    variant="ghost"
-    size="icon-lg"
-    className="focus-visible:ring-0 focus-visible:ring-offset-0 text-muted-foreground"
-  >
+      <Button
+        variant="ghost"
+        size="icon-lg"
+        className="focus-visible:ring-0 focus-visible:ring-offset-0 text-muted-foreground"
+      >
         <Link href="/sign-in">
-          <UserIcon  className="size-5" /> 
+          <UserIcon className="size-5" />
         </Link>
       </Button>
     );

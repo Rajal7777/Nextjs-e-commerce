@@ -9,7 +9,7 @@ import {
     FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { updateProfile } from "@/lib/actions/user.actions";
+import { updateProfile } from "@/lib/actions/user-actions";
 import { updateProfileSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";

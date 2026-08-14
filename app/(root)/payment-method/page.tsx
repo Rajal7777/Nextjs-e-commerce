@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { getUserById } from "@/lib/actions/user.actions";
+import { getUserById } from "@/lib/actions/user-actions";
 import PaymentMethodForm from "./paymentMethod-form";
 import CheckoutSteps from "@/components/shared/checkout-steps";
 

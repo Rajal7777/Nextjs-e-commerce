@@ -42,7 +42,7 @@ export const signInFormSchema = z.object({
 export const signUpFormSchema = z
   .object({
     name: z.string().min(3, "Name must be at leat 3 characters"),
-    email: z.string().email("Invalid email address"),
+    email: z.email("Invalid email address"),
     password: z.string().min(6, "password must be at least 6 characters"),
     confirmPassword: z
       .string()
@@ -145,4 +145,10 @@ export const insertReviewSchema = z.object({
 export const wishListSchema = z.object({
   userId: z.string().min(1, "User id is required"),
   productId: z.string().min(1, "Product id is required"),
+})
+
+
+//reset password schema
+export const resetPasswordSchema = z.object({
+  email: z.email("Invalid email address"),
 })

@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { signUpUser } from "@/lib/actions/user.actions";
+import { signUpUser } from "@/lib/actions/user-actions";
 import { useSearchParams } from "next/navigation";
 import { signUpDefaultValues } from "@/lib/utils";
 

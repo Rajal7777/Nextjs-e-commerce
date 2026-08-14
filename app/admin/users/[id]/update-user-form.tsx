@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
-import { updateUser } from "@/lib/actions/user.actions";
+import { updateUser } from "@/lib/actions/user-actions";
 import { useRouter } from "next/navigation";
 
 //use the form form shadcn

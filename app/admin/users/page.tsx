@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAllUsers, deleteUser } from "@/lib/actions/user.actions";
+import { getAllUsers, deleteUser } from "@/lib/actions/user-actions";
 import { formatId } from "@/lib/utils";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 const AdminUserPage = async (props: {
-  searchParams: Promise<{ page?: string; query?: string }>;
+  searchParams: Promise<{ page?: string; query?: string; }>;
 }) => {
   const { page = "1", query = "" } = await props.searchParams;
 

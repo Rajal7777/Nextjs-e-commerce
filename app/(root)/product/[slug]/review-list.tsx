@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import ReviewForm from "./review-form";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getAllReviews } from "@/lib/actions/review.actions";
+import { getAllReviews } from "@/lib/actions/review-actions";
 import {
   Card,
   CardContent,
@@ -41,15 +41,15 @@ const ReviewList = ({
   }, [productId]);
 
   //reload reviews after a new review is submitted
-const fetchReviews = async () => {
-  try {
-    const { data } = await getAllReviews({ productId });
+  const fetchReviews = async () => {
+    try {
+      const { data } = await getAllReviews({ productId });
 
-    setReviews(data);
-  } catch {
-    toast.error("Failed to load reviews");
-  }
-};
+      setReviews(data);
+    } catch {
+      toast.error("Failed to load reviews");
+    }
+  };
 
   return (
     <div className="space-y-4">
