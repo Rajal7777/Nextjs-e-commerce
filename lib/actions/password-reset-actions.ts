@@ -2,12 +2,14 @@
 
 import crypto from "node:crypto";
 import { prisma } from "@/db/prisma";
-import { resetPasswordSchema } from "../validators";
+import { resetPasswordSchema, updatePasswordSchema } from "../validators";
 import { formatError } from "../utils";
+import { hashSync } from "bcryptjs";
 
 import { SERVER_URL } from "@/lib/constants";
 import { sendResetPasswordEmail } from "@/email";
 
+//request password reset action
 export async function requestPasswordReset(email: string) {
   try {
     //validate email
@@ -62,6 +64,75 @@ export async function requestPasswordReset(email: string) {
     await sendResetPasswordEmail({ email: validatedEmail, resetUrl });
 
     return genericMessage;
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+}
+
+//update password action
+export async function resetPassword(data: {
+  token: string;
+  password: string;
+  confirmPassword: string;
+}) {
+  try {
+    //validate the user input data
+    const validatedData = updatePasswordSchema.parse(data);
+
+    //hash the token
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(validatedData.token)
+      .digest("hex");
+
+    //compare check if the token exists and is valid
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: {
+        tokenHash,
+      },
+    });
+
+    if (!resetToken) {
+      throw new Error("Invalid or expired reset token");
+    }
+
+    //if the token has expired, delete it from the db and throw an error
+    if (resetToken.expiresAt < new Date()) {
+      await prisma.passwordResetToken.delete({
+        where: {
+          id: resetToken.id,
+        },
+      });
+      throw new Error("Invalid or expired reset token");
+    }
+
+    //valid token, then hash new password and update the user password
+    const hashedPassword = hashSync(validatedData.password, 10);
+
+    //update the user password and delete the reset token at the same time using a transaction
+    await prisma.$transaction([
+      prisma.user.update({
+        where: {
+          id: resetToken.userId,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      }),
+      prisma.passwordResetToken.delete({
+        where: {
+          id: resetToken.id,
+        },
+      }),
+    ]);
+
+    return {
+      success: true,
+      message: "Password has been reset successfully",
+    };
   } catch (error) {
     return {
       success: false,
