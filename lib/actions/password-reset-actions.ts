@@ -19,35 +19,32 @@ export async function requestPasswordReset(email: string) {
 
     //generic message to avoid revealing if the email exists or not
     const genericMessage = {
-        success: true,
-        message: "If the email exists, a password reset link has been sent.",
-    }
+      success: true,
+      message: "If the email exists, a password reset link has been sent.",
+    };
 
-    if(!user) {
-        return genericMessage;
+    if (!user) {
+      return genericMessage;
     }
 
     //generate random token and store the hash on the db
-     const rawToken = crypto.randomBytes(32).toString("hex");
-     const tokenHash = crypto
-     .createHash("sha256")
-     .update(rawToken)
-     .digest("hex");
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
 
-     //30 minutes expiration time
-     const expirationTime = new Date(Date.now() + 30 * 60 * 1000);
+    //30 minutes expiration time
+    const expirationTime = new Date(Date.now() + 30 * 60 * 1000);
 
-
-        //store the hashed token and expiration time in the db
-        await prisma.passwordResetToken.create({
-            data: {
-                userId: user.id,
-                tokenHash,
-                expiresAt: expirationTime,
-            }
-        })
-
-
+    //store the hashed token and expiration time in the db
+    await prisma.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt: expirationTime,
+      },
+    });
   } catch (error) {
     return {
       success: false,
