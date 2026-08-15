@@ -5,6 +5,9 @@ import { prisma } from "@/db/prisma";
 import { resetPasswordSchema } from "../validators";
 import { formatError } from "../utils";
 
+import { SERVER_URL } from "@/lib/constants";
+import { sendResetPasswordEmail } from "@/email";
+
 export async function requestPasswordReset(email: string) {
   try {
     //validate email
@@ -37,6 +40,13 @@ export async function requestPasswordReset(email: string) {
     //30 minutes expiration time
     const expirationTime = new Date(Date.now() + 30 * 60 * 1000);
 
+    //delete any existing tokens for the user
+    await prisma.passwordResetToken.deleteMany({
+      where: {
+        userId: user.id,
+      },
+    });
+
     //store the hashed token and expiration time in the db
     await prisma.passwordResetToken.create({
       data: {
@@ -45,6 +55,13 @@ export async function requestPasswordReset(email: string) {
         expiresAt: expirationTime,
       },
     });
+
+    //create the reset url
+    const resetUrl = `${SERVER_URL}/reset-password?token=${encodeURIComponent(rawToken)}`;
+
+    await sendResetPasswordEmail({ email: validatedEmail, resetUrl });
+
+    return genericMessage;
   } catch (error) {
     return {
       success: false,

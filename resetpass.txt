@@ -71,3 +71,37 @@ sequenceDiagram
     App->>DB: Token valid cha ki chaina check garcha
     User->>App: Naya password submit garcha
     App->>DB: Password hash update garcha, token delete garcha
+
+
+
+    User
+ ↓
+Forgot Password
+ ↓
+Email enter
+ ↓
+Validate email
+ ↓
+Generate rawToken
+ ↓
+Hash rawToken
+ ↓
+Save hash + expiry in DB
+ ↓
+Create resetUrl
+ ↓
+Send email
+ ↓
+User clicks link
+ ↓
+/reset-password?token=rawToken
+ ↓
+Server gets rawToken
+ ↓
+Hash it again
+ ↓
+Compare with DB tokenHash
+ ↓
+Check expiry
+ ↓
+Allow password reset
