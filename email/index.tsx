@@ -2,6 +2,8 @@ import { Resend} from "resend";
 import { APP_NAME } from "@/lib/constants";
 import {Order} from "@/types";
 import PurchaseReceiptEmail from "./purchase-receipt";
+import ResetPasswordEmail from "./reset-password";
+
 
 
 
@@ -26,4 +28,24 @@ export const sendOrderConfirmationEmail = async ({
   }
 };
 
+
+//email for reset password
+export const sendResetPasswordEmail = async ({
+email,
+resetUrl,
+}: {
+  email:string;
+  resetUrl: string
+}) => {
+  try {
+    await resend.emails.send({
+      from: `${APP_NAME} <onboarding@resend.dev>`,
+      to: email,
+      subject: `Reset your password - ${APP_NAME}`,
+      react: <ResetPasswordEmail resetUrl={resetUrl}/>
+    })
+  } catch (error) {
+    console.error("Failed to send password reset email:",error)
+  }
+}
 
