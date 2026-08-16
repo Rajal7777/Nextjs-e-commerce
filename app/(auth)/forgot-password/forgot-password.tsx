@@ -22,15 +22,15 @@ const ForgotPasswordForm = () => {
   };
   return (
     <form onSubmit={handleSubmit}>
-      <div className="space-y-2">
-        <label htmlFor="email">Email</label>
+      <div className="space-y-3">
+        <label htmlFor="email">Enter Your Email</label>
         <input
           type="email"
           id="email"
           value={email}
           onChange={(e) =>setEmail(e.target.value) }
           required
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm  outline-none"
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm  outline-none mt-2"
         />
 
         <Button type="submit" className="w-full" disabled={isPending}>

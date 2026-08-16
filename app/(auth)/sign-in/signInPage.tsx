@@ -7,7 +7,6 @@ import { signInWithCredentials } from "@/lib/actions/user-actions";
 import { useSearchParams } from "next/navigation";
 import { signInDefaultValues } from "@/lib/constants";
 
-
 const initialState = {
   success: false,
   message: "",
@@ -58,12 +57,12 @@ const SignInPage = () => {
 
       <div className="text-right">
         <Link
-        href="/forgot-password"
-        className="text-sm text-muted-foreground hover:text-primary hover:underline"
+          href="/forgot-password"
+          className="text-sm text-muted-foreground hover:text-primary hover:underline"
         >
           Forgot password?
         </Link>
-        </div>
+      </div>
 
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? "Signing in..." : "Sign in"}
