@@ -4,9 +4,13 @@ import Link from "next/link";
 import MainNav from "./main-nav";
 import AdminSearch from "@/components/admin/admin-search-form";
 
-export default function AdminLayout({
+import { requireAdmin } from "@/lib/actions/auth-guard";
+
+export default async function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  await requireAdmin();
+
   return (
     <div className="w-full flex flex-col">
       <div className="h-20 border-b sm:wrapper mx-auto ">

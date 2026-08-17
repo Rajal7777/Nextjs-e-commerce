@@ -2,17 +2,15 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
-import  { NextRequest } from "next/server";
-
+import { NextRequest } from "next/server";
 
 import { prisma } from "./db/prisma";
-import CredentialsProvider from "next-auth/providers/credentials"; //determine how user logIn eg:- github,email
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { compare } from "bcryptjs";
 import { cookies } from "next/headers";
 import type { Session, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
-
-
 
 export const config = {
   pages: {
@@ -27,6 +25,10 @@ export const config = {
 
   //tells authjs user will login with email, password
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
     CredentialsProvider({
       credentials: {
         email: { type: "email" },
@@ -34,21 +36,26 @@ export const config = {
       },
 
       async authorize(credentials) {
-        if (credentials == null) return null;
+        const email =
+          typeof credentials.email === "string" ? credentials.email : null;
+
+        const password =
+          typeof credentials.password === "string"
+            ? credentials.password
+            : null;
+
+        if (!email || !password) return null;
 
         //Find user in database
         const user = await prisma.user.findUnique({
           where: {
-            email: credentials.email as string,
+            email: email,
           },
         });
 
         //Check if user exists and if the password matches
         if (user && user.password) {
-          const isMatch = await compare(
-            credentials.password as string,
-            user.password,
-          );
+          const isMatch = await compare(password, user.password);
 
           //If password is correct, return user// on sucess creates session or JWT
           if (isMatch) {
@@ -88,17 +95,30 @@ export const config = {
       token: JWT;
       user?: User;
       trigger: "signIn" | "signUp" | "update";
-      session: any;
+      session: unknown;
     }) {
+      // Handle session updates {user name}
+      if (trigger === "update" && session && typeof session === "object") {
+        const updateSession = session as {
+          name?: string;
+          email?: string;
+        };
+
+        if (updateSession.name) token.name = updateSession.name;
+        if (updateSession.email) token.email = updateSession.email;
+      }
+
       //only runs once after the successful login
-      //sotring extra data to jwt token
+      //storing extra data to jwt token
       if (user) {
         token.id = user.id;
         token.role = user.role;
 
-        //use Email name incase no name is set
+        //use Email name in case no name is set
         if (user.name === "NO_NAME" && user.email) {
           token.name = user.email.split("@")[0];
+        } else if (user.name) {
+          token.name = user.name;
         }
       }
 
@@ -106,42 +126,32 @@ export const config = {
         const cookiesObject = await cookies();
         const sessionCartId = cookiesObject.get("sessionCartId")?.value;
 
+        //for guest user,not logged in user
         if (sessionCartId) {
           const sessionCart = await prisma.cart.findFirst({
-            where: { sessionCartId },
+            where: {
+              sessionCartId,
+              userId: null,
+            },
           });
 
-          //Delete current user cart
+          //Delete current user cart & update
           if (sessionCart) {
-            await prisma.cart.deleteMany({
-              where: { userId: user.id },
-            });
+            await prisma.$transaction([
+              prisma.cart.deleteMany({
+                where: { userId: user.id },
+              }),
 
-            //Assign new cart
-            await prisma.cart.update({
-              where: { id: sessionCart.id },
-              data: { userId: user.id },
-            });
+              //new cart will be created for the user with the sessionCartId and userId
+              prisma.cart.update({
+                where: { id: sessionCart.id },
+                data: { userId: user.id },
+              }),
+            ]);
           }
         }
       }
 
-      // Handle session updates {user name}
-      if (trigger === "update") {
-        const updateSession = session as {
-          name?: string;
-          email?: string;
-        };
-
-        if (updateSession.name) {
-          token.name = updateSession.name;
-        }
-
-        if (updateSession.email) {
-          token.email = updateSession.email;
-        }
-      }
-    
       return token;
     },
     authorized({
@@ -153,13 +163,13 @@ export const config = {
     }) {
       //Array of regex patterns for path protected
       const protectedPaths = [
-        /\/shipping-address/,
-        /\/payment-method/,
-        /\/place-order/,
-        /\/profile/,
-        /\/user/,
-        /\/order/,
-        /\/admin/,
+        /^\/shipping-address(?:\/|$)/,
+        /^\/payment-method(?:\/|$)/,
+        /^\/place-order(?:\/|$)/,
+        /^\/profile(?:\/|$)/,
+        /^\/user(?:\/|$)/,
+        /^\/order(?:\/|$)/,
+        /^\/admin(?:\/|$)/,
       ];
 
       //Get pathname from the req URL obj
