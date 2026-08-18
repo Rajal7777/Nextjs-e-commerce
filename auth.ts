@@ -1,8 +1,9 @@
 //PrismaAdapter is bridge auth logic and prisma{database}:
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthConfig } from "next-auth";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
+import type { AdapterUser } from "next-auth/adapters"
 
 import { prisma } from "./db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -93,7 +94,7 @@ export const config = {
       session,
     }: {
       token: JWT;
-      user?: User;
+      user?: User | AdapterUser | undefined;
       trigger: "signIn" | "signUp" | "update";
       session: unknown;
     }) {
@@ -154,6 +155,7 @@ export const config = {
 
       return token;
     },
+
     authorized({
       auth,
       request,
@@ -196,4 +198,4 @@ export const config = {
   },
 };
 
-export const { auth, signIn, signOut, handlers } = NextAuth(config);
+export const { auth, signIn, signOut, handlers } = NextAuth(config as NextAuthConfig  );

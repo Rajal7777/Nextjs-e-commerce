@@ -10,7 +10,10 @@ import { signUpDefaultValues } from "@/lib/utils";
 
 
 const SignUpForm = () => {
-  const [data, action, pending] = useActionState(signUpUser, signUpDefaultValues);
+  const [data, action, pending] = useActionState(signUpUser, {
+    success: false,
+    message: "",
+  });
 
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";

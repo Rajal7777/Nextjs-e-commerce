@@ -1,4 +1,3 @@
-"use";
 
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
@@ -82,9 +81,10 @@ const UserButton = async () => {
           <DropdownMenuItem className="p-0 mb-1">
             <form className="w-full">
               <Button
-                onClick={signoutUser}
+                type="submit"
                 className="w-full py-4 px-2 h-4 justify-start"
                 variant="ghost"
+                onClick={signoutUser}
               >
                 Sign Out
               </Button>

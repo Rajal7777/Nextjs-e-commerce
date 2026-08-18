@@ -28,6 +28,7 @@ const calcPrice = (items: CartItem[]) => {
 
 //ADD TO CART
 export async function addItemToCart(data: CartItem) {
+  console.log(data);
   try {
     // Get the unique cart ID stored in the visitor's browser cookie.
     // This lets us know which shopping cart belongs to this visitor.
@@ -198,6 +199,7 @@ export async function getMyCart() {
   // Read the cart ID from the browser cookie.
   const sessionCartId = (await cookies()).get("sessionCartId")?.value;
 
+
   if (!sessionCartId) {
     throw new Error("Cart session not found.");
   }
@@ -210,10 +212,12 @@ export async function getMyCart() {
   const userId = session?.user?.id ? (session.user.id as string) : undefined;
 
   // Logged-in users: find cart by userId.
-  // Guest users: find cart by sessionCartId.
+  // Guests can only access anonymous carts for their session.
   const cart = await prisma.cart.findFirst({
-    where: userId ? { userId } : { sessionCartId },
+    where: userId ? { userId } : { sessionCartId, userId: null },
   });
+
+  console.log('cart', cart,"userId", userId, "sessionCartId", sessionCartId);
 
   // No cart found.
   if (!cart) return undefined;

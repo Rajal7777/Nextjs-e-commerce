@@ -14,8 +14,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { APP_NAME } from "@/lib/constants";
 
-//google povider    
-import { signIn } from "next-auth/react";
+
 
 export const metadata: Metadata = {
   title: "Sign in",
