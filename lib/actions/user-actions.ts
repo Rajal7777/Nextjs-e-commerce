@@ -33,7 +33,6 @@ export async function signInWithCredentials(
 
     await signIn("credentials", user);
 
-    //const [state] = useActionState(...)  here my state expects a success and message
     return { success: true, message: "Signed in successfully" };
   } catch (error) {
     //redirect() works by throwing a secret error.try...catch accidentally traps that secret error.throw error forwards the secret error back to Next.js so the page transition actually happens

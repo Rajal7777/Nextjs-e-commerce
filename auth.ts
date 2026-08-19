@@ -136,15 +136,15 @@ export const config = {
             },
           });
 
-          //Delete current user cart & update
+        //delete old cart for user and add userId to the session cart
           if (sessionCart) {
             await prisma.$transaction([
               prisma.cart.deleteMany({
                 where: { userId: user.id },
               }),
 
-              //new cart will be created for the user with the sessionCartId and userId
-              prisma.cart.update({
+              //add userId to the session cart
+             prisma.cart.update({
                 where: { id: sessionCart.id },
                 data: { userId: user.id },
               }),
@@ -181,7 +181,7 @@ export const config = {
       if (!auth && protectedPaths.some((path) => path.test(pathname)))
         return false;
 
-      if (!request.cookies.get("sessionCartId")) {
+         if (!request.cookies.get("sessionCartId")) {
         const response = NextResponse.next();
 
         response.cookies.set("sessionCartId", crypto.randomUUID(), {

@@ -28,10 +28,9 @@ const calcPrice = (items: CartItem[]) => {
 
 //ADD TO CART
 export async function addItemToCart(data: CartItem) {
-  console.log(data);
   try {
-    // Get the unique cart ID stored in the visitor's browser cookie.
-    // This lets us know which shopping cart belongs to this visitor.
+    // Get the sessionCartId stored in the visitor's browser cookie.
+    // This lets us know which shopping cart belongs to this guest.
     const sessionCartId = (await cookies()).get("sessionCartId")?.value;
 
     // Stop if the visitor doesn't have a cart cookie.
@@ -199,7 +198,6 @@ export async function getMyCart() {
   // Read the cart ID from the browser cookie.
   const sessionCartId = (await cookies()).get("sessionCartId")?.value;
 
-
   if (!sessionCartId) {
     throw new Error("Cart session not found.");
   }
@@ -217,8 +215,7 @@ export async function getMyCart() {
     where: userId ? { userId } : { sessionCartId, userId: null },
   });
 
-  console.log('cart', cart,"userId", userId, "sessionCartId", sessionCartId);
-
+ 
   // No cart found.
   if (!cart) return undefined;
 
