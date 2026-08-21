@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { Checkbox } from "../ui/checkbox";
-import {  Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 type ProductFormInput = z.input<typeof insertProductSchema>; //form input type
 type ProductFormValues = z.output<typeof insertProductSchema>; //form output type
@@ -276,7 +276,7 @@ const ProductForm = ({
                           className="absolute bottom-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-300 text-sm font-bold text-white hover:bg-red-400"
                         >
                           <Trash2 aria-hidden="true" width={16} height={16} className="flex items-center" />
-                       </button>
+                        </button>
                       </div>
                     ))}
 

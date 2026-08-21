@@ -7,8 +7,15 @@ import Rating from "@/components/rating";
 import WishlistButton from "../wishlist/wishlist-button";
 import AddToCart from "./addToCartBtn";
 
-const ProductCart = ({ product }: { product: ClientProduct; }) => {
-
+const ProductCart = ({
+  product,
+  priority = false,
+}: {
+  product: ClientProduct;
+  priority?: boolean;
+}) => {
+//fallback img
+const productImage = product.images[0] || "/images/loader.jpg";
   return (
     <Card
       size="sm"
@@ -21,12 +28,12 @@ const ProductCart = ({ product }: { product: ClientProduct; }) => {
             className="relative block h-full w-full"
           >
             <Image
-              src={product.images[0]}
+              src={productImage}
               alt={product.name}
               fill
               className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              priority
+              priority={priority}
             />
           </Link>
 
@@ -37,22 +44,22 @@ const ProductCart = ({ product }: { product: ClientProduct; }) => {
           />
 
           {/* Add to cart button */}
-
           <AddToCart
             iconOnly
+            disabled={product.stock <= 0}
             item={{
               productId: product.id,
               name: product.name,
               slug: product.slug,
               price: String(product.price),
-              image: product.images[0],
+              image: productImage,
               qty: 1,
             }}
           />
         </div>
       </CardHeader>
 
-      <CardContent className="flex  flex-col flex-1 text-center">
+      <CardContent className="flex flex-1 flex-col  text-center">
         <Link
           href={`/product/${product.slug}`}
           className="line-clamp-2 text-sm font-semibold leading-5 hover:underline sm:min-h-12 sm:text-base"
@@ -69,10 +76,13 @@ const ProductCart = ({ product }: { product: ClientProduct; }) => {
             value={Number(product.rating)}
             caption={`${Number(product.rating).toFixed(1)}`}
           />
-          {product.stock > 0 ? (
+         {product.stock > 0 && (
             <Price value={Number(product.price)} />
-          ) : (
-            <p className="text-sm text-destructive">Out of stock</p>
+          )}
+          {product.stock <= 0 && (
+            <span className="text-xs font-semibold text-red-600">
+              Out of Stock
+            </span>
           )}
         </div>
       </CardContent>

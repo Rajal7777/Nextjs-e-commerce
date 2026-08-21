@@ -13,6 +13,7 @@ import { notFound } from "next/navigation";
 import type { ClientProduct } from "@/types";
 import { Prisma } from "../generated/prisma/client";
 import { toClientProduct } from "@/lib/helpers/product";
+import { auth } from "@/auth";
 
 //types for getAllProducts function
 type ProductQueryParams = {
@@ -38,7 +39,7 @@ export async function getLatestProducts() {
 }
 
 //Get product by id
-export async function getProductById(productId: string) {
+export async function getProductBySlug(productId: string) {
   const product = await prisma.product.findFirst({
     where: { id: productId },
   });
@@ -147,7 +148,15 @@ export async function deleteProductById(id: string) {
 //create new product
 export async function createProduct(data: z.infer<typeof insertProductSchema>) {
   try {
-    //sanitize data
+    const session = await auth();
+
+    if (session?.user?.role !== "admin") {
+      return {
+        success: false,
+        message: "You are not authorized to perform this action",
+      };
+    }
+
     const product = insertProductSchema.parse(data);
 
     await prisma.product.create({
@@ -158,7 +167,7 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
 
     return {
       success: true,
-      message: "Create product successfully",
+      message: "Product created successfully",
     };
   } catch (error) {
     return {
@@ -171,26 +180,42 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
 //Update product
 export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
   try {
-    const product = updateProductSchema.parse(data);
+    const session = await auth();
 
-    const currentProduct = await prisma.product.findFirst({
-      where: { id: product.id },
+    if (session?.user?.role !== "admin") {
+      return {
+        success: false,
+        message: "You are not authorized to perform this action",
+      };
+    }
+
+    const { id, ...updateData } = updateProductSchema.parse(data);
+
+    const currentProduct = await prisma.product.findUnique({
+      where: { id },
     });
 
-    if (!currentProduct) throw new Error("Product not found");
+    if (!currentProduct) {
+      return {
+        success: false,
+        message: "Product not found",
+      };
+    }
 
     await prisma.product.update({
-      where: { id: product.id },
-      data: product,
+      where: { id },
+      data: updateData,
     });
 
     revalidatePath("/admin/products");
 
     return {
       success: true,
-      message: "Update product successfully",
+      message: "Product updated successfully",
     };
   } catch (error) {
+    console.error("updateProduct failed:", error);
+
     return {
       success: false,
       message: formatError(error),
