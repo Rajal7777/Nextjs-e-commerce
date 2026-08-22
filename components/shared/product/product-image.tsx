@@ -27,7 +27,7 @@ const ProductImages = ({ images }: { images: string[]; }) => {
                             current === index && 'border-gray-600')
                         }
                     >
-                        <Image src={image} alt="image with multi choise" width={100} height={100} preload={true}
+                        <Image src={image} alt="image with multiple choice" width={100} height={100} preload={true}
                             loading="eager" />
                     </div>
                 ))}

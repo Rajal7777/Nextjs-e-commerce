@@ -40,7 +40,7 @@ const Navbar = () => {
       <section className="mx-auto flex justify-between max-w-7xl items-center gap-2 px-2 py-2 sm:px-4 md:py-0">
         <div className="flex-start">
           <CategoryDrawer />
-          <Link href="/" className="flex-start ml-1 md:ml-4">
+          <Link href="/" className="flex-start ml-2 md:ml-4">
             <Image
               src="/images/store-icon.jpg"
               alt={`${APP_NAME} logo`}
@@ -48,6 +48,7 @@ const Navbar = () => {
               height={40}
               preload={true}
               loading="eager"
+              className="h-10 w-10 rounded-full object-cover object-center"
             />
             <span className="hidden md:block font-serif text-xl md:text-2xl font-semibold uppercase tracking-tight text-transparent bg-clip-text bg-linear-to-r from-stone-800 via-neutral-500 to-amber-700 shrink-0">
               {APP_NAME}

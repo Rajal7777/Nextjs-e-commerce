@@ -44,7 +44,7 @@ const ReviewForm = ({
 }: {
     userId: string;
     productId: string;
-    onReviewSubmitted: () => void;
+    onReviewSubmitted: () => Promise<void>;
 }) => {
     const [open, setOpen] = useState(false);
 
@@ -61,17 +61,23 @@ const ReviewForm = ({
 
     //handle dialog opener
     async function handleOpenForm() {
-        form.setValue('productId', productId);
-        form.setValue('userId', userId);
+        try {
+            form.setValue("productId", productId);
+            form.setValue("userId", userId);
 
-        const res = await getSingleReview({ productId });
+            const res = await getSingleReview({ productId });
 
-        if (res) {
-            form.setValue('title', res.title);
-            form.setValue('description', res.description);
-            form.setValue('rating', res.rating);
+            if (res) {
+                form.setValue("title", res.title);
+                form.setValue("description", res.description);
+                form.setValue("rating", res.rating);
+            }
+  
+            setOpen(true);
+        } catch (error) {
+            console.error("Failed to load review:", error);
+            toast.error("Failed to load your review. Please try again.");
         }
-        setOpen(true);
     }
 
     const onSubmit: SubmitHandler<z.infer<typeof insertReviewSchema>> = async (
@@ -88,7 +94,7 @@ const ReviewForm = ({
 
         setOpen(false);
 
-        onReviewSubmitted();
+      await  onReviewSubmitted();
 
         toast.success(res.message);
     };

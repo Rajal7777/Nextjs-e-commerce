@@ -15,18 +15,36 @@ export async function createUpdateReview(
     const session = await auth();
     if (!session) throw new Error("You must be logged in to submit a review");
 
-    //validate form data & add userId to the data
+    //validate form data & add userId
     const review = insertReviewSchema.parse({
       ...data,
       userId: session?.user.id,
     });
 
     //Get product being reviewed
-    const product = await prisma.product.findFirst({
+    const product = await prisma.product.findUnique({
       where: { id: review.productId },
     });
 
     if (!product) throw new Error("Product not found");
+
+    // Check whether the current user purchased this product.
+    const purchasedItem = await prisma.orderItem.findFirst({
+      where: {
+        productId: review.productId,
+        order: {
+          userId: session.user.id,
+          isPaid: true,
+        },
+      },
+      select: {
+        productId: true,
+      },
+    });
+
+    if (!purchasedItem) {
+      throw new Error("You can review this product only after purchasing it");
+    }
 
     //check if user has already reviewed this product
     const existingReview = await prisma.review.findFirst({
@@ -37,7 +55,7 @@ export async function createUpdateReview(
     });
 
     //If existingReview exists, update it, otherwise create a new review
-    //if failed Everything roll back. case success change the product's rating and number of reviews
+    //if failed Everything roll back. case success change the product's rating and  change number of reviews
     await prisma.$transaction(async (tx) => {
       if (existingReview) {
         //update the current review
@@ -60,7 +78,7 @@ export async function createUpdateReview(
         where: { productId: review.productId },
       });
 
-      //Get the number of reviews
+      //Get the number of reviews {count returns the number of reviews for a product}
       const numReviews = await tx.review.count({
         where: { productId: review.productId },
       });
@@ -78,10 +96,16 @@ export async function createUpdateReview(
     //revalidate the cached data for this page and load the updated data
     revalidatePath(`/product/${product.slug}`);
 
+    // ...existing code...
+
     return {
       success: true,
-      message: "Review updated successfully",
+      message: existingReview
+        ? "Review updated successfully"
+        : "Review submitted successfully",
     };
+
+    // ...existing code...
   } catch (error) {
     return {
       success: false,
@@ -104,7 +128,7 @@ export async function getAllReviews({ productId }: { productId: string }) {
     },
   });
 
-  return { data };  
+  return { data, success: true, message: "Reviews fetched successfully" };
 }
 
 //Get a review by userId and productId{get the single current user's review for a product}

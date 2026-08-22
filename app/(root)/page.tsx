@@ -15,8 +15,7 @@ const Homepage = async () => {
     getWishlistIds(),
   ]);
 
-  console.log("Latest Products:", latestProducts);
-
+ 
   //we will use Set for faster lookup of product ids in the wishlist
   const wishListSet = new Set(wishlistIds);
 

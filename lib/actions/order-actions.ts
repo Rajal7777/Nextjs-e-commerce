@@ -463,7 +463,7 @@ export async function deliverOrder(orderId: string) {
     revalidatePath(`/order/${orderId}`);
 
     return {
-      success: false,
+      success: true,
       message: "Order has been marked delivered",
     };
   } catch (error) {
@@ -473,3 +473,7 @@ export async function deliverOrder(orderId: string) {
     };
   }
 }
+
+
+
+

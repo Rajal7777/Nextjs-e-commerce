@@ -45,6 +45,7 @@ export async function addItemToCart(data: CartItem) {
     //validate data
     const item = cartItemSchema.parse(data);
 
+    //check if product exists 
     const product = await prisma.product.findUnique({
       where: { id: item.productId },
     });
@@ -53,6 +54,7 @@ export async function addItemToCart(data: CartItem) {
       throw new Error("Product not found");
     }
 
+    //create new cart
     if (!cart) {
       const newCart = insertCartItemSchema.parse({
         userId,
@@ -72,6 +74,7 @@ export async function addItemToCart(data: CartItem) {
           },
         });
 
+        // If the stock update count is 0,stop transaction
         if (stockUpdate.count === 0) {
           throw new Error("Not enough stock");
         }
@@ -94,6 +97,7 @@ export async function addItemToCart(data: CartItem) {
       (cartItem) => cartItem.productId === item.productId,
     );
 
+    // If the item already exists in the cart, update its quantity; otherwise, add it as a new item.
     const updatedItems = existingItem
       ? currentItems.map((cartItem) =>
           cartItem.productId === item.productId

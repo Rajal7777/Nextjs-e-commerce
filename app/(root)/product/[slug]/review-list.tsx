@@ -1,10 +1,14 @@
 "use client";
 
-import { toast } from "sonner";
-import ReviewForm from "./review-form";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { CalendarHeart, User } from "lucide-react";
+
+import ReviewForm from "./review-form";
+import Rating from "@/components/rating";
 import { getAllReviews } from "@/lib/actions/review-actions";
+import { formatDateTime } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -12,9 +16,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CalendarHeart, User } from "lucide-react";
-import { formatDateTime } from "@/lib/utils";
-import Rating from "@/components/rating";
 
 type ReviewListItem = Awaited<
   ReturnType<typeof getAllReviews>
@@ -30,30 +31,66 @@ const ReviewList = ({
   productSlug: string;
 }) => {
   const [reviews, setReviews] = useState<ReviewListItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadReviews = async () => {
-      const re = await getAllReviews({ productId });
-      setReviews(re.data);
-    };
+  const fetchReviews = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
 
-    loadReviews();
+    try {
+      const response = await getAllReviews({ productId });
+
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+
+      setReviews(response.data);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to load reviews";
+
+      setError(message);
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   }, [productId]);
 
-  //reload reviews after a new review is submitted
-  const fetchReviews = async () => {
-    try {
-      const { data } = await getAllReviews({ productId });
+  useEffect(() => {
+    void fetchReviews();
+  }, [fetchReviews]);
 
-      setReviews(data);
-    } catch {
-      toast.error("Failed to load reviews");
-    }
-  };
+  const callbackUrl = encodeURIComponent(`/product/${productSlug}`);
 
   return (
     <div className="space-y-4">
-      {reviews.length === 0 && <p>No reviews yet.</p>}
+      {isLoading && (
+        <p role="status" >
+          Loading reviews...
+        </p>
+      )}
+
+      {!isLoading && error && (
+        <div className="space-y-2">
+          <p  className="text-destructive">
+            {error}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => void fetchReviews()}
+            className="text-sm text-blue-500 underline"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {!isLoading && !error && reviews.length === 0 && (
+        <p>No reviews yet.</p>
+      )}
+
       {userId ? (
         <ReviewForm
           userId={userId}
@@ -61,44 +98,53 @@ const ReviewList = ({
           onReviewSubmitted={fetchReviews}
         />
       ) : (
-        <div>
+        <p>
           Please{" "}
           <Link
-            href={`/api/auth/signin?callbackUrl=/product/${productSlug}`}
+            href={`/api/auth/signin?callbackUrl=${callbackUrl}`}
             className="text-blue-500 underline"
           >
             sign in
           </Link>{" "}
           to write a review.
+        </p>
+      )}
+
+      {!isLoading && !error && reviews.length > 0 && (
+        <div
+          role="list"
+          aria-label="Customer reviews"
+          className="flex flex-col gap-3"
+        >
+          {reviews.map((review) => (
+            <Card key={review.id} role="listitem">
+              <CardHeader>
+                <CardTitle>{review.title}</CardTitle>
+                <CardDescription>{review.description}</CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                <div className="flex flex-col space-y-2 text-sm text-muted-foreground">
+                  <Rating value={Number(review.rating)} />
+
+                  <div className="flex items-center">
+                    <User className="mr-2 h-4 w-4" aria-hidden="true" />
+                    {review.user.name || "Anonymous"}
+                  </div>
+
+                  <div className="flex items-center">
+                    <CalendarHeart
+                      className="mr-2 h-4 w-4"
+                      aria-hidden="true"
+                    />
+                    {formatDateTime(review.createdAt).dateTime}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
-      <div className="flex flex-col gap-3">
-        {reviews.map((review) => (
-          <Card key={review.id}>
-            <CardHeader>
-              <div className="flex-between">
-                <CardTitle>{review.title}</CardTitle>
-              </div>
-              <CardDescription>{review.description}</CardDescription>
-            </CardHeader>
-
-            <CardContent>
-              <div className="flex flex-col space-y-2 text-sm text-muted-foreground">
-                <Rating value={review.rating} />
-                <div className="flex items-center">
-                  <User className="mr-2 h-4 w-4" />
-                  {review.userId}
-                </div>
-
-                <div className="flex items-center">
-                  <CalendarHeart className="mr-2 h-4 w-4" />
-                  {formatDateTime(review.createdAt).dateTime}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
     </div>
   );
 };

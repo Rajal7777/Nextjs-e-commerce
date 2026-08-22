@@ -30,6 +30,7 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
     <>
       <section className="container mx-auto mt-10 p-2">
         <div className="grid grid-cols-1 md:grid-cols-5 p-2">
+
           {/* Images column */}
           <div className="col-span-2 border">
             <ProductImages images={product.images} />
@@ -101,7 +102,7 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
 
       <section className='mt-10'>
         <h2 className="h2-bold">Customer Reviews</h2>
-        <ReviewList userId={userId || ''} productId={product.id} productSlug={product.slug} />
+        <ReviewList userId={userId || ''} productId ={product.id} productSlug={product.slug} />
       </section>
     </>
   );
