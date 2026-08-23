@@ -4,6 +4,7 @@ export const paypal = {
   createOrder: async function createOrder(price: number) {
     const accessToken = await generateAccessToken();
     const url = `${base}/v2/checkout/orders`;
+    const PAYPAL_CURRENCY = "JPY";
 
     const response = await fetch(url, {
       method: "POST",
@@ -16,8 +17,8 @@ export const paypal = {
         purchase_units: [
           {
             amount: {
-              currency_code: "JPY",
-              value: price,
+              currency_code: PAYPAL_CURRENCY,
+              value: price.toFixed(0),
             },
           },
         ],

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const OrderDetailsPage = async ({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; }>;
 }) => {
   const { id } = await params;
 
@@ -40,8 +40,10 @@ const OrderDetailsPage = async ({
 
     const stripe = new Stripe(stripeSecretKey);
 
+
+
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(Number(order.totalPrice)), // JPY is a zero-decimal currency
+      amount: Math.round(Number(order.totalPrice)),
       currency: "jpy",
       metadata: {
         orderId: order.id,
@@ -51,11 +53,40 @@ const OrderDetailsPage = async ({
     clientSecret = paymentIntent.client_secret;
   }
 
+  const normalizePaymentResult = (value: unknown) => {
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      return null;
+    }
+
+    const result = value as Record<string, unknown>;
+
+    if (
+      typeof result.id !== "string" ||
+      typeof result.status !== "string" ||
+      typeof result.email_address !== "string" ||
+      typeof result.pricePaid !== "string"
+    ) {
+      return null;
+    }
+
+    return {
+      id: result.id,
+      status: result.status,
+      email_address: result.email_address,
+      pricePaid: result.pricePaid,
+    };
+  };
+
+  const normalizedPaymentResult = normalizePaymentResult(
+    order.paymentResult,
+  );
+
   return (
     <OrderDetailsTable
       order={{
         ...order,
         shippingAddress: order.shippingAddress as ShippingAddress,
+        paymentResult: normalizedPaymentResult,
       }}
       stripeClientSecret={clientSecret}
       paypalClientId={process.env.PAYPAL_CLIENT_ID || "sb"}

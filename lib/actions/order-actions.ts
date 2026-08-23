@@ -98,7 +98,11 @@ export async function createOrder() {
     //incase some thing went wrong throw error instead of continue with invalid data
     if (!insertOrderId) throw new Error("Order not found");
 
-    console.log("insertOrderId", insertOrderId);
+    revalidatePath("/", "layout");
+    revalidatePath("/cart");
+    revalidatePath("/checkout");
+    revalidatePath(`/order/${insertOrderId}`);
+
     return {
       success: true,
       message: "Order created",
@@ -230,26 +234,15 @@ export async function updateOrderToPaid({
 
   if (order.isPaid) throw new Error("Order is already paid");
 
-  //Transaction to update order and account for product stock
-  await prisma.$transaction(async (tx) => {
-    //Iterate over Products and update stock
-    for (const item of order.orderItems) {
-      await tx.product.update({
-        where: { id: item.productId },
-        data: { stock: { increment: -item.qty } },
-      });
-    }
-
-    //Set the order to paid
-    await tx.order.update({
-      where: { id: orderId },
-      data: {
-        isPaid: true,
-        paidAt: new Date(),
-        paymentMethod: order.paymentMethod,
-        paymentResult,
-      },
-    });
+  //Transaction to update order payment status and send email to user
+  await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      isPaid: true,
+      paidAt: new Date(),
+      paymentMethod: order.paymentMethod,
+      paymentResult,
+    },
   });
 
   //Get updated order after transaction
@@ -271,7 +264,9 @@ export async function updateOrderToPaid({
       paymentResult: paymentResult as PaymentResult,
     },
   });
-  console.log(order);
+  revalidatePath(`/order/${orderId}`);
+
+  return updatedOrder;
 }
 
 //Get user's orders
@@ -450,8 +445,7 @@ export async function deliverOrder(orderId: string) {
     //check if paid or not
     if (!order.isPaid) throw new Error("Order not paid yet.");
 
-    console.log(order);
-
+  
     await prisma.order.update({
       where: { id: orderId },
       data: {
@@ -473,7 +467,3 @@ export async function deliverOrder(orderId: string) {
     };
   }
 }
-
-
-
-

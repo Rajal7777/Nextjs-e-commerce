@@ -59,7 +59,7 @@ const PayPalStatus = () => {
 };
 
 //Button to mark order as paid
-const MarkAsPaidButton = ({ orderId }: { orderId: string; }) => {
+const MarkAsPaidButton = ({ orderId }: { orderId: string }) => {
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -69,7 +69,7 @@ const MarkAsPaidButton = ({ orderId }: { orderId: string; }) => {
       onClick={() =>
         startTransition(async () => {
           const res = await updateOrderToPaidCOD(orderId);
-         
+
           if (res.success) {
             toast.success(res.message);
           } else {
@@ -84,7 +84,7 @@ const MarkAsPaidButton = ({ orderId }: { orderId: string; }) => {
 };
 
 //Button to mark order to delivered
-const MarkAsDeliveredButton = ({ orderId }: { orderId: string; }) => {
+const MarkAsDeliveredButton = ({ orderId }: { orderId: string }) => {
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -94,7 +94,7 @@ const MarkAsDeliveredButton = ({ orderId }: { orderId: string; }) => {
       onClick={() =>
         startTransition(async () => {
           const res = await deliverOrder(orderId);
-       
+
           if (res.success) {
             toast.success(res.message);
           } else {
@@ -145,40 +145,11 @@ const OrderDetailsTable = ({
     return res.data;
   };
 
-  const handleApprovePayPalOrder = async (data: { orderID: string; }) => {
+  const handleApprovePayPalOrder = async (data: { orderID: string }) => {
     const res = await approvePayPalOrder(order.id, data);
 
     toast(res.message);
   };
-
-  // async function handleChange({
-  //   btnType,
-  //   orderId,
-  // }: {
-  //   btnType: string;
-  //   orderId: string;
-  // }) {
-  //   console.log('i am form switch');
-  //   switch (btnType) {
-  //     case "payment":
-  //       const res = await updateOrderToPaidCOD(orderId);
-  //       if (res.success) {
-  //         toast.success(res.message);
-  //       } else {
-  //         toast.error(res.message);
-  //       }
-  //       break;
-
-  //     case "address":
-  //       const res2 = await deliverOrder(orderId);
-  //       if (res2.success) {
-  //         toast.success(res2.message);
-  //       } else {
-  //         toast.error(res2.message);
-  //       }
-  //       break;
-  //   }
-  // }
 
   return (
     <>
@@ -285,7 +256,12 @@ const OrderDetailsTable = ({
               {/* Paypal payment */}
               {!isPaid && normalizedPaymentMethod === "paypal" && (
                 <div>
-                  <PayPalScriptProvider options={{ clientId: paypalClientId }}>
+                  <PayPalScriptProvider
+                   options={{
+                     clientId: paypalClientId,
+                     currency: "JPY",
+                     intent: "capture",
+                     }}>
                     <PayPalStatus />
                     <PayPalButtons
                       createOrder={handleCreatePayPalOrder}
@@ -295,17 +271,18 @@ const OrderDetailsTable = ({
                 </div>
               )}
 
-               {/* Stripe payment */}
-              {!isPaid && normalizedPaymentMethod === "stripe" && stripeClientSecret && (
-                <div>
-                  <StripePayment
-                    orderId={order.id}
-                    clientSecret={stripeClientSecret}
-                  />
-                </div>
-              )}
+              {/* Stripe payment */}
+              {!isPaid &&
+                normalizedPaymentMethod === "stripe" &&
+                stripeClientSecret && (
+                  <div>
+                    <StripePayment
+                      orderId={order.id}
+                      clientSecret={stripeClientSecret}
+                    />
+                  </div>
+                )}
 
-            
               {/* Cash on delivery */}
               {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
                 <MarkAsPaidButton orderId={order.id} />
