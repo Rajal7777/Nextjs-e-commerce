@@ -13,12 +13,17 @@ export const sendOrderConfirmationEmail = async ({
   order: Order;
 }) => {
   try {
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: `${APP_NAME} <onboarding@resend.dev>`,
       to: order.user.email,
       subject: `Order Confirmation - ${APP_NAME}`,
       react: <PurchaseReceiptEmail order={order} />,
     });
+
+    //resend.emails.send() does not throw on API errors, it returns { error } instead
+    if (error) {
+      console.error("Failed to send order confirmation email:", error);
+    }
   } catch (error) {
     console.error("Failed to send order confirmation email:", error);
   }
@@ -33,12 +38,16 @@ export const sendResetPasswordEmail = async ({
   resetUrl: string;
 }) => {
   try {
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: `${APP_NAME} <onboarding@resend.dev>`,
       to: email,
       subject: `Reset your password - ${APP_NAME}`,
       react: <ResetPasswordEmail resetUrl={resetUrl} />,
     });
+
+    if (error) {
+      console.error("Failed to send password reset email:", error);
+    }
   } catch (error) {
     console.error("Failed to send password reset email:", error);
   }

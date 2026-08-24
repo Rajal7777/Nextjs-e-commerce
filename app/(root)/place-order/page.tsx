@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+     import { auth } from "@/auth";
 import CheckoutSteps from "@/components/shared/checkout-steps";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,7 +23,9 @@ const PlaceOrderPage = async () => {
     const session = await auth();
     const userId = session?.user?.id;
 
-    if (!userId) throw new Error('User not Found!');
+    if (!userId) {
+        return redirect('/sign-in?callbackUrl=%2Fplace-order');
+    }
 
     const user = await getUserById(userId);
 
@@ -33,10 +35,10 @@ const PlaceOrderPage = async () => {
 
     const userAddress = user.address as ShippingAddress;
     return (
-        <>
+        <>    
             <CheckoutSteps current={3} />
             <h1 className="py-4 text-2xl">Place Order</h1>
-            <div className="grid md:grid-cols-3 md:gap-5 mt-2">
+            <div className="grid md:grid-cols-3  mt-2 gap-4">
 
                 <div className="md:col-span-2 overflow-x-auto space-y-4">
                     {/* Shipping Address */}
@@ -45,7 +47,7 @@ const PlaceOrderPage = async () => {
                             <h2 className="text-xl pb-4">Shipping Address</h2>
                             <p>{userAddress.fullName}</p>
                             <p>
-                                {userAddress.streetAddress}, {userAddress.city}
+                                {userAddress.streetAddress}, {userAddress.city}{" "}
                                 {userAddress.postalCode}, {userAddress.country}
                             </p>
 
@@ -86,7 +88,7 @@ const PlaceOrderPage = async () => {
                                     {cart.items.map((item) => (
                                         <TableRow key={item.slug}>
                                             <TableCell>
-                                                <Link href={`product/${item.slug}`} className="flex items-center text-gray-600 space-x-2">
+                                                <Link href={`/product/${item.slug}`} className="flex items-center text-gray-600 space-x-2">
                                                     <Image src={item.image} alt={item.name} width={50} height={50} />
                                                     <span>{item.name}</span>
                                                 </Link>

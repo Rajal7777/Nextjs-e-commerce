@@ -3,7 +3,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth, { type NextAuthConfig } from "next-auth";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-import type { AdapterUser } from "next-auth/adapters"
+import type { AdapterUser } from "next-auth/adapters";
 
 import { prisma } from "./db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -22,7 +22,8 @@ export const config = {
     strategy: "jwt" as const,
     maxAge: 30 * 24 * 60 * 60, //30days
   },
-  adapter: PrismaAdapter(prisma), //connect authjs to prisma client{allows authjs to automatically create and manage users, liked acc  sessions, verification tokens}
+  //connect authjs to prisma client{allows authjs to automatically create and manage users, liked acc  sessions, verification tokens}
+  adapter: PrismaAdapter(prisma),
 
   //tells authjs user will login with email, password
   providers: [
@@ -58,7 +59,7 @@ export const config = {
         if (user && user.password) {
           const isMatch = await compare(password, user.password);
 
-          //If password is correct, return user// on sucess creates session or JWT
+          //return user on sucess, creates session or JWT
           if (isMatch) {
             return {
               id: user.id,
@@ -77,9 +78,8 @@ export const config = {
 
   //callbacks let you customize what Auth.js does at different stages
   callbacks: {
-    //This callback runs whenever someone calls:useSession(),auth,getServerSession
     async session({ session, token }: { session: Session; token: JWT }) {
-      //Set the user ID from the token
+      //Set the user extra fields from the token
       session.user.id = token.id;
       session.user.role = token.role;
       session.user.name = token.name;
@@ -98,7 +98,7 @@ export const config = {
       trigger: "signIn" | "signUp" | "update";
       session: unknown;
     }) {
-      // Handle session updates {user name}
+      // Handle session updates
       if (trigger === "update" && session && typeof session === "object") {
         const updateSession = session as {
           name?: string;
@@ -127,7 +127,7 @@ export const config = {
         const cookiesObject = await cookies();
         const sessionCartId = cookiesObject.get("sessionCartId")?.value;
 
-        //for guest user,not logged in user
+        //guest user,not logged in user
         if (sessionCartId) {
           const sessionCart = await prisma.cart.findFirst({
             where: {
@@ -136,7 +136,7 @@ export const config = {
             },
           });
 
-        //delete old cart for user and add userId to the session cart
+          //delete old cart for user and add userId to the session cart
           if (sessionCart) {
             await prisma.$transaction([
               prisma.cart.deleteMany({
@@ -144,7 +144,7 @@ export const config = {
               }),
 
               //add userId to the session cart
-             prisma.cart.update({
+              prisma.cart.update({
                 where: { id: sessionCart.id },
                 data: { userId: user.id },
               }),
@@ -181,12 +181,13 @@ export const config = {
       if (!auth && protectedPaths.some((path) => path.test(pathname)))
         return false;
 
-         if (!request.cookies.get("sessionCartId")) {
+      if (!request.cookies.get("sessionCartId")) {
         const response = NextResponse.next();
 
         response.cookies.set("sessionCartId", crypto.randomUUID(), {
           httpOnly: true,
           sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
           path: "/",
         });
 
@@ -198,4 +199,6 @@ export const config = {
   },
 };
 
-export const { auth, signIn, signOut, handlers } = NextAuth(config as NextAuthConfig  );
+export const { auth, signIn, signOut, handlers } = NextAuth(
+  config as NextAuthConfig,
+);

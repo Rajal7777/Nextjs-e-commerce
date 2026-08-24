@@ -15,7 +15,7 @@ const ProductCarousel = ({ products }: {
                 opts={{ loop: true, }}
                 plugins={[
                     Autoplay({
-                        delay: 8000,
+                        delay: 5000,
                         stopOnInteraction: true,
                         stopOnMouseEnter: true,
                     }),

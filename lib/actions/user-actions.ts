@@ -18,24 +18,28 @@ import { z } from "zod";
 import { PAGE_SIZE } from "../constants";
 import { revalidatePath } from "next/cache";
 
+export type ActionResult =
+  | { success: true; message: string }
+  | { success: false; message: string };
+
 //Sign in the user with credentials
 //useActionState, React automatically passes two arguments prevState, formdata
 export async function signInWithCredentials(
   prevState: unknown,
   formData: FormData,
 ) {
-  //Validate form data:- email is valid password  long enough
   try {
-    const user = signInFormSchema.parse({
+    //Validate form data
+    const userCredential = signInFormSchema.parse({
       email: formData.get("email"),
       password: formData.get("password"),
     });
 
-    await signIn("credentials", user);
+    await signIn("credentials", userCredential);
 
     return { success: true, message: "Signed in successfully" };
   } catch (error) {
-    //redirect() works by throwing a secret error.try...catch accidentally traps that secret error.throw error forwards the secret error back to Next.js so the page transition actually happens
+    // Let Next.js handle the redirect error
     if (isRedirectError(error)) {
       throw error; // rethrow error
     }
@@ -75,13 +79,19 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       password: plainPassword,
     });
 
-    return { success: true, message: "Signed in successufully!" };
+    return {
+      success: true,
+      message: "Signed in successfully!",
+    };
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
     }
 
-    return { success: false, message: formatError(error) };
+    return {
+      success: false,
+      message: formatError(error),
+    };
   }
 }
 
@@ -90,7 +100,7 @@ export async function signoutUser() {
   await signOut();
 }
 
-//Get user by the ID
+//user object by id
 export async function getUserById(userId: string) {
   const user = await prisma.user.findFirst({
     where: { id: userId },
@@ -130,23 +140,31 @@ export async function updateUserAddress(data: ShippingAddress) {
       message: "User address updated successfully!",
     };
   } catch (error) {
-    return { success: false, message: formatError(error) };
+    return {
+      success: false,
+      message: formatError(error),
+    };
   }
 }
 
 //Update user payment method
 export async function updateUserPaymentMethod(
   data: z.infer<typeof paymentMethodSchema>,
-) {
+): Promise<ActionResult> {
   try {
     const session = await auth();
+
+    if (!session?.user?.id) {
+      throw new Error("You must be signed in.");
+    }
+
     const currentUser = await prisma.user.findFirst({
       where: { id: session?.user?.id },
     });
 
     if (!currentUser) throw new Error("User not found");
 
-    //run time validation of payment type via zod
+    //run time validation of payment type
     const paymentMethod = paymentMethodSchema.parse(data);
 
     await prisma.user.update({
@@ -159,7 +177,10 @@ export async function updateUserPaymentMethod(
       message: "User updated successfully",
     };
   } catch (error) {
-    return { success: false, message: formatError(error) };
+    return {
+      success: false,
+      message: formatError(error),
+    };
   }
 }
 
@@ -191,7 +212,10 @@ export async function updateProfile(user: { name: string; email: string }) {
       message: "Profile updated successfully",
     };
   } catch (error) {
-    return { success: false, message: formatError(error) };
+    return {
+      success: false,
+      message: formatError(error),
+    };
   }
 }
 

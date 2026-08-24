@@ -12,13 +12,13 @@ export const metadata: Metadata = {
     title: 'Sign up'
 };
 
-const SignUppage = async (props: {
+const SignUpPage = async ({ searchParams }: {
     searchParams: Promise<{
         callbackUrl: string;
     }>;
 }) => {
 
-    const { callbackUrl } = await props.searchParams;
+    const { callbackUrl } = await searchParams;
     const session = await auth();
 
     if (session) {
@@ -30,7 +30,7 @@ const SignUppage = async (props: {
             <Card>
                 <CardHeader className="space-y-4">
                     <Link href='/' className="flex-center">
-                        <Image src='/images/logo.svg' alt={`${APP_NAME}`} width={100} height={100} preload={true}
+                        <Image src='/images/store-icon.jpg' alt={`${APP_NAME}`} width={100} height={100} preload={true}
                             loading="eager" />
                     </Link>
 
@@ -49,4 +49,4 @@ const SignUppage = async (props: {
 
 };
 
-export default SignUppage;
+export default SignUpPage;

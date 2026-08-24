@@ -13,9 +13,9 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const PaymentMethodForm = ({
-    prefferedPaymentMethod,
+    preferredPaymentMethod,
 }: {
-    prefferedPaymentMethod: string | null;
+    preferredPaymentMethod: string | null;
 }) => {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
@@ -27,7 +27,7 @@ const PaymentMethodForm = ({
     } = useForm<z.infer<typeof paymentMethodSchema>>({
         resolver: zodResolver(paymentMethodSchema),
         defaultValues: {
-            type: prefferedPaymentMethod || DEFAULT_PAYMENT_METHOD,
+            type: preferredPaymentMethod || DEFAULT_PAYMENT_METHOD,
         },
     });
 
@@ -62,7 +62,7 @@ const PaymentMethodForm = ({
                     {PAYMENT_METHODS.map((method) => (
                         <label
                             key={method}
-                            className="mb-3 flex cursor-pointer items-center gap-3 rounded-md border p-3 hover:bg-gray-50 hover:text-black">
+                            className="mb-3 flex  items-center gap-3 rounded-md border p-3 hover:bg-gray-50 hover:text-gray-500">
                             <input
                                 type="radio"
                                 value={method}
@@ -79,9 +79,11 @@ const PaymentMethodForm = ({
 
                     <button
                         type="submit"
+                        disabled={isPending}
+                        aria-busy={isPending}
                         className="mt-6 w-full rounded-md bg-black px-4 py-2 text-white hover:bg-gray-800"
                     >
-                        {isPending ? 'Loading...' : " Continue"}
+                        {isPending ? "Saving payment method..." : "Continue"}
                     </button>
                 </form>
             </CardContent>

@@ -6,10 +6,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import SignInPage from "./signInPage";
+import SignInForm from "./signinForm";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { APP_NAME } from "@/lib/constants";
@@ -20,12 +20,12 @@ export const metadata: Metadata = {
   title: "Sign in",
 };
 
-const SignInpage = async (props: {
+const SignInPage = async ({ searchParams }: {
   searchParams: Promise<{
     callbackUrl: string;
   }>;
 }) => {
-  const { callbackUrl } = await props.searchParams;
+  const { callbackUrl } = await searchParams;
   const session = await auth();
 
   if (session) {
@@ -55,11 +55,11 @@ const SignInpage = async (props: {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <SignInPage />
+          <SignInForm />
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default SignInpage;
+export default SignInPage;

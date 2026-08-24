@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { getOrderById, updateOrderToPaid } from "@/lib/actions/order-actions";
+import ConfirmStripePayment from "@/components/shared/confirm-stripe-payment";
+import { getOrderById } from "@/lib/actions/order-actions";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -48,20 +49,21 @@ const SuccessPage = async (props: {
         return redirect(`/order/${id}`);
     }
 
-    if (!order.isPaid) {
-        await updateOrderToPaid({
-            orderId: order.id,
-            paymentResult: {
-                id: paymentIntent.id,
-                status: paymentIntent.status,
-                email_address: paymentIntent.receipt_email || order.user.email,
-                pricePaid: String(paymentIntent.amount_received || paymentIntent.amount),
-            },
-        });
-    }
-
     return (
         <main className="max-w-4xl w-full mx-auto space-y-8">
+            {!order.isPaid && (
+                <ConfirmStripePayment
+                    orderId={order.id}
+                    paymentResult={{
+                        id: paymentIntent.id,
+                        status: paymentIntent.status,
+                        email_address: paymentIntent.receipt_email || order.user.email,
+                        pricePaid: String(
+                            paymentIntent.amount_received || paymentIntent.amount,
+                        ),
+                    }}
+                />
+            )}
             <div className="flex flex-col gap-6 items-center">
                 <h1>Thank you for your payment!</h1>
                 <p>We are now processing your order.</p>

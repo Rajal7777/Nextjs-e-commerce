@@ -15,8 +15,20 @@ import { Prisma } from "../generated/prisma/client";
 
 import { sendOrderConfirmationEmail } from "@/email";
 
+export type CreateOrderResult =
+  | {
+      success: true;
+      message: string;
+      redirectTo: string;
+    }
+  | {
+      success: false;
+      message: string;
+      redirectTo?: string;
+    };
+
 //Create order and create order items
-export async function createOrder() {
+export async function createOrder(): Promise<CreateOrderResult> {
   try {
     const session = await auth();
     if (!session) throw new Error("User is not authenticated");
@@ -39,7 +51,7 @@ export async function createOrder() {
     if (!user.address) {
       return {
         success: false,
-        message: "Your cart is empty",
+        message: "Shipping address required",
         redirectTo: "/shipping-address",
       };
     }
@@ -47,7 +59,7 @@ export async function createOrder() {
     if (!user.paymentMethod) {
       return {
         success: false,
-        message: "Your cart is empty",
+        message: "Payment method required",
         redirectTo: "/payment-method",
       };
     }
@@ -100,7 +112,6 @@ export async function createOrder() {
 
     revalidatePath("/", "layout");
     revalidatePath("/cart");
-    revalidatePath("/checkout");
     revalidatePath(`/order/${insertOrderId}`);
 
     return {
@@ -111,7 +122,10 @@ export async function createOrder() {
   } catch (error) {
     // If it's a redirect signal, throw it again so Next.js can handle it
     if (isRedirectError(error)) throw error;
-    return { success: false, message: formatError(error) };
+    return {
+      success: false,
+      message: formatError(error),
+     };
   }
 }
 
@@ -267,6 +281,31 @@ export async function updateOrderToPaid({
   revalidatePath(`/order/${orderId}`);
 
   return updatedOrder;
+}
+
+//Confirm a Stripe payment and mark the order paid; safe to call from a Client Component effect
+export async function confirmStripeOrderPaid({
+  orderId,
+  paymentResult,
+}: {
+  orderId: string;
+  paymentResult: PaymentResult;
+}) {
+  try {
+    const order = await prisma.order.findFirst({ where: { id: orderId } });
+    if (!order) throw new Error("Order not found");
+
+    //already confirmed (eg. effect ran twice) - nothing to do
+    if (order.isPaid) {
+      return { success: true, message: "Order is already paid" };
+    }
+
+    await updateOrderToPaid({ orderId, paymentResult });
+
+    return { success: true, message: "Order payment confirmed" };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
 }
 
 //Get user's orders
@@ -445,7 +484,6 @@ export async function deliverOrder(orderId: string) {
     //check if paid or not
     if (!order.isPaid) throw new Error("Order not paid yet.");
 
-  
     await prisma.order.update({
       where: { id: orderId },
       data: {
