@@ -28,9 +28,9 @@ const Menu = async () => {
           className="relative flex items-center justify-center rounded-full p-2 text-red-500 transition-colors duration-300 hover:bg-accent hover:text-red-600"
           aria-label={`Wishlist with ${wishlistItemCount} items`}
         >
-          <Heart className="h-5 w-5" />
+          <Heart className="size-5" />
           {wishlistItemCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
+            <span className="absolute -right-2 top-0 flex h-4 min-w-4.5 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white">
               {wishlistItemCount}
             </span>
           )}

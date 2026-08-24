@@ -10,6 +10,9 @@ import { getMyCart } from "@/lib/actions/cart-actions";
 import ReviewList from "./review-list";
 import { auth } from "@/auth";
 import Rating from "@/components/rating";
+import WishlistButton from "@/components/shared/wishlist/wishlist-button";
+import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
+import { RefreshCw, Truck } from "lucide-react";
 
 type ProductSlugProps = {
   params: Promise<{ slug: string; }>;
@@ -24,75 +27,108 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
 
   const session = await auth();
   const userId = session?.user?.id;
-  const cart = await getMyCart();
+  const [cart, wishlistIds] = await Promise.all([
+    getMyCart(),
+    getWishlistIds(),
+  ]);
+  const isFavorite = wishlistIds.includes(product.id);
 
   return (
-    <>
-      <section className="container mx-auto mt-10 p-2">
-        <div className="grid grid-cols-1 md:grid-cols-5 p-2">
-
-          {/* Images column */}
-          <div className="col-span-2 border">
+    <div className="max-w-6xl mx-auto">
+      <section className="container mx-auto mt-6  px-3 md:px-4">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-5 w-full">
+          <div className="p-2.5 md:p-3 lg:col-span-3">
             <ProductImages images={product.images} />
-            <div className="space-x-4 text-center pb-4">
-              <span className="text-md text-gray-500"> {product.category}</span>
-              <span className="text-sm font-semibold">{product.brand}</span>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <Badge variant="outline">{product.category}</Badge>
+              <Badge variant="secondary">{product.brand}</Badge>
             </div>
+            <p>{product.description}</p>
           </div>
 
-          {/* Detail column */}
-          <div className="col-span-2 p-5">
-            <div className="flex flex-col gap-6">
-              <h1 className="h3-bold">{product.name}</h1>
-             <Rating value={Number(product.rating)} />
-             <p>{product.numReviews} Reviews</p>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <Price
-                  value={Number(product.price)}
-                  className="w-24 rounded-full bg-green-400 px-5 py-2 text-center"
-                />
-              </div>
-            </div>
-            <div className="mt-10">
-              <p className="font-semibold">Description</p>
-              <p>{product.description}</p>
-            </div>
-          </div>
-
-          {/* Action Column */}
-          <div>
+          <div className="space-y-4 lg:col-span-2">
             <Card>
-              <CardContent className="p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <div>Price</div>
-                  <div>
-                    <Price value={Number(product.price)} />
+              <CardContent className="space-y-5 p-4 md:p-5">
+                <div>
+                  <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+                    {product.name}
+                  </h1>
+
+                  <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                    <Rating
+                      value={Number(product.rating)}
+                      caption={`(${product.numReviews} Reviews)`}
+                    />
+                    <span>|</span>
+                    <span>
+                      {product.stock > 0 ? "In Stock" : "Out of Stock"}
+                    </span>
                   </div>
-                </div>
 
-                <div className="flex justify-between mb-2">
-                  <div>Status</div>
-                  {product.stock > 0 ? (
-                    <Badge variant="outline">In stock</Badge>
-                  ) : (
-                    <Badge variant="destructive">Out of stock</Badge>
-                  )}
-                </div>
-
-                {product.stock > 0 && (
-                  <div className="flex-center">
-                    <AddToCart
-                      cart={cart}
-                      item={{
-                        productId: product.id,
-                        name: product.name,
-                        slug: product.slug,
-                        price: String(product.price),
-                        qty: 1,
-                        image: product.images[0],
-                      }}
+                  <div className="mt-4">
+                    <Price
+                      value={Number(product.price)}
+                      className="text-3xl font-semibold md:text-4xl"
                     />
                   </div>
+                </div>
+
+                <p className="text-sm leading-7 text-foreground/90">
+                  {product.description}
+                </p>
+
+                <div className="border-t pt-5">
+                  <div className="flex items-center gap-3">
+                    {product.stock > 0 && (
+                      <div className="flex-1">
+                        <AddToCart
+                          cart={cart}
+                          item={{
+                            productId: product.id,
+                            name: product.name,
+                            slug: product.slug,
+                            price: String(product.price),
+                            qty: 1,
+                            image: product.images[0],
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    <WishlistButton
+                      productId={product.id}
+                      initialIsFavorite={isFavorite}
+                      className="static left-auto top-auto inline-flex h-10 w-10 shrink-0 rounded-md border bg-white text-gray-700 shadow-none hover:bg-gray-100"
+                    />
+                  </div>
+
+                  <div className="mt-5 overflow-hidden rounded-lg border">
+                    <div className="flex items-start gap-3 border-b p-3">
+                      <Truck className="mt-1 h-5 w-5" />
+                      <div>
+                        <p className="font-semibold">Free Delivery</p>
+                        <p className="text-sm text-muted-foreground">
+                          Enter your postal code for delivery availability
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-3">
+                      <RefreshCw className="mt-1 h-5 w-5" />
+                      <div>
+                        <p className="font-semibold">Return Delivery</p>
+                        <p className="text-sm text-muted-foreground">
+                          Free 30 days delivery returns.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {product.stock <= 0 && (
+                  <Badge variant="destructive" className="w-fit">
+                    Out of stock
+                  </Badge>
                 )}
               </CardContent>
             </Card>
@@ -100,13 +136,16 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
         </div>
       </section>
 
-      <section className='mt-10'>
-        <h2 className="h2-bold">Customer Reviews</h2>
-        <ReviewList userId={userId || ''} productId ={product.id} productSlug={product.slug} />
+      <section className="container mx-auto mt-8 max-w-6xl px-3 md:px-4">
+        <h2 className="h2-bold mb-4">Customer Reviews</h2>
+        <ReviewList
+          userId={userId || ""}
+          productId={product.id}
+          productSlug={product.slug}
+        />
       </section>
-    </>
+    </div>
   );
 };
 
 export default ProductDetailsPage;
-

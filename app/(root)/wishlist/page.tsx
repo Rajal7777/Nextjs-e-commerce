@@ -17,7 +17,7 @@ const WishListPage = async () => {
   if (wishlistItems.length === 0) {
     return (
       <div className="py-10 text-center">
-        <h1 className="text-2xl font-bold">My Wishlist</h1>
+        <h1 className="text-2xl font-semibold text-muted-foreground">My Wishlist</h1>
         <p className="mt-4 text-muted-foreground">No items in your wishlist.</p>
         <Link
           href="/"
@@ -32,7 +32,7 @@ const WishListPage = async () => {
 
   return (
     <section className="py-10 px-4  text-center">
-      <h1 className="mb-6 text-2xl font-bold">My Wishlist</h1>
+      <h1 className="text-2xl font-semibold text-gray-800 mb-6">My Wishlist</h1>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {wishlistProducts.map((item) => (

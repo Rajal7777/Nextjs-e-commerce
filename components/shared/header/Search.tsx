@@ -1,7 +1,13 @@
+"use client";
+
 import { Input } from "@/components/ui/input";
 import { SearchIcon } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
-const Search = async () => {
+const Search = () => {
+  const searchParams = useSearchParams();
+  const queryValue = searchParams.get("q") ?? "";
+
   return (
     <form action="/search" method="GET" className="flex w-full gap-2">
       <div className="flex w-full gap-1">
@@ -9,6 +15,7 @@ const Search = async () => {
           name="q"
           type="text"
           placeholder="Search..."
+          defaultValue={queryValue}
           className="h-7 w-full text-sm md:w-50 lg:w-75"
         />
         <button

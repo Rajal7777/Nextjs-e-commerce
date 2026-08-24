@@ -9,11 +9,13 @@ import { useRouter } from "next/navigation";
 type WishlistButtonProps = {
   productId: string;
   initialIsFavorite: boolean;
+  className?: string;
 };
 
 const WishlistButton = ({
   productId,
   initialIsFavorite,
+  className,
 }: WishlistButtonProps) => {
   const [isPending, startTransition] = useTransition();
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
@@ -41,7 +43,7 @@ const WishlistButton = ({
     <button
       type="button"
       aria-label={isFavorite ? "Remove from wishlist" : "Add to wishlist"}
-      className={`absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full border bg-white/95 shadow-sm transition-colors sm:left-3 sm:top-3 sm:h-9 sm:w-9 ${isFavorite ? "fill-current bg-red-50 text-red-500" : "text-gray-700 hover:bg-red-400"}`}
+      className={`absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full border bg-white/95 shadow-sm transition-colors sm:left-3 sm:top-3 sm:h-9 sm:w-9 ${isFavorite ? "fill-current bg-red-50 text-red-500" : "text-gray-700 hover:bg-red-400"} ${className || ""}`}
       disabled={isPending}
       onClick={handleToggleWishBtn}
     >

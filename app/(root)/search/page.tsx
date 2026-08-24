@@ -6,7 +6,7 @@ import {
 } from "@/lib/actions/product-actions";
 import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronRight, Star } from "lucide-react";
 
 //Dynamic metadata
 export async function generateMetadata(props: {
@@ -121,11 +121,21 @@ const Search = async (props: {
 
   const priceItems = [
     { name: "Any Price", value: "all" },
-    { name: "$0 to $50", value: "0-50" },
-    { name: "$51 to $100", value: "51-100" },
-    { name: "$101 to $200", value: "101-200" },
-    { name: "$200 and up", value: "200+" },
+    { name: "Yen 0 - 1000", value: "0-1000" },
+    { name: "Yen 1000 - 3000", value: "1000-3000" },
+    { name: "Yen 3000 - 5000", value: "3000-5000" },
+    { name: "Yen 5000+", value: "5000+" },
   ];
+
+  const sortItems = [
+    { label: "Newest", value: "newest" },
+    { label: "Lowest", value: "lowest" },
+    { label: "Highest", value: "highest" },
+    { label: "Top Rated", value: "rating" },
+  ];
+
+  const currentSortLabel =
+    sortItems.find((item) => item.value === sort)?.label ?? "Newest";
 
   const ratingItems = [
     { name: "All Ratings", value: "all" },
@@ -135,146 +145,159 @@ const Search = async (props: {
     { name: "1 star & up", value: "1" },
   ];
 
-  const sortItems = ["Newest", "Lowest", "Highest", "Top Rated"];
-
-  const linkBaseClass =
-    "block rounded-md border px-3 py-2 text-sm transition-colors duration-200";
-  const activeClass = "border-primary bg-primary text-primary-foreground";
-  const idleClass = "border-border hover:bg-muted";
+  const hasActiveFilter =
+    (q !== "all" && q !== "") ||
+    (category !== "all" && category !== "") ||
+    (price !== "all" && price !== "") ||
+    (rating !== "all" && rating !== "");
 
   return (
-    <div className="grid gap-5 md:grid-cols-5">
-      {/* FILTERS */}
-      <div className="filter-links md:col-span-1">
-        <aside className="sticky top-20 rounded-xl border bg-card p-4 shadow-sm">
-          <h2 className="h3-bold mb-4">Filter Products</h2>
-
-          <div className="space-y-5">
-            <section>
-              <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
-                Search by category
-              </h3>
-              <div className="space-y-2">
+    <div className="grid gap-5 lg:grid-cols-[240px_1fr] mt-6">
+      <aside>
+        <div className="rounded-xl  bg-card p-3 lg:sticky lg:top-20">
+          <section>
+            <details className="group">
+              <summary className="flex cursor-pointer list-none items-center gap-2 rounded-md py-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                <span>Search by category</span>
+              </summary>
+              <div className="mt-2 max-h-[45vh] space-y-1 overflow-y-auto pr-1">
                 {categoryItems.map((item) => {
                   const isActive = category === item.value;
                   return (
                     <Link
                       key={`category-${item.value}`}
                       href={getFilterUrl({ c: item.value })}
-                      className={`${linkBaseClass} ${isActive ? activeClass : idleClass}`}
+                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
+                        ? "bg-muted font-semibold text-foreground"
+                        : "text-foreground/90 hover:bg-muted"
+                        }`}
                     >
-                      {item.name}
+                      <span className="truncate">{item.name}</span>
+                      <ChevronRight className="h-4 w-4" />
                     </Link>
                   );
                 })}
               </div>
-            </section>
+            </details>
+          </section>
 
-            <section>
-              <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
-                Search by price
-              </h3>
-              <div className="space-y-2">
+          <section className="mt-5 border-t pt-4">
+            <details className="group">
+              <summary className="flex cursor-pointer list-none items-center gap-2 rounded-md py-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                <span>Search by price</span>
+              </summary>
+              <div className="mt-2 space-y-1">
                 {priceItems.map((item) => {
                   const isActive = price === item.value;
                   return (
                     <Link
                       key={`price-${item.value}`}
                       href={getFilterUrl({ p: item.value })}
-                      className={`${linkBaseClass} ${isActive ? activeClass : idleClass}`}
+                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
+                        ? "bg-muted font-semibold text-foreground"
+                        : "text-foreground/90 hover:bg-muted"
+                        }`}
                     >
-                      {item.name}
+                      <span>{item.name}</span>
+                      <ChevronRight className="h-4 w-4" />
                     </Link>
                   );
                 })}
               </div>
-            </section>
+            </details>
+          </section>
 
-            <section>
-              <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
-                Search by customer review
-              </h3>
-              <div className="space-y-2">
+          <section className="mt-5 border-t pt-4">
+            <details className="group">
+              <summary className="flex cursor-pointer list-none items-center gap-2 rounded-md py-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                <span>Search by rating</span>
+              </summary>
+              <div className="mt-2 space-y-1">
                 {ratingItems.map((item) => {
                   const isActive = rating === item.value;
                   return (
                     <Link
                       key={`rating-${item.value}`}
                       href={getFilterUrl({ r: item.value })}
-                      className={`${linkBaseClass} ${isActive ? activeClass : idleClass}`}
+                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
+                        ? "bg-muted font-semibold text-foreground"
+                        : "text-foreground/90 hover:bg-muted"
+                        }`}
                     >
-                      {item.name}
+                      <span className="flex items-center gap-1.5">
+                        {item.value !== "all" ? <Star className="h-3.5 w-3.5" /> : null}
+                        {item.name}
+                      </span>
+                      <ChevronRight className="h-4 w-4" />
                     </Link>
                   );
                 })}
               </div>
-            </section>
+            </details>
+          </section>
+        </div>
+      </aside>
+
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-sm text-muted-foreground">
+            {hasActiveFilter ? "Filtered results" : "Showing all products"}
           </div>
-        </aside>
-      </div>
-      <div className="md:col-span-4 space-y-4">
-        <div className="flex-between flex-col md:flex-row my-4">
-          <div className="flex items-center">
+
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-semibold">Sort By:</span>
+            <div className="relative">
+              <details className="group">
+                <summary className="flex cursor-pointer list-none items-center gap-1 rounded-md border bg-card px-3 py-2">
+                  {currentSortLabel}
+                  <ChevronDown className="h-4 w-4" />
+                </summary>
+                <div className="absolute right-0 z-20 mt-2 min-w-40 rounded-lg border bg-card p-1 shadow-md">
+                  {sortItems.map((item) => (
+                    <Link
+                      key={item.value}
+                      href={getFilterUrl({ s: item.value })}
+                      className={`block rounded-md px-3 py-2 text-sm ${sort === item.value
+                          ? "bg-muted font-semibold"
+                          : "hover:bg-muted"
+                        }`}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        {(q !== "all" && q !== "") || (category !== "all" && category !== "") ? (
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             {q !== "all" && q !== "" && (
-              <p>
-                Search results for:
-                <span className="ml-2 font-semibold">{q}</span>
-              </p>
+              <span>
+                Search: <span className="font-semibold text-foreground">{q}</span>
+              </span>
             )}
-
             {category !== "all" && category !== "" && (
-              <p>
-                Search results by category:
-                <span className="ml-2 font-semibold">{category}</span>
-              </p>
+              <span>
+                Category: <span className="font-semibold text-foreground">{category}</span>
+              </span>
             )}
-
-            {price !== "all" && price !== "" && (
-              <p>
-                Search results by price:
-                <span className="ml-2 font-semibold">{price}</span>
-              </p>
-            )}
-
-            {rating !== "all" && rating !== "" && (
-              <p>
-                Search results by rating:
-                <span className="ml-2 font-semibold">{rating}</span>
-              </p>
-            )}
-
-            {(q !== "all" && q !== "") ||
-            (category !== "all" && category !== "") ||
-            (price !== "all" && price !== "") ||
-            (rating !== "all" && rating !== "") ? (
-              <Button
-                asChild
-                variant="secondary"
-                className="ml-4 text-sm text-red-400"
-              >
+            {hasActiveFilter ? (
+              <Button asChild variant="secondary" className="ml-1 text-sm text-red-500">
                 <Link href="/search">
                   Clear Filters
-                  <ArrowRight />
+                  <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
               </Button>
             ) : null}
           </div>
+        ) : null}
 
-          <div>
-            {/* Sorting */}
-            Sort by:{" "}
-            {sortItems.map((item) => (
-              <Link
-                key={item}
-                href={getFilterUrl({ s: item })}
-                className={`mx-2 ${sort === item ? "font-bold" : ""}`}
-              >
-                {item}
-              </Link>
-            ))}
-          </div>
-        </div>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-4 place-items-center">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 xl:gap-4">
           {productsWithWishlist.length === 0 && <div>No products found</div>}
           {productsWithWishlist.map((product) => (
             <ProductCart key={product.id} product={product} />

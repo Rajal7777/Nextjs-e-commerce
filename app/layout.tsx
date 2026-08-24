@@ -11,11 +11,16 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    template: `%s | Next Store`,
-    default: APP_NAME,
+    template: "%s | Next Store | Enjoy your shopping experience",
+    default: `${APP_NAME} | Enjoy your shopping experience`,
   },
-  description: "A modern e-Commerce website.",
+  description: "Enjoy your shopping experience with us.",
   metadataBase: new URL(SERVER_URL),
+  icons: {
+    icon: "/images/store-icon.jpg",
+    shortcut: "/images/store-icon.jpg",
+    apple: "/images/store-icon.jpg",
+  },
 };
 
 export default function RootLayout({

@@ -77,15 +77,34 @@ export async function getAllProducts({
 
   const categoryFilter = category && category !== "all" ? { category } : {};
 
-  const priceFilter: Prisma.ProductWhereInput =
-    price && price !== "all"
-      ? {
-          price: {
-            gte: Number(price.split("-")[0]),
-            lte: Number(price.split("-")[1]),
-          },
-        }
-      : {};
+  const buildPriceFilter = (priceValue?: string): Prisma.ProductWhereInput => {
+    if (!priceValue || priceValue === "all") return {};
+
+    if (priceValue.endsWith("+")) {
+      const min = Number(priceValue.replace("+", ""));
+      if (!Number.isFinite(min)) return {};
+      return {
+        price: {
+          gte: min,
+        },
+      };
+    }
+
+    const [minRaw, maxRaw] = priceValue.split("-");
+    const min = Number(minRaw);
+    const max = Number(maxRaw);
+
+    if (!Number.isFinite(min) || !Number.isFinite(max)) return {};
+
+    return {
+      price: {
+        gte: min,
+        lte: max,
+      },
+    };
+  };
+
+  const priceFilter: Prisma.ProductWhereInput = buildPriceFilter(price);
 
   const ratingFilter =
     rating && rating !== "all" ? { rating: { gte: Number(rating) } } : {};

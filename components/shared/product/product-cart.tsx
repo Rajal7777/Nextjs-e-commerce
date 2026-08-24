@@ -71,7 +71,7 @@ const productImage = product.images[0] || "/images/loader.jpg";
           {product.brand}
         </div>
 
-        <div className="flex min-h-11 flex-col items-center justify-end gap-1">
+        <div className="flex min-h-11 flex-col items-center justify-end gap-1 pb-2">
           <Rating
             value={Number(product.rating)}
             caption={`${Number(product.rating).toFixed(1)}`}

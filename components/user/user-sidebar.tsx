@@ -14,50 +14,39 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Package, ReceiptText, Users } from "lucide-react";
+import { ReceiptText, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "../ui/badge";
 
-const adminLinks = [
+const userLinks = [
     {
-        title: "Overview",
-        href: "/admin/overview",
-        icon: LayoutDashboard,
-    },
-    {
-        title: "Products",
-        href: "/admin/products",
-        icon: Package,
+        title: "Profile",
+        href: "/user/profile",
+        icon: UserRound,
     },
     {
         title: "Orders",
-        href: "/admin/orders",
+        href: "/user/orders",
         icon: ReceiptText,
-    },
-    {
-        title: "Users",
-        href: "/admin/users",
-        icon: Users,
     },
 ];
 
-const AdminSidebar = ({
-    name,
-    role,
-}: {
-    name?: string;
-    role?: string;
-}) => {
+const UserSidebar = ({ name, role }: { name?: string; role?: string; }) => {
     const pathname = usePathname();
     const { isMobile, setOpenMobile } = useSidebar();
+    console.log(isMobile);
 
     return (
         <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
             <SidebarHeader>
                 <div className="flex items-center justify-between gap-2">
-                    <Link href="/" className="flex items-center gap-2" onClick={() => setOpenMobile(false)}>
+                    <Link
+                        href="/"
+                        className="flex items-center gap-2"
+                        onClick={() => setOpenMobile(false)}
+                    >
                         <Image
                             src="/images/store-icon.jpg"
                             alt="Store logo"
@@ -66,21 +55,23 @@ const AdminSidebar = ({
                             className="rounded-full"
                         />
                         <div className="leading-tight group-data-[collapsible=icon]:hidden">
-                            <p className="text-sm font-semibold">Admin Panel</p>
-                            <div className="mt-1 flex items-center gap-2">
-                                <p className="text-xs text-muted-foreground truncate">
-                                    {name || "Admin User"}
+                            <p className="text-sm font-semibold">My Account</p>
+
+                            <div className="mt-1 flex items-center gap-4">
+                                <p className="text-sm text-muted-foreground truncate">
+                                    {name || "Guest User"}
                                 </p>
                                 <Badge
-                                    variant={(role || "user") === "admin" ? "default" : "secondary"}
-                                    className="text-[10px] uppercase"
+                                    variant={(role || "user") === "admin" ? "secondary" : "outline"}
+                                    className="text-[10px] uppercase text-green-600"
                                 >
                                     {role || "user"}
                                 </Badge>
                             </div>
+
                         </div>
                     </Link>
-                 <SidebarTrigger className={cn("hidden size-8 text-sidebar-foreground", isMobile && "block")} />
+                    <SidebarTrigger className={cn("hidden size-8 text-sidebar-foreground", isMobile && "block")} />
                 </div>
             </SidebarHeader>
 
@@ -88,9 +79,10 @@ const AdminSidebar = ({
                 <SidebarGroup>
                     <SidebarGroupLabel>Navigation</SidebarGroupLabel>
                     <SidebarMenu>
-                        {adminLinks.map((link) => {
+                        {userLinks.map((link) => {
                             const Icon = link.icon;
-                            const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                            const isActive =
+                                pathname === link.href || pathname.startsWith(`${link.href}/`);
 
                             return (
                                 <SidebarMenuItem key={link.href}>
@@ -109,7 +101,7 @@ const AdminSidebar = ({
                                             }}
                                         >
                                             <Icon className="size-4" />
-                                            <span className="group-data-[collapsible=icon]:hidden">
+                                            <span className={cn("group-data-[collapsible=icon]:hidden")}>
                                                 {link.title}
                                             </span>
                                         </Link>
@@ -120,9 +112,10 @@ const AdminSidebar = ({
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>
+
             <SidebarRail />
         </Sidebar>
     );
 };
 
-export default AdminSidebar;
+export default UserSidebar;
