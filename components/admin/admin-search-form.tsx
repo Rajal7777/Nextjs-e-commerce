@@ -16,17 +16,17 @@ const AdminSearch = () => {
     const formActionUrl =
         routes.find(route => pathname.includes(route)) ?? "/admin/products";
 
-        //only keep empty sting if query param is null or undefined, otherwise use the query param value    
+    //only keep empty sting if query param is null or undefined, otherwise use the query param value    
     const queryValue = searchParams.get("query") ?? "";
 
     return (
-        <form action={formActionUrl} method="GET">
+        <form action={formActionUrl} method="GET" className="w-full sm:w-auto">
             <Input
                 type="text"
                 placeholder="Search..."
                 name="query"
                 defaultValue={queryValue}
-                className="w-20 md:w-70  lg:w-100"
+                className="h-9 w-full sm:w-55 md:w-70 lg:w-85"
             />
             <button className="sr-only" type="submit">
                 Search

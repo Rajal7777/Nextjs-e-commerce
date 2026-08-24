@@ -17,10 +17,10 @@ import { ShippingAddress } from "@/types";
 import { z } from "zod";
 import { PAGE_SIZE } from "../constants";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "../generated/prisma/client";
 
 export type ActionResult =
-  | { success: true; message: string }
-  | { success: false; message: string };
+  { success: true; message: string } | { success: false; message: string };
 
 //Sign in the user with credentials
 //useActionState, React automatically passes two arguments prevState, formdata
@@ -230,28 +230,57 @@ export async function getAllUsers({
   query?: string;
 }) {
   const searchText = query?.trim();
-
-  const where = searchText
+  const where: Prisma.UserWhereInput | undefined = searchText
     ? {
         OR: [
-          { name: { contains: searchText, mode: "insensitive" as const } },
-          { email: { contains: searchText, mode: "insensitive" as const } },
+          {
+            name: {
+              contains: searchText,
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            email: {
+              contains: searchText,
+              mode: "insensitive" as const,
+            },
+          },
         ],
       }
     : undefined;
 
-  const data = await prisma.user.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    take: limit,
-    skip: (page - 1) * limit,
-  });
+  // Guard against NaN/float inputs coming from query parsing.
+  const normalizedPage = Number.isFinite(page) ? Math.trunc(page) : 1;
+  const normalizedLimit = Number.isFinite(limit)
+    ? Math.trunc(limit)
+    : PAGE_SIZE;
 
-  const dataCount = await prisma.user.count({ where });
+  const safePage = Math.max(1, normalizedPage);
+  const safeLimit = Math.min(Math.max(1, normalizedLimit), 100);
+
+  const [data, dataCount] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        role: true,
+        createdAt: true,
+      },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      take: safeLimit,
+      skip: (safePage - 1) * safeLimit,
+    }),
+
+    prisma.user.count({ where }),
+  ]);
 
   return {
     data,
-    totalPages: Math.ceil(dataCount / limit),
+    totalPages: Math.ceil(dataCount / safeLimit),
+    totalItems: dataCount,
   };
 }
 

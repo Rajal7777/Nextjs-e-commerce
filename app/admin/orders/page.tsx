@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 const AdminOrdersPage = async (props: {
-    searchParams: Promise<{ page?: string; query?: string }>;
+    searchParams: Promise<{ page?: string; query?: string; }>;
 }) => {
     const { page = "1", query = "" } = await props.searchParams;
 
@@ -71,10 +71,12 @@ const AdminOrdersPage = async (props: {
                                     {order.isDelivered ? "order Delivered" : "Not Delivered"}
                                 </TableCell>
                                 <TableCell>
-                                    <Button asChild variant="outline" size='sm'>
-                                        <Link href={`/order/${order.id}`}>order detail</Link>
-                                    </Button>
-                                    <DeleteDialog id={order.id} action={deleteOrder} />
+                                    <div className="flex flex-col gap-1 sm:flex-row">
+                                        <Button asChild variant="outline" size='sm'>
+                                            <Link href={`/order/${order.id}`}>order detail</Link>
+                                        </Button>
+                                        <DeleteDialog id={order.id} action={deleteOrder} />
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ))}

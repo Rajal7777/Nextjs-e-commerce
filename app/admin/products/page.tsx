@@ -34,50 +34,50 @@ const AdminProductPage = async (props: {
         page,
         category,
     });
-    console.log("products", products);
-    
+
     return (
         <main className="space-y-2">
             <header className="flex-between">
-                <h1>products</h1>
+                <h1>Products</h1>
                 <Button asChild>
                     <Link href="/admin/products/create">Create Product</Link>
                 </Button>
             </header>
 
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead> ID</TableHead>
-                        <TableHead>Product Name</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Stock</TableHead>
-                        <TableHead>Rating</TableHead>
-                        <TableHead>actions </TableHead>
-                    </TableRow>
-                </TableHeader>
-
-                <TableBody>
-                    {products.data.map((product) => (
-                        <TableRow key={product.id}>
-                            <TableCell>{formatId(product.id)}</TableCell>
-                            <TableCell>{product.name}</TableCell>
-                            <TableCell>{formatCurrency(product.price)}</TableCell>
-                            <TableCell>{product.category}</TableCell>
-                            <TableCell>{product.stock}</TableCell>
-                            <TableCell>{product.rating}</TableCell>
-                            <TableCell className="flex gap-1">
-                                <Button asChild variant="outline" size="sm">
-                                    <Link href={`/admin/products/${product.id}`}>Edit</Link>
-                                </Button>
-                                {/* Delete */}
-                                <DeleteDialog id={product.id} action={deleteProductById} />
-                            </TableCell>
+            <div className="overflow-x-auto">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead> ID</TableHead>
+                            <TableHead>Product Name</TableHead>
+                            <TableHead>Price</TableHead>
+                            <TableHead>Category</TableHead>
+                            <TableHead>Stock</TableHead>
+                            <TableHead>Rating</TableHead>
+                            <TableHead>Actions</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+
+                    <TableBody>
+                        {products.data.map((product) => (
+                            <TableRow key={product.id}>
+                                <TableCell>{formatId(product.id)}</TableCell>
+                                <TableCell>{product.name}</TableCell>
+                                <TableCell>{formatCurrency(product.price)}</TableCell>
+                                <TableCell>{product.category}</TableCell>
+                                <TableCell>{product.stock}</TableCell>
+                                <TableCell>{product.rating}</TableCell>
+                                <TableCell className="flex flex-col gap-1 sm:flex-row">
+                                    <Button asChild variant="outline" size="sm">
+                                        <Link href={`/admin/products/${product.id}`}>Edit</Link>
+                                    </Button>
+                                    <DeleteDialog id={product.id} action={deleteProductById} />
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
             {products.totalPages > 1 && (
                 <Pagination page={page} totalPages={products.totalPages} />
             )}

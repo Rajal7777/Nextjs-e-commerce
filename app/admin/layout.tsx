@@ -1,40 +1,56 @@
 import Menu from "@/components/shared/header/menu";
 import Image from "next/image";
 import Link from "next/link";
-import MainNav from "./main-nav";
 import AdminSearch from "@/components/admin/admin-search-form";
+import AdminSidebar from "@/components/admin/admin-sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 import { requireAdmin } from "@/lib/actions/auth-guard";
 
 export default async function AdminLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: Readonly<{ children: React.ReactNode; }>) {
   await requireAdmin();
 
   return (
-    <div className="w-full flex flex-col">
-      <div className="h-20 border-b sm:wrapper mx-auto ">
-        <div className="flex items-center h-16 ">
-          <Link href="/" className="w-22 hidden sm:block">
-            <Image
-              src="/images/store-icon.jpg"
-              alt="logo"
-              loading="eager"
-              height={48}
-              width={48}
-            />
-          </Link>
+    <SidebarProvider>
+      <AdminSidebar />
 
-          <MainNav className="mx-2" />
+      <SidebarInset>
+        <div className="border-b">
+          <div className="wrapper mx-auto flex min-h-16 items-center gap-3">
+            <SidebarTrigger />
 
-          <div className="ml-auto items-center flex space-x-4">
+            <Link href="/" className="w-22 hidden sm:block">
+              <Image
+                src="/images/store-icon.jpg"
+                alt="logo"
+                loading="eager"
+                height={40}
+                width={40}
+                className="rounded-full"
+              />
+            </Link>
+
+            <div className="ml-auto flex items-center gap-3">
+              <div className="hidden sm:block">
+                <AdminSearch />
+              </div>
+              <Menu />
+            </div>
+          </div>
+
+          <div className="wrapper mx-auto pb-3 sm:hidden">
             <AdminSearch />
-            <Menu />
           </div>
         </div>
-      </div>
 
-      <div className="wrapper flex-1">{children}</div>
-    </div>
+        <div className="wrapper py-4">{children}</div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

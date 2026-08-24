@@ -125,7 +125,7 @@ export async function createOrder(): Promise<CreateOrderResult> {
     return {
       success: false,
       message: formatError(error),
-     };
+    };
   }
 }
 
@@ -375,7 +375,7 @@ export async function getOrderSummary() {
   const latestSales = await prisma.order.findMany({
     orderBy: { createdAt: "desc" },
     include: {
-      user: { select: { name: true } },
+      user: { select: { name: true, image: true } },
     },
     take: 6,
   });
