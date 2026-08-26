@@ -8,6 +8,7 @@ import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronDown, ChevronRight, Star } from "lucide-react";
 import Pagination from "@/components/shared/pagination";
+import { Suspense } from 'react'
 
 //Dynamic metadata
 export async function generateMetadata({
@@ -339,9 +340,11 @@ const Search = async ({
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 xl:gap-4">
           {productsWithWishlist.length === 0 && <div>No products found</div>}
-          {productsWithWishlist.map((product) => (
-            <ProductCart key={product.id} product={product} />
-          ))}
+          <Suspense fallback={<p>Loading products...</p>}>
+            {productsWithWishlist.map((product) => (
+              <ProductCart key={product.id} product={product} />
+            ))}
+          </Suspense>
         </div>
 
         {productsWithWishlist.length > 0 && products.totalPages > 1 && (

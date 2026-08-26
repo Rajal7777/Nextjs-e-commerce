@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import ProductCart from "./product-cart";
 import { ClientProduct } from "@/types";
 import Pagination from "@/components/shared/pagination";
+import { Suspense } from "react";
 
 const ProductList = ({
   products,
@@ -32,13 +33,15 @@ const ProductList = ({
       ) : (
         <>
           <div className="mx-auto w-full max-w-90 sm:max-w-2xl lg:max-w-6xl grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-1">
-            {products.map((product, index) => (
-              <ProductCart
-                product={product}
-                key={product.slug}
-                priority={index === 0}
-              />
-            ))}
+            <Suspense fallback={<p>Loading Products...</p>}>
+              {products.map((product, index) => (
+                <ProductCart
+                  product={product}
+                  key={product.slug}
+                  priority={index === 0}
+                />
+              ))}
+            </Suspense>
           </div>
 
           {totalPages > 1 && (
