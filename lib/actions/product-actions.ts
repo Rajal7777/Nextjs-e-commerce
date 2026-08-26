@@ -67,10 +67,26 @@ export async function getAllProducts({
   const queryFilter: Prisma.ProductWhereInput =
     query && query !== "all"
       ? {
-          name: {
-            contains: query,
-            mode: "insensitive",
-          } as Prisma.StringFilter,
+          OR: [
+            {
+              name: {
+                contains: query,
+                mode: "insensitive",
+              },
+            },
+            {
+              brand: {
+                contains: query,
+                mode: "insensitive",
+              },
+            },
+            {
+              category: {
+                contains: query,
+                mode: "insensitive",
+              },
+            },
+          ],
         }
       : {};
 

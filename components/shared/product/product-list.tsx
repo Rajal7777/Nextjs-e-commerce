@@ -41,7 +41,7 @@ const ProductList = ({
             ))}
           </div>
 
-          {totalPages > 0 && (
+          {totalPages > 1 && (
             <div className="mt-8 flex justify-center">
               <Pagination
                 page={currentPage}

@@ -10,13 +10,15 @@ import { ArrowRight, ChevronDown, ChevronRight, Star } from "lucide-react";
 import Pagination from "@/components/shared/pagination";
 
 //Dynamic metadata
-export async function generateMetadata({ searchParams }: {
-  searchParams: {
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{
     q?: string;
     category?: string;
     price?: string;
     rating?: string;
-  };
+  }>;
 }) {
   const {
     q = "",
@@ -45,7 +47,7 @@ export async function generateMetadata({ searchParams }: {
   };
 }
 
-const Search = async (props: {
+const Search = async ({searchParams}: {
   searchParams: Promise<{
     q?: string;
     category?: string;
@@ -62,7 +64,7 @@ const Search = async (props: {
     rating = "all",
     sort = "newest",
     page = "1",
-  } = await props.searchParams;
+  } = await searchParams;
 
   //filter url
   const getFilterUrl = ({
@@ -169,10 +171,11 @@ const Search = async (props: {
                     <Link
                       key={`category-${item.value}`}
                       href={getFilterUrl({ c: item.value })}
-                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
-                        ? "bg-muted font-semibold text-foreground"
-                        : "text-foreground/90 hover:bg-muted"
-                        }`}
+                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${
+                        isActive
+                          ? "bg-muted font-semibold text-foreground"
+                          : "text-foreground/90 hover:bg-muted"
+                      }`}
                     >
                       <span className="truncate">{item.name}</span>
                       <ChevronRight className="h-4 w-4" />
@@ -196,10 +199,11 @@ const Search = async (props: {
                     <Link
                       key={`price-${item.value}`}
                       href={getFilterUrl({ p: item.value })}
-                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
-                        ? "bg-muted font-semibold text-foreground"
-                        : "text-foreground/90 hover:bg-muted"
-                        }`}
+                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${
+                        isActive
+                          ? "bg-muted font-semibold text-foreground"
+                          : "text-foreground/90 hover:bg-muted"
+                      }`}
                     >
                       <span>{item.name}</span>
                       <ChevronRight className="h-4 w-4" />
@@ -223,13 +227,16 @@ const Search = async (props: {
                     <Link
                       key={`rating-${item.value}`}
                       href={getFilterUrl({ r: item.value })}
-                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
-                        ? "bg-muted font-semibold text-foreground"
-                        : "text-foreground/90 hover:bg-muted"
-                        }`}
+                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${
+                        isActive
+                          ? "bg-muted font-semibold text-foreground"
+                          : "text-foreground/90 hover:bg-muted"
+                      }`}
                     >
                       <span className="flex items-center gap-1.5">
-                        {item.value !== "all" ? <Star className="h-3.5 w-3.5" /> : null}
+                        {item.value !== "all" ? (
+                          <Star className="h-3.5 w-3.5" />
+                        ) : null}
                         {item.name}
                       </span>
                       <ChevronRight className="h-4 w-4" />
@@ -261,10 +268,11 @@ const Search = async (props: {
                     <Link
                       key={item.value}
                       href={getFilterUrl({ s: item.value })}
-                      className={`block rounded-md px-3 py-2 text-sm ${sort === item.value
-                        ? "bg-muted font-semibold"
-                        : "hover:bg-muted"
-                        }`}
+                      className={`block rounded-md px-3 py-2 text-sm ${
+                        sort === item.value
+                          ? "bg-muted font-semibold"
+                          : "hover:bg-muted"
+                      }`}
                     >
                       {item.label}
                     </Link>
@@ -275,20 +283,29 @@ const Search = async (props: {
           </div>
         </div>
 
-        {(q !== "all" && q !== "") || (category !== "all" && category !== "") ? (
+        {(q !== "all" && q !== "") ||
+        (category !== "all" && category !== "") ? (
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             {q !== "all" && q !== "" && (
               <span>
-                Search: <span className="font-semibold text-foreground">{q}</span>
+                Search:{" "}
+                <span className="font-semibold text-foreground">{q}</span>
               </span>
             )}
             {category !== "all" && category !== "" && (
               <span>
-                Category: <span className="font-semibold text-foreground">{category}</span>
+                Category:{" "}
+                <span className="font-semibold text-foreground">
+                  {category}
+                </span>
               </span>
             )}
             {hasActiveFilter ? (
-              <Button asChild variant="secondary" className="ml-1 text-sm text-red-500">
+              <Button
+                asChild
+                variant="secondary"
+                className="ml-1 text-sm text-red-500"
+              >
                 <Link href="/search">
                   Clear Filters
                   <ArrowRight className="ml-1 h-4 w-4" />
@@ -305,7 +322,15 @@ const Search = async (props: {
           ))}
         </div>
 
-        <Pagination page={currentPage} totalPages={products.totalPages} />
+        {productsWithWishlist.length > 0 && products.totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <Pagination
+              page={currentPage}
+              totalPages={products.totalPages}
+              urlParamName="page"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
