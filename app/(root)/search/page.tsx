@@ -47,7 +47,9 @@ export async function generateMetadata({
   };
 }
 
-const Search = async ({searchParams}: {
+const Search = async ({
+  searchParams,
+}: {
   searchParams: Promise<{
     q?: string;
     category?: string;
@@ -57,6 +59,7 @@ const Search = async ({searchParams}: {
     page?: string;
   }>;
 }) => {
+
   const {
     q = "",
     category = "all",
@@ -67,6 +70,7 @@ const Search = async ({searchParams}: {
   } = await searchParams;
 
   //filter url
+  // filter url
   const getFilterUrl = ({
     c,
     s,
@@ -81,29 +85,52 @@ const Search = async ({searchParams}: {
     pg?: string;
   }) => {
     const params = { q, category, price, rating, sort, page };
-    if (c) params.category = c;
-    if (p) params.price = p;
-    if (r) params.rating = r;
+
+    if (c !== undefined) {
+      params.category = c;
+      params.q = ""; // Clears the search query when filtering by category
+      params.page = "1";
+    }
+
+    if (p) {
+      params.price = p;
+      params.page = "1";
+    }
+
+    if (r) {
+      params.rating = r;
+      params.page = "1";
+    }
     if (pg) params.page = pg;
     if (s) params.sort = s;
-    return `/search?${new URLSearchParams(params).toString()}`;
+
+    // Remove empty string parameters if you want cleaner URLs
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value && value !== "all") {
+        searchParams.set(key, value);
+      }
+    });
+
+    return `/search?${searchParams.toString()}`;
   };
 
   const parsedPage = Number(page);
   const currentPage =
     Number.isFinite(parsedPage) && parsedPage > 0 ? Math.floor(parsedPage) : 1;
 
-  const products = await getAllProducts({
-    query: q,
-    category,
-    price,
-    rating,
-    sort,
-    page: currentPage,
-  });
-
-  //get wishlist ids for the current user
-  const wishlistIds = await getWishlistIds();
+  const [products, wishlistIds, categories] = await Promise.all([
+    getAllProducts({
+      query: q,
+      category,
+      price,
+      rating,
+      sort,
+      page: currentPage,
+    }),
+    getWishlistIds(),
+    getAllCategories(),
+  ]);
 
   const wishListSet = new Set(wishlistIds);
 
@@ -111,8 +138,6 @@ const Search = async ({searchParams}: {
     ...product,
     isFavorite: wishListSet.has(product.id),
   }));
-
-  const categories = await getAllCategories();
 
   const categoryItems = [
     { name: "All", value: "all" },
@@ -124,10 +149,10 @@ const Search = async ({searchParams}: {
 
   const priceItems = [
     { name: "Any Price", value: "all" },
-    { name: "Yen 0 - 1000", value: "0-1000" },
-    { name: "Yen 1000 - 3000", value: "1000-3000" },
-    { name: "Yen 3000 - 5000", value: "3000-5000" },
-    { name: "Yen 5000+", value: "5000+" },
+    { name: "¥0 - ¥1000", value: "0-1000" },
+    { name: "¥1000 - ¥3000", value: "1000-3000" },
+    { name: "¥3000 - ¥5000", value: "3000-5000" },
+    { name: "¥5000+", value: "5000" },
   ];
 
   const sortItems = [
@@ -139,6 +164,7 @@ const Search = async ({searchParams}: {
 
   const currentSortLabel =
     sortItems.find((item) => item.value === sort)?.label ?? "Newest";
+
 
   const ratingItems = [
     { name: "All Ratings", value: "all" },
@@ -171,11 +197,10 @@ const Search = async ({searchParams}: {
                     <Link
                       key={`category-${item.value}`}
                       href={getFilterUrl({ c: item.value })}
-                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${
-                        isActive
-                          ? "bg-muted font-semibold text-foreground"
-                          : "text-foreground/90 hover:bg-muted"
-                      }`}
+                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
+                        ? "bg-muted font-semibold text-foreground"
+                        : "text-foreground/90 hover:bg-muted"
+                        }`}
                     >
                       <span className="truncate">{item.name}</span>
                       <ChevronRight className="h-4 w-4" />
@@ -199,11 +224,10 @@ const Search = async ({searchParams}: {
                     <Link
                       key={`price-${item.value}`}
                       href={getFilterUrl({ p: item.value })}
-                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${
-                        isActive
-                          ? "bg-muted font-semibold text-foreground"
-                          : "text-foreground/90 hover:bg-muted"
-                      }`}
+                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
+                        ? "bg-muted font-semibold text-foreground"
+                        : "text-foreground/90 hover:bg-muted"
+                        }`}
                     >
                       <span>{item.name}</span>
                       <ChevronRight className="h-4 w-4" />
@@ -227,11 +251,10 @@ const Search = async ({searchParams}: {
                     <Link
                       key={`rating-${item.value}`}
                       href={getFilterUrl({ r: item.value })}
-                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${
-                        isActive
-                          ? "bg-muted font-semibold text-foreground"
-                          : "text-foreground/90 hover:bg-muted"
-                      }`}
+                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
+                        ? "bg-muted font-semibold text-foreground"
+                        : "text-foreground/90 hover:bg-muted"
+                        }`}
                     >
                       <span className="flex items-center gap-1.5">
                         {item.value !== "all" ? (
@@ -268,11 +291,10 @@ const Search = async ({searchParams}: {
                     <Link
                       key={item.value}
                       href={getFilterUrl({ s: item.value })}
-                      className={`block rounded-md px-3 py-2 text-sm ${
-                        sort === item.value
-                          ? "bg-muted font-semibold"
-                          : "hover:bg-muted"
-                      }`}
+                      className={`block rounded-md px-3 py-2 text-sm ${sort === item.value
+                        ? "bg-muted font-semibold"
+                        : "hover:bg-muted"
+                        }`}
                     >
                       {item.label}
                     </Link>
@@ -284,7 +306,7 @@ const Search = async ({searchParams}: {
         </div>
 
         {(q !== "all" && q !== "") ||
-        (category !== "all" && category !== "") ? (
+          (category !== "all" && category !== "") ? (
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             {q !== "all" && q !== "" && (
               <span>
