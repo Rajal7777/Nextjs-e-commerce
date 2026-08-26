@@ -6,11 +6,20 @@ import {
 } from "@/lib/actions/product-actions";
 import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown, ChevronRight, Star } from "lucide-react";
+import { ChevronDown, Filter, X } from "lucide-react";
 import Pagination from "@/components/shared/pagination";
-import { Suspense } from 'react'
+import { Suspense } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
+import FilterControls from "./filter-bar";
 
-//Dynamic metadata
+// Dynamic metadata
 export async function generateMetadata({
   searchParams,
 }: {
@@ -60,7 +69,6 @@ const Search = async ({
     page?: string;
   }>;
 }) => {
-
   const {
     q = "",
     category = "all",
@@ -70,8 +78,7 @@ const Search = async ({
     page = "1",
   } = await searchParams;
 
-  //filter url
-  // filter url
+  // Filter URL builder
   const getFilterUrl = ({
     c,
     s,
@@ -105,7 +112,6 @@ const Search = async ({
     if (pg) params.page = pg;
     if (s) params.sort = s;
 
-    // Remove empty string parameters if you want cleaner URLs
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
       if (value && value !== "all") {
@@ -141,7 +147,7 @@ const Search = async ({
   }));
 
   const categoryItems = [
-    { name: "All", value: "all" },
+    { name: "All Categories", value: "all" },
     ...categories.map((item) => ({
       name: item.category,
       value: item.category,
@@ -158,14 +164,13 @@ const Search = async ({
 
   const sortItems = [
     { label: "Newest", value: "newest" },
-    { label: "Lowest", value: "lowest" },
-    { label: "Highest", value: "highest" },
+    { label: "Price: Low to High", value: "lowest" },
+    { label: "Price: High to Low", value: "highest" },
     { label: "Top Rated", value: "rating" },
   ];
 
   const currentSortLabel =
     sortItems.find((item) => item.value === sort)?.label ?? "Newest";
-
 
   const ratingItems = [
     { name: "All Ratings", value: "all" },
@@ -181,121 +186,202 @@ const Search = async ({
     (price !== "all" && price !== "") ||
     (rating !== "all" && rating !== "");
 
+  // Reusable component for rendering filter groups
+  // const FilterControls = () => (
+  //   <div className="space-y-4">
+  //     <section>
+  //       <details className="group" open>
+  //         <summary className="flex cursor-pointer list-none items-center justify-between py-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+  //           <span>Category</span>
+  //           <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+  //         </summary>
+  //         <div className="mt-2 max-h-52 space-y-1 overflow-y-auto pr-1">
+  //           {categoryItems.map((item) => {
+  //             const isActive = category === item.value;
+  //             return (
+  //               <Link
+  //                 key={`category-${item.value}`}
+  //                 href={getFilterUrl({ c: item.value })}
+  //                 className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm transition-colors ${
+  //                   isActive
+  //                     ? "bg-primary/10 font-semibold text-primary"
+  //                     : "text-foreground/80 hover:bg-muted"
+  //                 }`}
+  //               >
+  //                 <span className="truncate">{item.name}</span>
+  //                 <ChevronRight className="h-4 w-4 opacity-50" />
+  //               </Link>
+  //             );
+  //           })}
+  //         </div>
+  //       </details>
+  //     </section>
+
+  //     <section className="border-t pt-4">
+  //       <details className="group" open>
+  //         <summary className="flex cursor-pointer list-none items-center justify-between py-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+  //           <span>Price Range</span>
+  //           <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+  //         </summary>
+  //         <div className="mt-2 space-y-1">
+  //           {priceItems.map((item) => {
+  //             const isActive = price === item.value;
+  //             return (
+  //               <Link
+  //                 key={`price-${item.value}`}
+  //                 href={getFilterUrl({ p: item.value })}
+  //                 className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm transition-colors ${
+  //                   isActive
+  //                     ? "bg-primary/10 font-semibold text-primary"
+  //                     : "text-foreground/80 hover:bg-muted"
+  //                 }`}
+  //               >
+  //                 <span>{item.name}</span>
+  //                 <ChevronRight className="h-4 w-4 opacity-50" />
+  //               </Link>
+  //             );
+  //           })}
+  //         </div>
+  //       </details>
+  //     </section>
+
+  //     <section className="border-t pt-4">
+  //       <details className="group" open>
+  //         <summary className="flex cursor-pointer list-none items-center justify-between py-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+  //           <span>Rating</span>
+  //           <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+  //         </summary>
+  //         <div className="mt-2 space-y-1">
+  //           {ratingItems.map((item) => {
+  //             const isActive = rating === item.value;
+  //             return (
+  //               <Link
+  //                 key={`rating-${item.value}`}
+  //                 href={getFilterUrl({ r: item.value })}
+  //                 className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm transition-colors ${
+  //                   isActive
+  //                     ? "bg-primary/10 font-semibold text-primary"
+  //                     : "text-foreground/80 hover:bg-muted"
+  //                 }`}
+  //               >
+  //                 <span className="flex items-center gap-1.5">
+  //                   {item.value !== "all" && (
+  //                     <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+  //                   )}
+  //                   {item.name}
+  //                 </span>
+  //                 <ChevronRight className="h-4 w-4 opacity-50" />
+  //               </Link>
+  //             );
+  //           })}
+  //         </div>
+  //       </details>
+  //     </section>
+  //   </div>
+  // );
+
   return (
-    <div className="grid gap-5 lg:grid-cols-[240px_1fr] mt-6">
-      <aside>
-        <div className="rounded-xl  bg-card p-3 lg:sticky lg:top-20">
-          <section>
-            <details className="group">
-              <summary className="flex cursor-pointer list-none items-center gap-2 rounded-md py-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
-                <span>Search by category</span>
-              </summary>
-              <div className="mt-2 max-h-[45vh] space-y-1 overflow-y-auto pr-1">
-                {categoryItems.map((item) => {
-                  const isActive = category === item.value;
-                  return (
-                    <Link
-                      key={`category-${item.value}`}
-                      href={getFilterUrl({ c: item.value })}
-                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
-                        ? "bg-muted font-semibold text-foreground"
-                        : "text-foreground/90 hover:bg-muted"
-                        }`}
-                    >
-                      <span className="truncate">{item.name}</span>
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  );
-                })}
-              </div>
-            </details>
-          </section>
-
-          <section className="mt-5 border-t pt-4">
-            <details className="group">
-              <summary className="flex cursor-pointer list-none items-center gap-2 rounded-md py-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
-                <span>Search by price</span>
-              </summary>
-              <div className="mt-2 space-y-1">
-                {priceItems.map((item) => {
-                  const isActive = price === item.value;
-                  return (
-                    <Link
-                      key={`price-${item.value}`}
-                      href={getFilterUrl({ p: item.value })}
-                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
-                        ? "bg-muted font-semibold text-foreground"
-                        : "text-foreground/90 hover:bg-muted"
-                        }`}
-                    >
-                      <span>{item.name}</span>
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  );
-                })}
-              </div>
-            </details>
-          </section>
-
-          <section className="mt-5 border-t pt-4">
-            <details className="group">
-              <summary className="flex cursor-pointer list-none items-center gap-2 rounded-md py-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
-                <span>Search by rating</span>
-              </summary>
-              <div className="mt-2 space-y-1">
-                {ratingItems.map((item) => {
-                  const isActive = rating === item.value;
-                  return (
-                    <Link
-                      key={`rating-${item.value}`}
-                      href={getFilterUrl({ r: item.value })}
-                      className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm ${isActive
-                        ? "bg-muted font-semibold text-foreground"
-                        : "text-foreground/90 hover:bg-muted"
-                        }`}
-                    >
-                      <span className="flex items-center gap-1.5">
-                        {item.value !== "all" ? (
-                          <Star className="h-3.5 w-3.5" />
-                        ) : null}
-                        {item.name}
-                      </span>
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  );
-                })}
-              </div>
-            </details>
-          </section>
+    <div className="mt-4 grid gap-6 lg:grid-cols-[240px_1fr] lg:mt-6">
+      {/* Desktop Sidebar Filters */}
+      <aside className="hidden lg:block">
+        <div className="sticky top-20 rounded-xl p-4">
+          <div className="mb-4 flex items-center justify-between border-b pb-3">
+            <h2 className="font-semibold text-foreground">Filters</h2>
+            {hasActiveFilter && (
+              <Link
+                href="/search"
+                className="text-xs text-destructive hover:underline"
+              >
+                Reset All
+              </Link>
+            )}
+          </div>
+          <FilterControls
+            getFilterUrl={getFilterUrl}
+            category={category}
+            price={price}
+            rating={rating}
+            categoryItems={categoryItems}
+            priceItems={priceItems}
+            ratingItems={ratingItems}
+          />
         </div>
       </aside>
 
       <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="text-sm text-muted-foreground">
+        {/* Top Controls Bar */}
+        <div className="flex items-center justify-between gap-3 border-b pb-3">
+          {/* Mobile Filter Button */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Filter className="h-4 w-4" />
+                  <span>Filters</span>
+                  {hasActiveFilter && (
+                    <span className="flex h-2 w-2 rounded-full bg-primary" />
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side="left"
+                className="w-75 sm:w-87 p-6 overflow-y-auto "
+              >
+                <SheetHeader className="border-b pb-4 text-left">
+                  <SheetTitle className="flex items-center justify-between">
+                    <span>Filter Products</span>
+                    {hasActiveFilter && (
+                      <SheetClose asChild>
+                        <Link
+                          href="/search"
+                          className="text-xs font-normal text-destructive hover:underline"
+                        >
+                          Clear All
+                        </Link>
+                      </SheetClose>
+                    )}
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">
+                  <FilterControls
+                    getFilterUrl={getFilterUrl}
+                    category={category}
+                    price={price}
+                    rating={rating}
+                    categoryItems={categoryItems}
+                    priceItems={priceItems}
+                    ratingItems={ratingItems}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          <div className="hidden text-sm text-muted-foreground sm:block">
             {hasActiveFilter ? "Filtered results" : "Showing all products"}
           </div>
 
-          <div className="flex items-center gap-2 text-sm">
-            <span className="font-semibold">Sort By:</span>
+          {/* Sort Dropdown */}
+          <div className="flex items-center gap-2 text-sm ml-auto sm:ml-0">
+            <span className="hidden text-muted-foreground sm:inline">
+              Sort by:
+            </span>
             <div className="relative">
               <details className="group">
-                <summary className="flex cursor-pointer list-none items-center gap-1 rounded-md border bg-card px-3 py-2">
-                  {currentSortLabel}
-                  <ChevronDown className="h-4 w-4" />
+                <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg border bg-card px-3 py-1.5 text-xs font-medium shadow-sm transition-colors hover:bg-muted sm:text-sm">
+                  <span>{currentSortLabel}</span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
                 </summary>
-                <div className="absolute right-0 z-20 mt-2 min-w-40 rounded-lg border bg-card p-1 shadow-md">
+                <div className="absolute right-0 z-30 mt-1.5 min-w-40 rounded-lg border bg-popover p-1 shadow-lg ring-1 ring-black/5">
                   {sortItems.map((item) => (
                     <Link
                       key={item.value}
                       href={getFilterUrl({ s: item.value })}
-                      className={`block rounded-md px-3 py-2 text-sm ${sort === item.value
-                        ? "bg-muted font-semibold"
-                        : "hover:bg-muted"
-                        }`}
+                      className={`block rounded-md px-3 py-2 text-xs transition-colors sm:text-sm ${
+                        sort === item.value
+                          ? "bg-accent font-semibold text-accent-foreground"
+                          : "hover:bg-muted"
+                      }`}
                     >
                       {item.label}
                     </Link>
@@ -306,49 +392,72 @@ const Search = async ({
           </div>
         </div>
 
-        {(q !== "all" && q !== "") ||
-          (category !== "all" && category !== "") ? (
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            {q !== "all" && q !== "" && (
-              <span>
-                Search:{" "}
-                <span className="font-semibold text-foreground">{q}</span>
+        {/* Active Filter Badges */}
+        {hasActiveFilter && (
+          <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+            {q && q !== "all" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground">
+                Search: {q}
               </span>
             )}
-            {category !== "all" && category !== "" && (
-              <span>
-                Category:{" "}
-                <span className="font-semibold text-foreground">
-                  {category}
-                </span>
+            {category && category !== "all" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground">
+                Category: {category}
               </span>
             )}
-            {hasActiveFilter ? (
-              <Button
-                asChild
-                variant="secondary"
-                className="ml-1 text-sm text-red-500"
-              >
-                <Link href="/search">
-                  Clear Filters
-                  <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
-            ) : null}
+            {price && price !== "all" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground">
+                Price: {price}
+              </span>
+            )}
+            {rating && rating !== "all" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground">
+                Rating: {rating}+★
+              </span>
+            )}
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Link href="/search">
+                Clear Filters
+                <X className="ml-1 h-3.5 w-3.5" />
+              </Link>
+            </Button>
           </div>
-        ) : null}
+        )}
 
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 xl:gap-4">
-          {productsWithWishlist.length === 0 && <div>No products found</div>}
-          <Suspense fallback={<p>Loading products...</p>}>
-            {productsWithWishlist.map((product) => (
-              <ProductCart key={product.id} product={product} />
-            ))}
-          </Suspense>
+        {/* Mobile Product Card Grid Polish */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
+          {productsWithWishlist.length === 0 ? (
+            <div className="col-span-full py-12 text-center text-muted-foreground">
+              No products match your criteria.
+            </div>
+          ) : (
+            <Suspense
+              fallback={
+                <p className="col-span-full py-8 text-center text-sm text-muted-foreground">
+                  Loading products...
+                </p>
+              }
+            >
+              {productsWithWishlist.map((product) => (
+                <div
+                  key={product.id}
+                  className="h-full transition-transform active:scale-[0.98]"
+                >
+                  <ProductCart product={product} />
+                </div>
+              ))}
+            </Suspense>
+          )}
         </div>
 
+        {/* Mobile-Friendly Pagination Container */}
         {productsWithWishlist.length > 0 && products.totalPages > 1 && (
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex justify-center border-t pt-6 overflow-x-auto pb-2">
             <Pagination
               page={currentPage}
               totalPages={products.totalPages}
