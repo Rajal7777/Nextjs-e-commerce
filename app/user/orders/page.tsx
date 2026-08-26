@@ -1,4 +1,4 @@
-import Pagination from "@/components/shared/pagintaion";
+import Pagination from "@/components/shared/pagination";
 import {
   Table,
   TableBody,
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 const OrdersPage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; }>;
 }) => {
   const { page } = await searchParams;
   const pageNumber = Number(page);

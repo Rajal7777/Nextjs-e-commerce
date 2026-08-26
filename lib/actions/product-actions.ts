@@ -6,7 +6,6 @@ import { PAGE_SIZE } from "./../constants/index";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/db/prisma";
 import { convertToPlainObject, formatError } from "../utils";
-import { LATEST_PRODUCTS_LIMIT } from "../constants";
 import { getTotalPages } from "../pagination";
 import { insertProductSchema, updateProductSchema } from "../validators";
 import { notFound } from "next/navigation";
@@ -29,7 +28,7 @@ type ProductQueryParams = {
 //Get latest products
 export async function getLatestProducts() {
   const data = await prisma.product.findMany({
-    take: LATEST_PRODUCTS_LIMIT,
+    // take: LATEST_PRODUCTS_LIMIT,
     orderBy: {
       createdAt: "desc",
     },

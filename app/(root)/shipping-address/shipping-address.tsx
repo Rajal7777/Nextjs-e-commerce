@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { updateUserAddress } from "@/lib/actions/user-actions";
 import * as z from "zod";
 
-const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
+const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -37,14 +37,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
   });
 
   // 3. Destructure + isSubmit Successful then reset
-  const { reset, handleSubmit } = form;
-
-  // 4. Trigger reset when submission succeeds
-  // useEffect(() => {
-  //     if (isSubmitSuccessful) {
-  //         reset(shippingAdressDefaultValue);
-  //     }
-  // }, [isSubmitSuccessful, reset]);
+  const { handleSubmit } = form;
 
   function onSubmit(data: z.infer<typeof shippingAddressSchema>) {
     startTransition(async () => {
@@ -55,7 +48,6 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
         return;
       }
 
-      reset(shippingAdressDefaultValue);
       router.push("/payment-method");
     });
   }

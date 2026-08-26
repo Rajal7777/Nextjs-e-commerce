@@ -1,5 +1,5 @@
 import DeleteDialog from "@/components/shared/delete-dialog";
-import Pagination from "@/components/shared/pagintaion";
+import Pagination from "@/components/shared/pagination";
 import { Button } from "@/components/ui/button";
 import {
     Table,
@@ -14,20 +14,21 @@ import {
     deleteProductById,
 } from "@/lib/actions/product-actions";
 import { formatCurrency, formatId } from "@/lib/utils";
+import Image from "next/image";
 import Link from "next/link";
 
-const AdminProductPage = async (props: {
+const AdminProductPage = async ({ searchParams }: {
     searchParams: Promise<{
         page: string;
         query: string;
         category: string;
     }>;
 }) => {
-    const searchParams = await props.searchParams;
+    const searchParam = await searchParams;
 
-    const page = Number(searchParams.page) || 1;
-    const searchText = searchParams.query || "";
-    const category = searchParams.category || "";
+    const page = Number(searchParam.page) || 1;
+    const searchText = searchParam.query || "";
+    const category = searchParam.category || "";
 
     const products = await getAllProducts({
         query: searchText,
@@ -49,6 +50,7 @@ const AdminProductPage = async (props: {
                     <TableHeader>
                         <TableRow>
                             <TableHead> ID</TableHead>
+                            <TableHead>Product Image</TableHead>
                             <TableHead>Product Name</TableHead>
                             <TableHead>Price</TableHead>
                             <TableHead>Category</TableHead>
@@ -62,6 +64,14 @@ const AdminProductPage = async (props: {
                         {products.data.map((product) => (
                             <TableRow key={product.id}>
                                 <TableCell>{formatId(product.id)}</TableCell>
+                                <TableCell>
+                                    <Image
+                                        src={product.images[0]}
+                                        alt={product.name}
+                                        width={50}
+                                        height={50}
+                                    />
+                                </TableCell>
                                 <TableCell>{product.name}</TableCell>
                                 <TableCell>{formatCurrency(product.price)}</TableCell>
                                 <TableCell>{product.category}</TableCell>

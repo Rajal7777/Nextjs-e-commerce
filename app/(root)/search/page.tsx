@@ -7,9 +7,10 @@ import {
 import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronDown, ChevronRight, Star } from "lucide-react";
+import Pagination from "@/components/shared/pagination";
 
 //Dynamic metadata
-export async function generateMetadata(props: {
+export async function generateMetadata({ searchParams }: {
   searchParams: {
     q?: string;
     category?: string;
@@ -22,7 +23,7 @@ export async function generateMetadata(props: {
     category = "all",
     price = "all",
     rating = "all",
-  } = await props.searchParams;
+  } = await searchParams;
 
   const isQuery = q && q !== "all" && q.trim() !== "";
   const isCategory = category && category !== "all" && category.trim() !== "";
@@ -261,8 +262,8 @@ const Search = async (props: {
                       key={item.value}
                       href={getFilterUrl({ s: item.value })}
                       className={`block rounded-md px-3 py-2 text-sm ${sort === item.value
-                          ? "bg-muted font-semibold"
-                          : "hover:bg-muted"
+                        ? "bg-muted font-semibold"
+                        : "hover:bg-muted"
                         }`}
                     >
                       {item.label}
@@ -303,6 +304,8 @@ const Search = async (props: {
             <ProductCart key={product.id} product={product} />
           ))}
         </div>
+
+        <Pagination page={currentPage} totalPages={products.totalPages} />
       </div>
     </div>
   );

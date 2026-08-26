@@ -1,4 +1,4 @@
-import Pagination from "@/components/shared/pagintaion";
+import Pagination from "@/components/shared/pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import DeleteDialog from "@/components/shared/delete-dialog";
