@@ -14,13 +14,13 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { APP_NAME } from "@/lib/constants";
 
-
-
 export const metadata: Metadata = {
   title: "Sign in",
 };
 
-const SignInPage = async ({ searchParams }: {
+const SignInPage = async ({
+  searchParams,
+}: {
   searchParams: Promise<{
     callbackUrl: string;
   }>;
@@ -28,8 +28,13 @@ const SignInPage = async ({ searchParams }: {
   const { callbackUrl } = await searchParams;
   const session = await auth();
 
+  const safeCallbackUrl =
+    callbackUrl?.startsWith("/") && !callbackUrl.startsWith("//")
+      ? callbackUrl
+      : "/";
+
   if (session) {
-    return redirect(callbackUrl || "/");
+    return redirect(safeCallbackUrl);
   }
 
   return (

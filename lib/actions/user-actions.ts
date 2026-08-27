@@ -23,7 +23,7 @@ export type ActionResult =
   { success: true; message: string } | { success: false; message: string };
 
 //Sign in the user with credentials
-//useActionState, React automatically passes two arguments prevState, formdata
+//useActionState automatically passes two arguments prevState, formdata
 export async function signInWithCredentials(
   prevState: unknown,
   formData: FormData,
@@ -35,20 +35,39 @@ export async function signInWithCredentials(
       password: formData.get("password"),
     });
 
-    await signIn("credentials", userCredential);
+    // Get callback URL from form
+    const callbackUrlValue = formData.get("callbackUrl");
 
-    return { success: true, message: "Signed in successfully" };
+    // Validate callback URL to prevent open redirects
+    const callbackUrl =
+      typeof callbackUrlValue === "string" && callbackUrlValue
+        ? callbackUrlValue
+        : "/";
+
+    // Sign in and redirect after successful authentication
+    await signIn("credentials", {
+      ...userCredential,
+      redirectTo: callbackUrl,
+    });
+
+    return {
+      success: true,
+      message: "Signed in successfully",
+    };
   } catch (error) {
     // Let Next.js handle the redirect error
     if (isRedirectError(error)) {
       throw error; // rethrow error
     }
 
-    return { success: false, message: "Invalid email or password" };
+    return {
+      success: false,
+      message: "Invalid email or password",
+    };
   }
 }
 
-//Sign up user
+// Sign up user
 export async function signUpUser(prevState: unknown, formData: FormData) {
   try {
     const user = signUpFormSchema.parse({
@@ -58,25 +77,37 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       confirmPassword: formData.get("confirmPassword"),
     });
 
-    //Plain password before hashed
+    // Get callback URL from form
+    const callbackUrlValue = formData.get("callbackUrl");
+
+    // Validate callback URL to prevent open redirects
+    const callbackUrl =
+      typeof callbackUrlValue === "string" &&
+      callbackUrlValue.startsWith("/") &&
+      !callbackUrlValue.startsWith("//")
+        ? callbackUrlValue
+        : "/";
+
+    // Plain password before hashing
     const plainPassword = user.password;
 
-    //hash password
-    user.password = hashSync(user.password, 10);
+    // Hash password
+    const hashedPassword = hashSync(plainPassword, 10);
 
-    //save user signUp data to db
+    // Save user to database
     await prisma.user.create({
       data: {
         name: user.name,
         email: user.email,
-        password: user.password,
+        password: hashedPassword,
       },
     });
 
-    //Sign in user to home page after sign up
+    // Auto sign-in after sign-up
     await signIn("credentials", {
       email: user.email,
       password: plainPassword,
+      redirectTo: callbackUrl,
     });
 
     return {
@@ -84,6 +115,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       message: "Signed in successfully!",
     };
   } catch (error) {
+    // Re-throw redirect error so Next.js can handle navigation
     if (isRedirectError(error)) {
       throw error;
     }

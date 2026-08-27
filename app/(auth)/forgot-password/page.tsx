@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 const ForgotPasswordPage = async () => {
     const session = await auth();
 
-    //if user logged in then send to home page
+    //user logged in then send to home page
     if (session) {
         redirect("/");
     }

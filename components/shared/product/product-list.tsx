@@ -45,7 +45,7 @@ const ProductList = ({
           </div>
 
           {totalPages > 1 && (
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8 flex ">
               <Pagination
                 page={currentPage}
                 totalPages={totalPages}

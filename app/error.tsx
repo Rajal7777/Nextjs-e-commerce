@@ -10,6 +10,7 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  
   useEffect(() => {
     console.error("Search Route Error:", error);
   }, [error]);

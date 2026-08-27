@@ -30,8 +30,8 @@ const SignUpPage = async ({ searchParams }: {
             <Card>
                 <CardHeader className="space-y-4">
                     <Link href='/' className="flex-center">
-                        <Image src='/images/store-icon.jpg' alt={`${APP_NAME}`} width={100} height={100} preload={true}
-                            loading="eager" />
+                        <Image src='/images/store-icon.jpg'
+                         alt={APP_NAME} width={100} height={100} />
                     </Link>
 
                     <CardTitle className="text-center">Create Account</CardTitle>
