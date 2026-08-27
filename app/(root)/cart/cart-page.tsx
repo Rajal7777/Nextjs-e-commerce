@@ -4,55 +4,59 @@ import { Button } from "@/components/ui/button";
 import {
   addItemToCart,
   removeItemFromCart,
-  removeItemsFromCart,
+  deleteItemsFromCart,
 } from "@/lib/actions/cart-actions";
 import { Cart } from "@/types";
-import { ArrowRight, Loader, Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useTransition } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import EmptyCart from "./empty-cart";
 
-const CartTable = ({ cart }: { cart?: Cart }) => {
-  const [isPending, startTransition] = useTransition();
+const CartTable = ({ cart }: { cart?: Cart; }) => {
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const [checkoutPending, setCheckoutPending] = useState(false);
   const router = useRouter();
 
   const totalItems = cart?.items.reduce((acc, item) => acc + item.qty, 0) ?? 0;
 
-  const handleDecreaseQty = (productId: string) => {
-    startTransition(async () => {
-      const res = await removeItemFromCart(productId);
+  const runCartAction = async (
+    actionKey: string,
+    action: () => Promise<{ success: boolean; message: string; }>,
+  ) => {
+    setPendingAction(actionKey);
+    try {
+      const res = await action();
       if (!res.success) {
         toast.error(res.message);
         return;
       }
       router.refresh();
-    });
+    } finally {
+      setPendingAction(null);
+    }
+  };
+
+  const handleDecreaseQty = (productId: string) => {
+    runCartAction(`decrease-${productId}`, async () => removeItemFromCart(productId));
   };
 
   const handleIncreaseQty = (item: Cart["items"][number]) => {
-    startTransition(async () => {
-      const res = await addItemToCart(item);
-      if (!res.success) {
-        toast.error(res.message);
-        return;
-      }
-      router.refresh();
-    });
+    runCartAction(`increase-${item.productId}`, async () =>
+      addItemToCart({ ...item, qty: 1 }),
+    );
   };
 
   const handleRemoveItem = (item: Cart["items"][number]) => {
-    startTransition(async () => {
-      const res = await removeItemsFromCart(item);
-      if (!res.success) {
-        toast.error(res.message);
-        return;
-      }
-      router.refresh();
-    });
+    runCartAction(`remove-${item.productId}`, async () => deleteItemsFromCart(item));
+  };
+
+  const handleCheckout = () => {
+    setCheckoutPending(true);
+    router.push("/shipping-address");
   };
 
   return (
@@ -96,19 +100,16 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <div className="inline-flex items-center rounded-md border bg-background">
                         <Button
-                          disabled={isPending}
+                          disabled={pendingAction === `decrease-${item.productId}`}
                           variant="ghost"
                           size="sm"
                           type="button"
                           onClick={() => handleDecreaseQty(item.productId)}
                           aria-label={`Decrease quantity of ${item.name}`}
-                          className="h-8 w-8 rounded-r-none px-0"
+                          className={`h-8 w-8 rounded-r-none px-0 ${pendingAction === `decrease-${item.productId}` ? "animate-pulse opacity-40 pointer-events-none" : ""
+                            }`}
                         >
-                          {isPending ? (
-                            <Loader className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Minus className="h-4 w-4" />
-                          )}
+                          <Minus className="h-4 w-4" />
                         </Button>
 
                         <span className="min-w-8 px-2 text-center text-sm font-medium">
@@ -116,29 +117,27 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                         </span>
 
                         <Button
-                          disabled={isPending}
+                          disabled={pendingAction === `increase-${item.productId}`}
                           variant="ghost"
                           size="sm"
                           type="button"
                           onClick={() => handleIncreaseQty(item)}
                           aria-label={`Increase quantity of ${item.name}`}
-                          className="h-8 w-8 rounded-l-none px-0"
+                          className={`h-8 w-8 rounded-r-none px-0 ${pendingAction === `increase-${item.productId}` ? "animate-pulse opacity-40 pointer-events-none" : ""
+                            }`}
                         >
-                          {isPending ? (
-                            <Loader className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Plus className="h-4 w-4" />
-                          )}
+                          <Plus className="h-4 w-4" />
                         </Button>
                       </div>
 
                       <Button
-                        disabled={isPending}
+                        disabled={pendingAction === `remove-${item.productId}`}
                         variant="ghost"
                         size="sm"
                         type="button"
                         onClick={() => handleRemoveItem(item)}
-                        className="text-destructive hover:text-destructive"
+                        className={`h-8 w-8 rounded-r-none px-0 ${pendingAction === `remove-${item.productId}` ? "animate-pulse opacity-40 pointer-events-none" : ""
+                          }`}
                         aria-label={`Remove ${item.name} from cart`}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -194,22 +193,10 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
 
               <Button
                 className="mt-6 w-full"
-                disabled={isPending}
-                onClick={() =>
-                  startTransition(() => router.push("/shipping-address"))
-                }
+                disabled={checkoutPending || !!pendingAction}
+                onClick={handleCheckout}
               >
-                {isPending ? (
-                  <>
-                    Loading...
-                    <Loader className="h-4 w-4 animate-spin" />
-                  </>
-                ) : (
-                  <>
-                    Proceed to Checkout
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
+                {checkoutPending ? "Processing..." : "Proceed to Checkout"}
               </Button>
             </div>
           </aside>

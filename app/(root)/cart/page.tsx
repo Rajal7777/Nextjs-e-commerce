@@ -11,9 +11,7 @@ const CartPage = async () => {
 
 
   return (
-    <div>
-      <CartTable cart={cart} />
-    </div>
+     <CartTable cart={cart} />
   );
 };
 

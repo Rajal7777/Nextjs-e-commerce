@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 //target date for sale end
-const TARGET_DATE = new Date("2026-09-01T00:00:00Z");
+const TARGET_DATE = new Date("2026-09-20T00:00:00Z");
 
 //CALCULATE TIME LEFT
 /*

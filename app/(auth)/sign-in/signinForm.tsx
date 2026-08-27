@@ -104,7 +104,7 @@ const SignInForm = () => {
         onClick={() => signIn("google", { callbackUrl })}
       >
         <GoogleIcon />
-        Continue with Google
+        {pending ? "Signing in..." : "Sign in with Google"}
       </Button>
 
       <div className="text-sm text-center text-muted-foreground">

@@ -26,24 +26,39 @@ import {
   PayPalScriptProvider,
   usePayPalScriptReducer,
 } from "@paypal/react-paypal-js";
+
 import {
   createPayPalOrder,
   approvePayPalOrder,
   deliverOrder,
   updateOrderToPaidCOD,
 } from "@/lib/actions/order-actions";
+
 import { toast } from "sonner";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import StripePayment from "./stripe-payment";
 
-//paypal payment
+import {
+  CheckCircle2,
+  Clock3,
+  CreditCard,
+  MapPin,
+  Package,
+  Truck,
+} from "lucide-react";
+
+// ======================================================
+// PAYPAL STATUS
+// ======================================================
+
 const PayPalStatus = () => {
   const [{ isPending, isRejected }] = usePayPalScriptReducer();
 
   if (isPending) {
     return (
-      <div className="mb-2 text-sm text-muted-foreground">
+      <div className="flex items-center gap-2 py-2 text-sm text-muted-foreground">
+        <Clock3 className="size-4 animate-pulse" />
         Loading PayPal...
       </div>
     );
@@ -51,20 +66,26 @@ const PayPalStatus = () => {
 
   if (isRejected) {
     return (
-      <div className="mb-2 text-sm text-destructive">Error loading PayPal</div>
+      <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+        Unable to load PayPal. Please try again.
+      </div>
     );
   }
 
   return null;
 };
 
-//Button to mark order as paid
+// ======================================================
+// MARK AS PAID
+// ======================================================
+
 const MarkAsPaidButton = ({ orderId }: { orderId: string }) => {
   const [isPending, startTransition] = useTransition();
 
   return (
     <Button
       type="button"
+      className="w-full"
       disabled={isPending}
       onClick={() =>
         startTransition(async () => {
@@ -78,18 +99,22 @@ const MarkAsPaidButton = ({ orderId }: { orderId: string }) => {
         })
       }
     >
-      {isPending ? "Processing..." : "Mark To Paid"}
+      {isPending ? "Processing..." : "Mark as Paid"}
     </Button>
   );
 };
 
-//Button to mark order to delivered
+// ======================================================
+// MARK AS DELIVERED
+// ======================================================
+
 const MarkAsDeliveredButton = ({ orderId }: { orderId: string }) => {
   const [isPending, startTransition] = useTransition();
 
   return (
     <Button
       type="button"
+      className="w-full"
       disabled={isPending}
       onClick={() =>
         startTransition(async () => {
@@ -103,10 +128,14 @@ const MarkAsDeliveredButton = ({ orderId }: { orderId: string }) => {
         })
       }
     >
-      {isPending ? "Processing..." : "Mark to Delivered"}
+      {isPending ? "Processing..." : "Mark as Delivered"}
     </Button>
   );
 };
+
+// ======================================================
+// ORDER DETAILS
+// ======================================================
 
 const OrderDetailsTable = ({
   order,
@@ -132,137 +161,338 @@ const OrderDetailsTable = ({
     isDelivered,
     deliveredAt,
   } = order;
+
   const normalizedPaymentMethod = paymentMethod?.toLowerCase();
+
+  // ======================================================
+  // PAYPAL
+  // ======================================================
 
   const handleCreatePayPalOrder = async () => {
     const res = await createPayPalOrder(order.id);
 
     if (!res.success) {
-      toast(res.message);
+      toast.error(res.message);
       return undefined;
     }
 
     return res.data;
   };
 
-  const handleApprovePayPalOrder = async (data: { orderID: string }) => {
+  const handleApprovePayPalOrder = async (data: {
+    orderID: string;
+  }) => {
     const res = await approvePayPalOrder(order.id, data);
 
-    toast(res.message);
+    if (res.success) {
+      toast.success(res.message);
+    } else {
+      toast.error(res.message);
+    }
   };
 
   return (
-    <>
-      <div className="grid gap-4 md:grid-cols-3 md:gap-5">
-        <div className=" col-span-1 md:col-span-2 space-y-4 overflow-x-auto">
-          <Card className="border">
-            <CardHeader>
-              <CardTitle className="text-xl pb-4">Payment Method</CardTitle>
-              <CardDescription>{paymentMethod}</CardDescription>
-              <CardContent>
-                {isPaid ? (
-                  <Badge variant="secondary">
-                    Paid at {formatDateTime(paidAt!).dateTime}
-                  </Badge>
-                ) : (
-                  <Badge variant="destructive">Not paid</Badge>
-                )}
-              </CardContent>
-            </CardHeader>
-            <hr />
+    <div className="grid gap-6 lg:grid-cols-3 my-6">
 
-            <CardContent>
-              <h2 className="text-xl pb-4">Shipping Address</h2>
-              <p>{shippingAddress.fullName}</p>
-              <p>
-                {shippingAddress.postalCode}-
-                <span className="capitalize">{shippingAddress.city}</span>,{" "}
-                <span className="capitalize">
-                  {shippingAddress.streetAddress}
-                </span>
-                , <span className="capitalize">{shippingAddress.country}</span>
-              </p>
-              {isDelivered ? (
-                <Badge variant="secondary">
-                  {formatDateTime(deliveredAt!).dateTime}
+      <div className="space-y-6 lg:col-span-2">
+        {/* PAYMENT INFORMATION */}
+
+        <Card>
+          <CardHeader className="border-b">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex gap-3">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+                  <CreditCard className="size-5" />
+                </div>
+
+                <div>
+                  <CardTitle>Payment Information</CardTitle>
+                  <CardDescription className="mt-1">
+                    Payment method and status
+                  </CardDescription>
+                </div>
+              </div>
+
+              {isPaid ? (
+                <Badge
+                  variant="secondary"
+                  className="gap-1.5"
+                >
+                  <CheckCircle2 className="size-3.5" />
+                  Paid
                 </Badge>
               ) : (
-                <Badge variant="secondary">Not Delivered</Badge>
+                <Badge
+                  variant="destructive"
+                  className="gap-1.5"
+                >
+                  <Clock3 className="size-3.5" />
+                  Unpaid
+                </Badge>
               )}
-            </CardContent>
+            </div>
+          </CardHeader>
 
-            <CardContent className="p-4 gap-4">
-              <h2 className="text-xl pb-4">Order Items</h2>
+          <CardContent className="pt-6">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Payment Method
+                </p>
+
+                <p className="mt-1 font-medium">
+                  {paymentMethod}
+                </p>
+              </div>
+
+              {isPaid && paidAt && (
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Paid At
+                  </p>
+
+                  <p className="mt-1 font-medium">
+                    {formatDateTime(paidAt).dateTime}
+                  </p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* SHIPPING INFORMATION */}
+
+        <Card>
+          <CardHeader className="border-b">
+            <div className="flex gap-3">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+                <MapPin className="size-5" />
+              </div>
+
+              <div>
+                <CardTitle>Shipping Address</CardTitle>
+                <CardDescription className="mt-1">
+                  Where your order will be delivered
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="pt-6">
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold">
+                {shippingAddress.fullName}
+              </p>
+
+              <p className="text-muted-foreground">
+                {shippingAddress.streetAddress}
+              </p>
+
+              <p className="text-muted-foreground">
+                {shippingAddress.postalCode},{" "}
+                {shippingAddress.city}
+              </p>
+
+              <p className="text-muted-foreground">
+                {shippingAddress.country}
+              </p>
+            </div>
+
+            <div className="mt-5 border-t pt-4">
+              <div className="flex items-center gap-2">
+                <Truck className="size-4 text-muted-foreground" />
+
+                <span className="text-sm text-muted-foreground">
+                  Delivery Status
+                </span>
+
+                {isDelivered ? (
+                  <Badge variant="secondary" className="ml-auto">
+                    Delivered
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="ml-auto">
+                    Processing
+                  </Badge>
+                )}
+              </div>
+
+              {isDelivered && deliveredAt && (
+                <p className="mt-2 text-right text-xs text-muted-foreground">
+                  Delivered at{" "}
+                  {formatDateTime(deliveredAt).dateTime}
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ORDER ITEMS */}
+
+        <Card>
+          <CardHeader className="border-b">
+            <div className="flex gap-3">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+                <Package className="size-5" />
+              </div>
+
+              <div>
+                <CardTitle>Order Items</CardTitle>
+                <CardDescription className="mt-1">
+                  {orderItems.length}{" "}
+                  {orderItems.length === 1 ? "item" : "items"} in
+                  this order
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Item</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Price</TableHead>
+                    <TableHead className="pl-6">
+                      Product
+                    </TableHead>
+
+                    <TableHead className="text-center">
+                      Quantity
+                    </TableHead>
+
+                    <TableHead className="pr-6 text-right">
+                      Price
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
+
                 <TableBody>
                   {orderItems.map((item) => (
                     <TableRow key={item.slug}>
-                      <TableCell>
+                      <TableCell className="pl-6">
                         <Link
                           href={`/product/${item.slug}`}
-                          className="flex items-center"
+                          className="flex min-w-55 items-center gap-3 hover:opacity-80"
                         >
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            width={50}
-                            height={50}
-                          ></Image>
-                          <span className="px-2">{item.name}</span>
+                          <div className="relative size-14 shrink-0 overflow-hidden rounded-lg border bg-muted">
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              fill
+                              className="object-contain p-1"
+                            />
+                          </div>
+
+                          <span className="font-medium">
+                            {item.name}
+                          </span>
                         </Link>
                       </TableCell>
-                      <TableCell>
-                        <span className="px-2">{item.qty}</span>
+
+                      <TableCell className="text-center">
+                        <span className="inline-flex min-w-8 items-center justify-center rounded-md bg-muted px-2 py-1 text-sm">
+                          {item.qty}
+                        </span>
                       </TableCell>
-                      <TableCell className="text-right">
+
+                      <TableCell className="pr-6 text-right font-medium">
                         {formatCurrency(item.price)}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        <div>
-          <Card>
-            <CardContent className="p-4 space-y-4 gap-4">
-              <h2 className="text-xl pb-4">Order Summary</h2>
-              <div className="flex justify-between">
-                <div>Items</div>
-                <div>{formatCurrency(itemsPrice)}</div>
-              </div>
-              <div className="flex justify-between">
-                <div>Tax</div>
-                <div>{formatCurrency(taxPrice)}</div>
-              </div>
-              <div className="flex justify-between">
-                <div>Shipping</div>
-                <div>{formatCurrency(shippingPrice)}</div>
-              </div>
-              <div className="flex justify-between">
-                <div>Total</div>
-                <div>{formatCurrency(totalPrice)}</div>
+      {/* ==================================================
+          RIGHT SIDE - ORDER SUMMARY
+      ================================================== */}
+
+      <div className="lg:col-span-1">
+        <Card className="sticky top-6">
+          <CardHeader className="border-b">
+            <CardTitle>Order Summary</CardTitle>
+            <CardDescription>
+              Review your order total
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4 pt-6">
+            {/* PRICE BREAKDOWN */}
+
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  Items
+                </span>
+
+                <span>
+                  {formatCurrency(itemsPrice)}
+                </span>
               </div>
 
-              {/* Paypal payment */}
-              {!isPaid && normalizedPaymentMethod === "paypal" && (
-                <div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  Tax
+                </span>
+
+                <span>
+                  {formatCurrency(taxPrice)}
+                </span>
+              </div>
+
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  Shipping
+                </span>
+
+                <span>
+                  {formatCurrency(shippingPrice)}
+                </span>
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold">
+                  Total
+                </span>
+
+                <span className="text-xl font-bold">
+                  {formatCurrency(totalPrice)}
+                </span>
+              </div>
+            </div>
+
+            {/* ======================================
+                PAYMENT ACTIONS  
+                */}
+
+            {!isPaid &&
+              normalizedPaymentMethod === "paypal" && (
+                <div className="space-y-3 border-t pt-5">
+                  <div>
+                    <h3 className="font-medium">
+                      Complete Payment
+                    </h3>
+
+                    <p className="text-xs text-muted-foreground">
+                      Secure payment powered by PayPal
+                    </p>
+                  </div>
+
                   <PayPalScriptProvider
-                   options={{
-                     clientId: paypalClientId,
-                     currency: "JPY",
-                     intent: "capture",
-                     }}>
+                    options={{
+                      clientId: paypalClientId,
+                      currency: "JPY",
+                      intent: "capture",
+                    }}
+                  >
                     <PayPalStatus />
+
                     <PayPalButtons
                       createOrder={handleCreatePayPalOrder}
                       onApprove={handleApprovePayPalOrder}
@@ -271,31 +501,70 @@ const OrderDetailsTable = ({
                 </div>
               )}
 
-              {/* Stripe payment */}
-              {!isPaid &&
-                normalizedPaymentMethod === "stripe" &&
-                stripeClientSecret && (
-                  <div>
-                    <StripePayment
-                      orderId={order.id}
-                      clientSecret={stripeClientSecret}
-                    />
+            {!isPaid &&
+              normalizedPaymentMethod === "stripe" &&
+              stripeClientSecret && (
+                <div className="border-t pt-5">
+                  <div className="mb-4">
+                    <h3 className="font-medium">
+                      Complete Payment
+                    </h3>
+
+                    <p className="text-xs text-muted-foreground">
+                      Secure payment powered by Stripe
+                    </p>
                   </div>
-                )}
 
-              {/* Cash on delivery */}
-              {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
-                <MarkAsPaidButton orderId={order.id} />
+                  <StripePayment
+                    orderId={order.id}
+                    clientSecret={stripeClientSecret}
+                  />
+                </div>
               )}
 
-              {isAdmin && isPaid && !isDelivered && (
-                <MarkAsDeliveredButton orderId={order.id} />
+            {/* COD */}
+
+            {isAdmin &&
+              !isPaid &&
+              paymentMethod === "CashOnDelivery" && (
+                <div className="border-t pt-5">
+                  <p className="mb-3 text-sm text-muted-foreground">
+                    Cash on delivery order
+                  </p>
+
+                  <MarkAsPaidButton
+                    orderId={order.id}
+                  />
+                </div>
               )}
-            </CardContent>
-          </Card>
-        </div>
+
+            {/* DELIVERY */}
+
+            {isAdmin && isPaid && !isDelivered && (
+              <div className="border-t pt-5">
+                <p className="mb-3 text-sm text-muted-foreground">
+                  Payment received. You can now mark this
+                  order as delivered.
+                </p>
+
+                <MarkAsDeliveredButton
+                  orderId={order.id}
+                />
+              </div>
+            )}
+
+            {/* COMPLETED */}
+
+            {isPaid && isDelivered && (
+              <div className="flex items-center justify-center gap-2 rounded-lg bg-muted p-3 text-sm font-medium">
+                <CheckCircle2 className="size-4" />
+                Order Completed
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
-    </>
+    </div>
   );
 };
 

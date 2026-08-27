@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { addItemToCart, removeItemsFromCart } from "@/lib/actions/cart-actions";
+import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart-actions";
 import { Cart, CartItem } from "@/types";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { useState } from "react";
@@ -44,7 +44,7 @@ const AddToCart = ({
 
   //Handle remove from cart
   const handleRemoveFromCart = async () => {
-    const res = await removeItemsFromCart(item);
+    const res = await removeItemFromCart(item.productId);
     if (res.success) {
       router.refresh();
       toast.success(res.message);

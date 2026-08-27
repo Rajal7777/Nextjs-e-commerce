@@ -88,7 +88,7 @@ const sampleData = {
       name: "Running Sneakers",
       slug: "running-sneakers",
       category: "Men's Shoes",
-      description: "Lightweight mesh sneakers built for everyday comfort",
+      description: "sneakers built for everyday comfort",
       images: [
         "/images/sample-products/6g.png",
         "/images/sample-products/6w.png",
