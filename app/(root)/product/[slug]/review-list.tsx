@@ -7,7 +7,7 @@ import { CalendarHeart, User } from "lucide-react";
 
 import ReviewForm from "./review-form";
 import Rating from "@/components/rating";
-import { getAllReviews } from "@/lib/actions/review-actions";
+import { getAllReviews } from "@/lib/actions/user/review-actions";
 import { formatDateTime } from "@/lib/utils";
 import {
   Card,

@@ -1,10 +1,10 @@
-     import { auth } from "@/auth";
+import { auth } from "@/auth";
 import CheckoutSteps from "@/components/shared/checkout-steps";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getMyCart } from "@/lib/actions/cart-actions";
-import { getUserById } from "@/lib/actions/user-actions";
+import { getMyCart } from "@/lib/actions/cart/cart-actions";
+import { getUserById } from "@/lib/actions/user/user-actions";
 import { formatCurrency } from "@/lib/utils";
 import { ShippingAddress } from "@/types";
 import { Metadata } from "next";
@@ -35,7 +35,7 @@ const PlaceOrderPage = async () => {
 
     const userAddress = user.address as ShippingAddress;
     return (
-        <>    
+        <>
             <CheckoutSteps current={3} />
             <h1 className="py-4 text-2xl">Place Order</h1>
             <div className="grid md:grid-cols-3  mt-2 gap-4">

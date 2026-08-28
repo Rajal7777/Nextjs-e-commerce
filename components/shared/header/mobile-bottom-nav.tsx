@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Heart, ShoppingCart, UserIcon } from "lucide-react";
+import { Heart, Home, ShoppingCart, UserIcon } from "lucide-react";
 import { auth } from "@/auth";
 import { cn } from "@/lib/utils";
-import { getMyCart } from "@/lib/actions/cart-actions";
+import { getMyCart } from "@/lib/actions/cart/cart-actions";
 import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
 
 
@@ -16,7 +16,16 @@ const MobileBottomNav = async () => {
     const wishlistItemCount = wishlistIds.length;
     return (
         <nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
-            <div className={cn("grid h-14 items-center px-4", session ? "grid-cols-2" : "grid-cols-3")}>
+            <div className={cn("grid h-14 items-center px-4", session ? "grid-cols-3" : "grid-cols-4")}>
+                <Link
+                    href="/"
+                    className="flex h-full items-center justify-center text-muted-foreground"
+                    aria-label="Home"
+                    title="Home"
+                >
+                    <Home className="h-5 w-5" />
+                </Link>
+
                 <Link
                     href="/cart"
                     className="relative flex h-full items-center justify-center text-muted-foreground"

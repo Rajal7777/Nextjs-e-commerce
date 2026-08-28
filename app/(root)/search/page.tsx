@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   getAllCategories,
   getAllProducts,
-} from "@/lib/actions/product-actions";
+} from "@/lib/actions/product/product-actions";
 import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Filter, X } from "lucide-react";

@@ -12,7 +12,7 @@ import {
 import {
     getAllProducts,
     deleteProductById,
-} from "@/lib/actions/product-actions";
+} from "@/lib/actions/product/product-actions";
 import { formatCurrency, formatId } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";

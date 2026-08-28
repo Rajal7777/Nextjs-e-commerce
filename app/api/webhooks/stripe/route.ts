@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { updateOrderToPaid } from "@/lib/actions/order-actions";
+import { updateOrderToPaid } from "@/lib/actions/order/order-actions";
 
 //intialize stripe
 const stripeSecretKey =

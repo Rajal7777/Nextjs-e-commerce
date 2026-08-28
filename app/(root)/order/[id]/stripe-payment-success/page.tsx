@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import ConfirmStripePayment from "@/components/shared/confirm-stripe-payment";
-import { getOrderById } from "@/lib/actions/order-actions";
+import { getOrderById } from "@/lib/actions/order/order-actions";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";

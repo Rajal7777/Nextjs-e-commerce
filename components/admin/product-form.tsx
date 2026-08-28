@@ -11,7 +11,7 @@ import slugify from "slugify";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { z } from "zod";
-import { createProduct, updateProduct } from "@/lib/actions/product-actions";
+import { createProduct, updateProduct } from "@/lib/actions/product/product-actions";
 import { UploadButton } from "@/lib/uploadThing";
 import { toast } from "sonner";
 import { Card } from "../ui/card";

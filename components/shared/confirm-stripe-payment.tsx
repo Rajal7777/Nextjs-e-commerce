@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { confirmStripeOrderPaid } from "@/lib/actions/order-actions";
+import { confirmStripeOrderPaid } from "@/lib/actions/order/order-actions";
 import type { PaymentResult } from "@/types";
 
 //Invokes the paid-order Server Function after mount instead of during page render

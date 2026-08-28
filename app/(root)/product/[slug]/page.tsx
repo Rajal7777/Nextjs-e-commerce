@@ -1,4 +1,4 @@
-import { getProductBySLug } from "@/lib/actions/product-actions";
+import { getProductBySLug } from "@/lib/actions/product/product-actions";
 import { notFound } from "next/navigation";
 import Price from "@/components/shared/product/price";
 import ProductImages from "@/components/shared/product/product-image";
@@ -6,7 +6,7 @@ import ProductImages from "@/components/shared/product/product-image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import AddToCart from "@/components/shared/product/addToCartBtn";
-import { getMyCart } from "@/lib/actions/cart-actions";
+import { getMyCart } from "@/lib/actions/cart/cart-actions";
 import ReviewList from "./review-list";
 import { auth } from "@/auth";
 import Rating from "@/components/rating";

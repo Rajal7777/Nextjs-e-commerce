@@ -1,9 +1,9 @@
 import ModeToggle from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, Home, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import UserButton from "./user-button";
-import { getMyCart } from "@/lib/actions/cart-actions";
+import { getMyCart } from "@/lib/actions/cart/cart-actions";
 import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
 
 //SideBar menu in md screen
@@ -20,7 +20,25 @@ const Menu = async () => {
 
   return (
     <div className="flex justify-end gap-3">
-      <nav className="hidden md:flex w-full max-w-xs gap-1">
+      <Link
+        href="/"
+        className="flex items-center justify-center rounded-full p-2 text-muted-foreground transition-colors duration-300 hover:bg-accent hover:text-foreground md:hidden"
+        aria-label="Home"
+        title="Home"
+      >
+        <Home className="size-5" />
+      </Link>
+
+      <nav className="hidden md:flex w-full max-w-xs items-center justify-end gap-1">
+        <Link
+          href="/"
+          className="flex items-center justify-center rounded-full p-2 text-muted-foreground transition-colors duration-300 hover:bg-accent hover:text-foreground"
+          aria-label="Home"
+          title="Home"
+        >
+          <Home className="size-5" />
+        </Link>
+
         <ModeToggle />
 
         <Link

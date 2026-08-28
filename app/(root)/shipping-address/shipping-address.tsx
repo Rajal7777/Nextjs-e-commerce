@@ -24,7 +24,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { updateUserAddress } from "@/lib/actions/user-actions";
+import { updateUserAddress } from "@/lib/actions/user/user-actions";
 import * as z from "zod";
 
 const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {

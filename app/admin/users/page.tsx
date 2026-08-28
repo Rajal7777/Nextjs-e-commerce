@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAllUsers, deleteUser } from "@/lib/actions/user-actions";
+import { getAllUsers, deleteUser } from "@/lib/actions/user/user-actions";
 import { formatId } from "@/lib/utils";
 import { Metadata } from "next";
 import Image from "next/image";

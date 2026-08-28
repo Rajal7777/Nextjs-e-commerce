@@ -11,6 +11,7 @@ import {
 
 import { requireAdmin } from "@/lib/actions/auth-guard";
 import { auth } from "@/auth";
+import { Home } from "lucide-react";
 
 export default async function AdminLayout({
   children,
@@ -30,7 +31,7 @@ export default async function AdminLayout({
           <div className="wrapper mx-auto flex min-h-16 items-center gap-3">
             <SidebarTrigger />
 
-            <Link href="/" className="w-22 hidden sm:block">
+            <Link href="/" className="hidden w-22 sm:block" aria-label="Home">
               <Image
                 src="/images/store-icon.jpg"
                 alt="logo"

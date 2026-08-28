@@ -1,5 +1,5 @@
 import CartTable from "./cart-page";
-import { getMyCart } from "@/lib/actions/cart-actions";
+import { getMyCart } from "@/lib/actions/cart/cart-actions";
 
 
 export const metadata = {
@@ -11,7 +11,7 @@ const CartPage = async () => {
 
 
   return (
-     <CartTable cart={cart} />
+    <CartTable cart={cart} />
   );
 };
 

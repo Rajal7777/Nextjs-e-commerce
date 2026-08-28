@@ -31,7 +31,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { StarIcon } from "lucide-react";
-import { createUpdateReview, getSingleReview } from "@/lib/actions/review-actions";
+import { createUpdateReview, getSingleReview } from "@/lib/actions/user/review-actions";
 import { toast } from "sonner";
 
 type CustomerReviewInput = z.input<typeof insertReviewSchema>;

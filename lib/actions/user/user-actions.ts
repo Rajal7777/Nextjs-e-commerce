@@ -6,18 +6,18 @@ import {
   signInFormSchema,
   signUpFormSchema,
   updateUserSchema,
-} from "../validators";
+} from "../../validators";
 import { auth, signIn, signOut } from "@/auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 import { prisma } from "@/db/prisma";
 import { hashSync } from "bcryptjs";
-import { formatError } from "../utils";
+import { formatError } from "../../utils";
 import { ShippingAddress } from "@/types";
 import { z } from "zod";
-import { PAGE_SIZE } from "../constants";
+import { PAGE_SIZE } from "../../constants";
 import { revalidatePath } from "next/cache";
-import { Prisma } from "../generated/prisma/client";
+import { Prisma } from "../../generated/prisma/client";
 
 export type ActionResult =
   { success: true; message: string } | { success: false; message: string };

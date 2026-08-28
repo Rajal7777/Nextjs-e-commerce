@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductBySlug } from "@/lib/actions/product-actions";
+import { getProductBySlug } from "@/lib/actions/product/product-actions";
 import ProductForm from "@/components/admin/product-form";
 import { insertProductSchema } from "@/lib/validators";
 import { z } from "zod";

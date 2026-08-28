@@ -1,10 +1,10 @@
-import { getOrderById } from "@/lib/actions/order-actions";
 import { ShippingAddress } from "@/types";
+import { getOrderById } from "@/lib/actions/order/order-actions";
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import OrderDetailsTable from "./order-detail-table";
 import { auth } from "@/auth";
-import Stripe from "stripe";
+import { createStripePaymentIntent } from "@/lib/actions/order/payment-actions";
 
 export const metadata: Metadata = {
   title: "Order Details",
@@ -17,40 +17,38 @@ const OrderDetailsPage = async ({
 }) => {
   const { id } = await params;
 
-  const order = await getOrderById(id);
-  if (!order) notFound();
-
   const session = await auth();
 
+  if (!session?.user) {
+    redirect("/api/auth/signin"); // Redirect to login page if unauthenticated
+  }
+
+  const order = await getOrderById(id, {
+    userId: session.user.id,
+    isAdmin: session.user.role === "admin",
+  });
+
+
+  if (!order) notFound();
+
+  // 3. Security Guard: Prevent data exposure across accounts
+  const isAdmin = session.user.role === "admin";
+  const isOwner = order.userId === session.user.id;
+
+  if (!isOwner && !isAdmin) {
+    notFound(); // Use notFound instead of "Unauthorized" text to disguise order existence
+  }
+
   let clientSecret: string | null = null;
-  const isStripePayment = order.paymentMethod?.toLowerCase() === "stripe";
 
-  // Create a PaymentIntent only if the order is unpaid
-  // and the selected payment method is Stripe.
-  if (!order.isPaid && isStripePayment) {
-    const stripeSecretKey =
-      process.env.STRIPE_SECRET_KEY ||
-      process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
+  if (!order.isPaid && order.paymentMethod?.toLowerCase() === "stripe") {
+    const paymentIntentResult = await createStripePaymentIntent(order.id);
 
-    if (!stripeSecretKey) {
-      throw new Error(
-        "Missing STRIPE_SECRET_KEY (or NEXT_PUBLIC_STRIPE_SECRET_KEY fallback).",
-      );
+    if (paymentIntentResult.success) {
+      clientSecret = paymentIntentResult.clientSecret ?? null;
+    } else {
+      console.error("[Stripe PaymentIntent Exception]:", paymentIntentResult.message);
     }
-
-    const stripe = new Stripe(stripeSecretKey);
-
-
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(Number(order.totalPrice)),
-      currency: "jpy",
-      metadata: {
-        orderId: order.id,
-      },
-    });
-
-    clientSecret = paymentIntent.client_secret;
   }
 
   const normalizePaymentResult = (value: unknown) => {
@@ -77,9 +75,7 @@ const OrderDetailsPage = async ({
     };
   };
 
-  const normalizedPaymentResult = normalizePaymentResult(
-    order.paymentResult,
-  );
+  const normalizedPaymentResult = normalizePaymentResult(order.paymentResult);
 
   return (
     <OrderDetailsTable

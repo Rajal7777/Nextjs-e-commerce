@@ -1,19 +1,24 @@
 "use server";
 
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { convertToPlainObject, formatError } from "../utils";
+import { convertToPlainObject, formatError } from "../../utils";
 import { auth } from "@/auth";
-import { getMyCart } from "./cart-actions";
-import { getUserById } from "./user-actions";
-import { insertOrderSchema } from "../validators";
+import { getMyCart } from "../cart/cart-actions";
+import { getUserById } from "../user/user-actions";
+import { insertOrderSchema } from "../../validators";
 import { prisma } from "@/db/prisma";
 import { CartItem, PaymentResult, ShippingAddress } from "@/types";
-import { paypal } from "../paypal";
+import { paypal } from "../../paypal";
 import { revalidatePath } from "next/cache";
-import { PAGE_SIZE } from "../constants";
-import { Prisma } from "../generated/prisma/client";
+import { PAGE_SIZE } from "../../constants";
+import { Prisma } from "../../generated/prisma/client";
 
 import { sendOrderConfirmationEmail } from "@/email";
+
+interface GetOrderOptions {
+  userId?: string;
+  isAdmin?: boolean;
+}
 
 export type CreateOrderResult =
   | {
@@ -130,14 +135,26 @@ export async function createOrder(): Promise<CreateOrderResult> {
 }
 
 //Get order by id
-export async function getOrderById(orderId: string) {
+export async function getOrderById(orderId: string, options?: GetOrderOptions) {
+  const { userId, isAdmin } = options ?? {};
+
+  // Construct a secure where clause dynamically
+  const whereClause: Record<string, any> = { id: orderId };
+
+  // Security Guard: If not an admin, restrict the query to the user's own rows
+  if (userId && !isAdmin) {
+    whereClause.userId = userId;
+  }
+
   const data = await prisma.order.findFirst({
-    where: { id: orderId },
+    where: whereClause,
     include: {
       orderItems: true,
       user: { select: { name: true, email: true } },
     },
   });
+
+  if (!data) return null;
 
   return convertToPlainObject(data);
 }

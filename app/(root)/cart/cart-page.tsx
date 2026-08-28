@@ -5,7 +5,7 @@ import {
   addItemToCart,
   removeItemFromCart,
   deleteItemsFromCart,
-} from "@/lib/actions/cart-actions";
+} from "@/lib/actions/cart/cart-actions";
 import { Cart } from "@/types";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
@@ -34,14 +34,11 @@ const CartTable = ({ cart }: { cart?: Cart; }) => {
         toast.error(res.message);
         return;
       }
+      toast.success(res.message);
       router.refresh();
     } finally {
       setPendingAction(null);
     }
-  };
-
-  const handleDecreaseQty = (productId: string) => {
-    runCartAction(`decrease-${productId}`, async () => removeItemFromCart(productId));
   };
 
   const handleIncreaseQty = (item: Cart["items"][number]) => {
@@ -49,6 +46,11 @@ const CartTable = ({ cart }: { cart?: Cart; }) => {
       addItemToCart({ ...item, qty: 1 }),
     );
   };
+
+  const handleDecreaseQty = (productId: string) => {
+    runCartAction(`decrease-${productId}`, async () => removeItemFromCart(productId));
+  };
+
 
   const handleRemoveItem = (item: Cart["items"][number]) => {
     runCartAction(`remove-${item.productId}`, async () => deleteItemsFromCart(item));

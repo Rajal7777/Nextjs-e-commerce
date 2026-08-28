@@ -3,7 +3,7 @@ import ProductList from "@/components/shared/product/product-list";
 import {
   getFeaturedProducts,
   getAllProducts,
-} from "@/lib/actions/product-actions";
+} from "@/lib/actions/product/product-actions";
 import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
 import ViewAllProductsButton from "@/components/view-all-products-button";
 import IconBox from "@/components/iconBox";

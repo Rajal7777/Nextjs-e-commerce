@@ -1,7 +1,7 @@
 "use client";
 import type { SubmitEventHandler } from "react";
 import { Button } from "@/components/ui/button";
-import { createOrder } from "@/lib/actions/order-actions";
+import { createOrder } from "@/lib/actions/order/order-actions";
 import { Check, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";

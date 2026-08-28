@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
-import { getMyCart } from "@/lib/actions/cart-actions";
-import { getUserById } from "@/lib/actions/user-actions";
+import { getMyCart } from "@/lib/actions/cart/cart-actions";
+import { getUserById } from "@/lib/actions/user/user-actions";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import ShippingAddressForm from "./shipping-address";

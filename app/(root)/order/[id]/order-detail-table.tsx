@@ -32,7 +32,7 @@ import {
   approvePayPalOrder,
   deliverOrder,
   updateOrderToPaidCOD,
-} from "@/lib/actions/order-actions";
+} from "@/lib/actions/order/order-actions";
 
 import { toast } from "sonner";
 import { useTransition } from "react";
@@ -48,9 +48,9 @@ import {
   Truck,
 } from "lucide-react";
 
-// ======================================================
+
 // PAYPAL STATUS
-// ======================================================
+
 
 const PayPalStatus = () => {
   const [{ isPending, isRejected }] = usePayPalScriptReducer();
@@ -75,9 +75,9 @@ const PayPalStatus = () => {
   return null;
 };
 
-// ======================================================
+
 // MARK AS PAID
-// ======================================================
+
 
 const MarkAsPaidButton = ({ orderId }: { orderId: string }) => {
   const [isPending, startTransition] = useTransition();
@@ -104,9 +104,9 @@ const MarkAsPaidButton = ({ orderId }: { orderId: string }) => {
   );
 };
 
-// ======================================================
+
 // MARK AS DELIVERED
-// ======================================================
+
 
 const MarkAsDeliveredButton = ({ orderId }: { orderId: string }) => {
   const [isPending, startTransition] = useTransition();
@@ -133,9 +133,7 @@ const MarkAsDeliveredButton = ({ orderId }: { orderId: string }) => {
   );
 };
 
-// ======================================================
 // ORDER DETAILS
-// ======================================================
 
 const OrderDetailsTable = ({
   order,
@@ -164,9 +162,9 @@ const OrderDetailsTable = ({
 
   const normalizedPaymentMethod = paymentMethod?.toLowerCase();
 
-  // ======================================================
+
   // PAYPAL
-  // ======================================================
+
 
   const handleCreatePayPalOrder = async () => {
     const res = await createPayPalOrder(order.id);

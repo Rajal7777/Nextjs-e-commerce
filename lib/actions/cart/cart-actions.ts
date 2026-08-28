@@ -2,13 +2,15 @@
 
 import { CartItem } from "@/types";
 import { cookies } from "next/headers";
+export const removeItemsFromCart = removeItemFromCart;
+
 import { auth } from "@/auth";
-import { convertToPlainObject, formatError } from "../utils";
-import { cartItemSchema, insertCartItemSchema } from "../validators";
-import { calculateConsumptionTax, roundDecimal } from "../utils";
+import { convertToPlainObject, formatError } from "../../utils";
+import { cartItemSchema, insertCartItemSchema } from "../../validators";
+import { calculateConsumptionTax, roundDecimal } from "../../utils";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/db/prisma";
-import { Prisma } from "../generated/prisma/browser";
+import { Prisma } from "../../generated/prisma/browser";
 
 //Calculate price
 const calcPrice = (items: CartItem[]) => {
@@ -87,7 +89,7 @@ export async function addItemToCart(data: CartItem) {
       return { success: true, message: "Item added to cart" };
     }
 
-    const currentItems = cart.items as CartItem[];
+    const currentItems = (cart.items ?? []) as CartItem[];
     const existingItem = currentItems.find(
       (ci) => ci.productId === item.productId,
     );
@@ -150,7 +152,6 @@ export async function removeItemFromCart(productId: string) {
       throw new Error("Cart session not found");
     }
 
-    // 2. Get product with only needed fields
     const product = await prisma.product.findUnique({
       where: { id: productId },
       select: {
@@ -165,13 +166,12 @@ export async function removeItemFromCart(productId: string) {
       throw new Error("Product not found");
     }
 
-    // 3. Get cart with authorization
     const cart = await getMyCart();
     if (!cart) {
       throw new Error("Cart not found");
     }
 
-    // 4. Authorization checks
+    // Authorization checks
     if (cart.userId && cart.userId !== userId) {
       throw new Error("Unauthorized: Cannot modify another user's cart");
     }
@@ -180,8 +180,9 @@ export async function removeItemFromCart(productId: string) {
       throw new Error("Unauthorized: Invalid cart session");
     }
 
-    // 5. Find item in cart
-    const currentItems = cart.items as CartItem[];
+    // Find item in cart
+    const currentItems = (cart.items ?? []) as CartItem[];
+
     const existingItem = currentItems.find(
       (cartItem) => cartItem.productId === productId,
     );
@@ -191,10 +192,13 @@ export async function removeItemFromCart(productId: string) {
     }
 
     if (existingItem.qty <= 0) {
-      throw new Error("Invalid quantity");
+      return {
+        success: false,
+        message: "Item quantity is already zero",
+      };
     }
 
-    // 6. Calculate updated items
+    //Calculate updated items
     const isRemoved = existingItem.qty === 1;
 
     const updatedItems = isRemoved
@@ -265,22 +269,17 @@ export async function removeItemFromCart(productId: string) {
     revalidatePath("/cart");
     revalidatePath("/"); // If cart is shown on homepage
 
-    // 9. Log for debugging
+    //Log for debugging
     console.log(
       `[Cart] ${isRemoved ? "Removed" : "Decreased"} ${product.name} from cart`,
     );
 
-    // 10. Return success response
+    //Return success response
     return {
       success: true,
       message: isRemoved
         ? `${product.name} removed from cart`
         : `${product.name} quantity decreased`,
-      data: {
-        productId: product.id,
-        newQuantity: isRemoved ? 0 : existingItem.qty - 1,
-        isRemoved,
-      },
     };
   } catch (error) {
     // Log error for debugging
@@ -296,7 +295,7 @@ export async function removeItemFromCart(productId: string) {
 //DELETE ITEMS
 export async function deleteItemsFromCart(data: CartItem) {
   try {
-    // 1. Authentication & Authorization
+    //Authentication
     const session = await auth();
     const userId = session?.user?.id;
     const sessionCartId = (await cookies()).get("sessionCartId")?.value;
@@ -305,13 +304,13 @@ export async function deleteItemsFromCart(data: CartItem) {
       throw new Error("Cart session not found");
     }
 
-    // 2. Get cart with validation
+    //Get cart with validation
     const cart = await getMyCart();
     if (!cart) {
       throw new Error("Cart not found");
     }
 
-    // 3. Authorization checks
+    // Authorization checks
     if (cart.userId && cart.userId !== userId) {
       throw new Error("Unauthorized: Cannot modify another user's cart");
     }
@@ -320,10 +319,10 @@ export async function deleteItemsFromCart(data: CartItem) {
       throw new Error("Unauthorized: Invalid cart session");
     }
 
-    // 4. Validate input
+    //Validate input
     const item = cartItemSchema.parse(data);
 
-    // 5. Get product with only needed fields
+    // Get product with only needed fields
     const product = await prisma.product.findUnique({
       where: { id: item.productId },
       select: {
@@ -338,18 +337,21 @@ export async function deleteItemsFromCart(data: CartItem) {
       throw new Error("Product not found");
     }
 
-    // 6. Find item in cart
-    const currentItems = cart.items as CartItem[];
+    // Find item in cart
+    const currentItems = (cart.items ?? []) as CartItem[];
 
     const existingItem = currentItems.find(
       (cartItem) => cartItem.productId === item.productId,
     );
 
     if (!existingItem) {
-      throw new Error("Item not found in cart");
+      return {
+        success: false,
+        message: "Item not found in your cart",
+      };
     }
 
-    // 7. Log quantity mismatch if any
+    // Log quantity mismatch if any
     if (item.qty && item.qty !== existingItem.qty) {
       console.warn(
         `[Cart] Quantity mismatch for ${product.name}: ` +
@@ -358,18 +360,19 @@ export async function deleteItemsFromCart(data: CartItem) {
       );
     }
 
-    // 8. Calculate updated items
+    // Calculate updated items
     const updatedItems = currentItems.filter(
       (cartItem) => cartItem.productId !== item.productId,
     );
 
-    // 9. Execute transaction with retry logic
+    //Execute transaction with retry logic
     const MAX_RETRIES = 3;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         await prisma.$transaction(
           async (tx) => {
+            // Lock the product row to prevent race conditions
             const lockedProduct = await tx.$queryRaw<{ stock: number }[]>`
               SELECT stock
               FROM "Product"
@@ -402,44 +405,35 @@ export async function deleteItemsFromCart(data: CartItem) {
               },
             });
           },
+          // Serialize concurrent transactions to prevent race conditions.
           {
             isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
             timeout: 5000,
           },
         );
 
-        break;
+        break; //exit loop if transaction succeeds
       } catch (error) {
         if (attempt === MAX_RETRIES) {
           throw error;
         }
 
+        // Exponential backoff before retrying
         await new Promise((resolve) =>
           setTimeout(resolve, 100 * Math.pow(2, attempt)),
         );
       }
     }
 
-    // 10. Revalidate paths
+    //Revalidate paths
     revalidatePath(`/product/${product.slug}`);
     revalidatePath("/cart");
     revalidatePath("/");
 
-    // 11. Log for debugging
-    console.log(
-      `[Cart] Deleted ${existingItem.qty}x ${product.name} from cart. ` +
-        `Remaining items: ${updatedItems.length}`,
-    );
-
-    // 12. Return success response
+    // Return success response
     return {
       success: true,
       message: `${product.name} removed from cart`,
-      data: {
-        productId: product.id,
-        quantityRemoved: existingItem.qty,
-        remainingItems: updatedItems.length,
-      },
     };
   } catch (error) {
     // Log error for debugging

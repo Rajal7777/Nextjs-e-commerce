@@ -2,15 +2,15 @@
 
 //prisma object lets you communicate with database
 import { z } from "zod";
-import { PAGE_SIZE } from "./../constants/index";
+import { PAGE_SIZE } from "../../constants";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/db/prisma";
-import { convertToPlainObject, formatError } from "../utils";
-import { getTotalPages } from "../pagination";
-import { insertProductSchema, updateProductSchema } from "../validators";
+import { convertToPlainObject, formatError } from "../../utils";
+import { getTotalPages } from "../../pagination";
+import { insertProductSchema, updateProductSchema } from "../../validators";
 import { notFound } from "next/navigation";
 import type { ClientProduct } from "@/types";
-import { Prisma } from "../generated/prisma/client";
+import { Prisma } from "../../generated/prisma/client";
 import { toClientProduct } from "@/lib/helpers/product";
 import { auth } from "@/auth";
 

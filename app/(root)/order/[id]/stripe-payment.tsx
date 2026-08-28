@@ -8,7 +8,7 @@ import {
   useElements,
   LinkAuthenticationElement,
 } from "@stripe/react-stripe-js";
-import { FormEvent, useEffect, useState } from "react";
+import { SubmitEventHandler, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { SERVER_URL } from "@/lib/constants";
@@ -33,7 +33,7 @@ const StripeForm = ({ orderId }: { orderId: string; }) => {
   const [email, setEmail] = useState<string>("");
 
   //handle stripe form submission
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
     if (!stripe || !elements || !email) {
@@ -54,7 +54,7 @@ const StripeForm = ({ orderId }: { orderId: string; }) => {
       setErrorMessage(error.message || "An unexpected error occurred.");
     }
     setIsLoading(false);
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit}>
