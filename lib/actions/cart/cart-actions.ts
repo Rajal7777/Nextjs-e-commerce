@@ -7,30 +7,14 @@ export const removeItemsFromCart = removeItemFromCart;
 import { auth } from "@/auth";
 import { convertToPlainObject, formatError } from "../../utils";
 import { cartItemSchema, insertCartItemSchema } from "../../validators";
-import { calculateConsumptionTax, roundDecimal } from "../../utils";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/db/prisma";
 import { Prisma } from "../../generated/prisma/browser";
-
-//Calculate price
-const calcPrice = (items: CartItem[]) => {
-  const itemsPrice = roundDecimal(
-    items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0),
-  );
-  const shippingPrice = roundDecimal(itemsPrice >= 10000 ? 0 : 500);
-  const taxPrice = calculateConsumptionTax(itemsPrice);
-  const totalPrice = roundDecimal(itemsPrice + taxPrice + shippingPrice);
-
-  return {
-    itemsPrice: String(itemsPrice),
-    shippingPrice: String(shippingPrice),
-    taxPrice: String(taxPrice),
-    totalPrice: String(totalPrice),
-  };
-};
+import { calcPrice } from "./cart-utils";
 
 //ADD TO CART
 export async function addItemToCart(data: CartItem) {
+  console.log("addItemToCart called with data:", data);
   try {
     const sessionCartId = (await cookies()).get("sessionCartId")?.value;
     if (!sessionCartId) throw new Error("Cart session not found.");
@@ -448,21 +432,18 @@ export async function deleteItemsFromCart(data: CartItem) {
 
 // Finds the current user's cart.
 export async function getMyCart() {
-  // Read the cart ID from the browser cookie.
   const sessionCartId = (await cookies()).get("sessionCartId")?.value;
-
-  if (!sessionCartId) {
-    throw new Error("Cart session not found.");
-  }
 
   // Check if the visitor is logged in.
   const session = await auth();
 
   // Logged-in users have a user ID.Guests do not.
-  const userId = session?.user?.id ? (session.user.id as string) : undefined;
+  const userId = session?.user?.id ? session.user.id : undefined;
+  if (!sessionCartId && !userId) {
+    return undefined;
+  }
 
-  // Logged-in users: find cart by userId.
-  // Guests can only access anonymous carts for their session.
+  // Logged-in users: find cart by userId. or by sessionId
   const cart = await prisma.cart.findFirst({
     where: userId ? { userId } : { sessionCartId, userId: null },
   });

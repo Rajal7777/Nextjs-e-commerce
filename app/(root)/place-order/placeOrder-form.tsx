@@ -1,4 +1,5 @@
 "use client";
+
 import type { SubmitEventHandler } from "react";
 import { Button } from "@/components/ui/button";
 import { createOrder } from "@/lib/actions/order/order-actions";
@@ -15,17 +16,23 @@ const PlaceOrderForm = () => {
     event.preventDefault();
     if (isPending) return;
 
-    startTransition(async () => {
-      const res = await createOrder();
+   startTransition(async () => {
+  try {
+    const res = await createOrder();
 
-      if (!res.success) {
-        toast.error(res.message);
-      }
+    if (!res.success) {
+      toast.error(res.message);
+      return;
+    }
 
-      if (res.redirectTo) {
-        router.push(res.redirectTo);
-      }
-    });
+    if (res.redirectTo) {
+      router.push(res.redirectTo);
+    }
+  } catch (error) {
+    console.error("[Place Order]", error);
+    toast.error("Something went wrong. Please try again.");
+  }
+});
   };
 
   return (

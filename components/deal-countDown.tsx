@@ -35,6 +35,7 @@ const DealCountdown = () => {
     minutes: 0,
     seconds: 0,
   });
+  
 
   useEffect(() => {
     //calculate time left every second

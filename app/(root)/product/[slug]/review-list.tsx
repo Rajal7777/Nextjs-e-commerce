@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
 import { CalendarHeart, User } from "lucide-react";
-
 import ReviewForm from "./review-form";
 import Rating from "@/components/rating";
 import { getAllReviews } from "@/lib/actions/user/review-actions";
@@ -16,17 +14,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import LoadingPage from "@/app/loading";
 
-type ReviewListItem = Awaited<
-  ReturnType<typeof getAllReviews>
->["data"][number];
+type ReviewListItem = Awaited<ReturnType<typeof getAllReviews>>["data"][number];
+
 
 const ReviewList = ({
   userId,
   productId,
   productSlug,
 }: {
-  userId: string;
+  userId?: string;
   productId: string;
   productSlug: string;
 }) => {
@@ -51,7 +49,6 @@ const ReviewList = ({
         error instanceof Error ? error.message : "Failed to load reviews";
 
       setError(message);
-      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -65,17 +62,11 @@ const ReviewList = ({
 
   return (
     <div className="space-y-4">
-      {isLoading && (
-        <p role="status" >
-          Loading reviews...
-        </p>
-      )}
+      {isLoading && <LoadingPage />}
 
       {!isLoading && error && (
-        <div className="space-y-2">
-          <p  className="text-destructive">
-            {error}
-          </p>
+        <div className="space-y-2" role="alert">
+          <p className="text-destructive">{error}</p>
 
           <button
             type="button"
@@ -87,9 +78,7 @@ const ReviewList = ({
         </div>
       )}
 
-      {!isLoading && !error && reviews.length === 0 && (
-        <p>No reviews yet.</p>
-      )}
+      {!isLoading && !error && reviews.length === 0 && <p>No reviews yet.</p>}
 
       {userId ? (
         <ReviewForm

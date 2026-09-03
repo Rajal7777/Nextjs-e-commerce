@@ -1,4 +1,4 @@
-import { getProductBySLug } from "@/lib/actions/product/product-actions";
+import { getProductBySlug } from "@/lib/actions/product/product-actions";
 import { notFound } from "next/navigation";
 import Price from "@/components/shared/product/price";
 import ProductImages from "@/components/shared/product/product-image";
@@ -13,44 +13,73 @@ import Rating from "@/components/rating";
 import WishlistButton from "@/components/shared/wishlist/wishlist-button";
 import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
 import { RefreshCw, Truck } from "lucide-react";
+import { Metadata } from "next";
+import { Suspense } from "react";
+
+
 
 type ProductSlugProps = {
   params: Promise<{ slug: string; }>;
 };
 
+//SEO optimization 
+export async function generateMetadata({ params }: ProductSlugProps): Promise<Metadata> {
+  const { slug } = await params;
+  if (!slug || !/^[a-zA-Z0-9-]+$/.test(slug)) return { title: "Product Not Found" };
+  const product = await getProductBySlug(slug);
+  if (!product) return { title: "Product Not Found" };
+  return { title: `${product.name} - Store`, description: product.description };
+}
+
 const ProductDetailsPage = async (props: ProductSlugProps) => {
   const { slug } = await props.params;
 
-  const product = await getProductBySLug(slug);
+  //validate slug
+  if (
+    !slug ||
+    typeof slug !== "string" ||
+    slug.length > 100 ||
+    !/^[a-zA-Z0-9-]+$/.test(slug)
+  ) {
+    notFound();
+  }
 
-  if (!product) notFound();
+  const product = await getProductBySlug(slug);
 
-  const session = await auth();
-  const userId = session?.user?.id;
-  const [cart, wishlistIds] = await Promise.all([
+  if (!product) {
+    notFound();
+  }
+
+  const [session, cart, wishlistIds] = await Promise.all([
+    auth(),
     getMyCart(),
     getWishlistIds(),
   ]);
-  const isFavorite = wishlistIds.includes(product.id);
+
+  const userId = session?.user?.id ;
+
+  const isFavorite = wishlistIds.includes(product.id) ?? false;
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <section className="container mx-auto mt-6  px-3 md:px-4">
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-5 w-full">
-          <div className="p-2.5 md:p-3 lg:col-span-3">
+    <div className="max-w-6xl mx-auto px-4 py-6">
+      <section className="w-full">
+        {/* Product Details Section */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-12 items-start w-full">
+          {/* Left Side */}
+          <div className="w-full md:col-span-7 space-y-4">
             <ProductImages images={product.images} />
-            <div className="mt-4 flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline">{product.category}</Badge>
               <Badge variant="secondary">{product.brand}</Badge>
             </div>
-            <p>{product.description}</p>
           </div>
 
-          <div className="space-y-4 lg:col-span-2">
-            <Card>
-              <CardContent className="space-y-5 p-4 md:p-5">
+          {/* Right Side*/}
+          <div className="w-full md:col-span-5 space-y-4">
+            <Card className="h-full border-muted/60 shadow-sm">
+              <CardContent className="space-y-5 p-5 md:p-6">
                 <div>
-                  <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+                  <h1 className="text-xl font-bold tracking-tight md:text-3xl text-foreground">
                     {product.name}
                   </h1>
 
@@ -60,7 +89,13 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
                       caption={`(${product.numReviews} Reviews)`}
                     />
                     <span>|</span>
-                    <span>
+                    <span
+                      className={
+                        product.stock > 0
+                          ? "text-emerald-600 font-medium"
+                          : "text-destructive font-medium"
+                      }
+                    >
                       {product.stock > 0 ? "In Stock" : "Out of Stock"}
                     </span>
                   </div>
@@ -68,12 +103,12 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
                   <div className="mt-4">
                     <Price
                       value={Number(product.price)}
-                      className="text-3xl font-semibold md:text-4xl"
+                      className="text-xl font-semibold md:text-3xl text-foreground"
                     />
                   </div>
                 </div>
 
-                <p className="text-sm leading-7 text-foreground/90">
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   {product.description}
                 </p>
 
@@ -87,7 +122,8 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
                             productId: product.id,
                             name: product.name,
                             slug: product.slug,
-                            price: String(product.price),
+                            price:
+                              String(product.price) ?? "/images/store-icon.jpg",
                             qty: 1,
                             image: product.images[0],
                           }}
@@ -102,22 +138,22 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
                     />
                   </div>
 
-                  <div className="mt-5 overflow-hidden rounded-lg border">
-                    <div className="flex items-start gap-3 border-b p-3">
-                      <Truck className="mt-1 h-5 w-5" />
+                  <div className="mt-5 overflow-hidden rounded-lg border border-muted/60">
+                    <div className="flex items-start gap-3 border-b border-muted/60 p-3.5">
+                      <Truck className="mt-0.5 h-5 w-5 text-muted-foreground shrink-0" />
                       <div>
-                        <p className="font-semibold">Free Delivery</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm font-semibold">Free Delivery</p>
+                        <p className="text-xs text-muted-foreground">
                           Enter your postal code for delivery availability
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 p-3">
-                      <RefreshCw className="mt-1 h-5 w-5" />
+                    <div className="flex items-start gap-3 p-3.5">
+                      <RefreshCw className="mt-0.5 h-5 w-5 text-muted-foreground shrink-0" />
                       <div>
-                        <p className="font-semibold">Return Delivery</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm font-semibold">Return Delivery</p>
+                        <p className="text-xs text-muted-foreground">
                           Free 30 days delivery returns.
                         </p>
                       </div>
@@ -126,7 +162,10 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
                 </div>
 
                 {product.stock <= 0 && (
-                  <Badge variant="destructive" className="w-fit">
+                  <Badge
+                    variant="destructive"
+                    className="w-full justify-center py-1.5 text-sm"
+                  >
                     Out of stock
                   </Badge>
                 )}
@@ -136,13 +175,19 @@ const ProductDetailsPage = async (props: ProductSlugProps) => {
         </div>
       </section>
 
-      <section className="container mx-auto mt-8 max-w-6xl px-3 md:px-4">
-        <h2 className="h2-bold mb-4">Customer Reviews</h2>
-        <ReviewList
-          userId={userId || ""}
-          productId={product.id}
-          productSlug={product.slug}
-        />
+      {/* Review Section spacing optimization */}
+      <section className="mt-12 border-t pt-8 w-full">
+        <h2 className="text-xl font-bold tracking-tight md:text-2xl mb-6 text-foreground">
+          Customer Reviews
+        </h2>
+
+        <Suspense fallback={<p>Loading Reviews...</p>}>
+          <ReviewList
+            productId={product.id}
+            productSlug={product.slug}
+            userId={userId}
+          />
+        </Suspense>
       </section>
     </div>
   );

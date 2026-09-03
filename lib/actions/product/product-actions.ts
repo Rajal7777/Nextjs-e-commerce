@@ -38,9 +38,9 @@ export async function getLatestProducts() {
 }
 
 //Get product by id
-export async function getProductBySlug(productId: string) {
-  const product = await prisma.product.findFirst({
-    where: { id: productId },
+export async function getProductBySlug(slug: string) {
+  const product = await prisma.product.findUnique({
+    where: { slug },
   });
   if (!product) return notFound();
 
@@ -48,11 +48,11 @@ export async function getProductBySlug(productId: string) {
 }
 
 //Get single product by it's slug
-export async function getProductBySLug(slug: string) {
-  return await prisma.product.findFirst({
-    where: { slug },
-  });
-}
+// export async function getProductBySlug(slug: string) {
+//   return await prisma.product.findFirst({
+//     where: { slug },
+//   });
+// }
 
 //Get all products
 export async function getAllProducts({

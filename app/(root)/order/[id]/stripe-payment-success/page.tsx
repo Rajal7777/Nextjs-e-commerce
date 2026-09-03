@@ -6,10 +6,10 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import Stripe from "stripe";
 import { CheckCircle2, ShoppingBag, Receipt } from "lucide-react";
+import { auth } from "@/auth";
 
 const stripeSecretKey =
-  process.env.STRIPE_SECRET_KEY ||
-  process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
+  process.env.STRIPE_SECRET_KEY || process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey) {
   throw new Error(
@@ -30,16 +30,27 @@ const SuccessPage = async (props: {
   const { id } = await props.params;
   const { payment_intent: paymentIntentId } = await props.searchParams;
 
+  const session = await auth();
+
+  // Redirect to login page if unauthenticated
+  if (!session?.user) {
+    redirect("/api/auth/signin");
+  }
+
+  const isAdmin = session.user.role === "admin";
+
   // Fetch order
-  const order = await getOrderById(id);
+  const order = await getOrderById(id, {
+    userId: session.user.id,
+    isAdmin: isAdmin,
+  });
 
   if (!order) {
     notFound();
   }
 
   // Retrieve payment intent from Stripe
-  const paymentIntent =
-    await stripe.paymentIntents.retrieve(paymentIntentId);
+  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
   // Verify payment intent belongs to this order
   if (
@@ -75,8 +86,8 @@ const SuccessPage = async (props: {
           </h1>
 
           <p className="mx-auto max-w-lg text-muted-foreground">
-            Your payment has been successfully processed. We are now
-            preparing your order and will keep you updated.
+            Your payment has been successfully processed. We are now preparing
+            your order and will keep you updated.
           </p>
         </div>
 
@@ -97,9 +108,7 @@ const SuccessPage = async (props: {
 
           <div className="space-y-4 pt-5">
             <div className="flex items-center justify-between gap-4">
-              <span className="text-sm text-muted-foreground">
-                Order ID
-              </span>
+              <span className="text-sm text-muted-foreground">Order ID</span>
 
               <span className="max-w-55 truncate font-mono text-sm font-medium">
                 #{order.id}
@@ -122,9 +131,7 @@ const SuccessPage = async (props: {
                 Payment Method
               </span>
 
-              <span className="text-sm font-medium">
-                Stripe
-              </span>
+              <span className="text-sm font-medium">Stripe</span>
             </div>
           </div>
         </div>
@@ -137,11 +144,9 @@ const SuccessPage = async (props: {
               paymentResult={{
                 id: paymentIntent.id,
                 status: paymentIntent.status,
-                email_address:
-                  paymentIntent.receipt_email || order.user.email,
+                email_address: paymentIntent.receipt_email || order.user.email,
                 pricePaid: String(
-                  paymentIntent.amount_received ||
-                    paymentIntent.amount,
+                  paymentIntent.amount_received || paymentIntent.amount,
                 ),
               }}
             />

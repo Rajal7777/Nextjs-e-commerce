@@ -48,9 +48,7 @@ import {
   Truck,
 } from "lucide-react";
 
-
 // PAYPAL STATUS
-
 
 const PayPalStatus = () => {
   const [{ isPending, isRejected }] = usePayPalScriptReducer();
@@ -75,9 +73,7 @@ const PayPalStatus = () => {
   return null;
 };
 
-
 // MARK AS PAID
-
 
 const MarkAsPaidButton = ({ orderId }: { orderId: string }) => {
   const [isPending, startTransition] = useTransition();
@@ -104,10 +100,7 @@ const MarkAsPaidButton = ({ orderId }: { orderId: string }) => {
   );
 };
 
-
 // MARK AS DELIVERED
-
-
 const MarkAsDeliveredButton = ({ orderId }: { orderId: string }) => {
   const [isPending, startTransition] = useTransition();
 
@@ -162,10 +155,8 @@ const OrderDetailsTable = ({
 
   const normalizedPaymentMethod = paymentMethod?.toLowerCase();
 
-
-  // PAYPAL
-
-
+  
+  
   const handleCreatePayPalOrder = async () => {
     const res = await createPayPalOrder(order.id);
 
@@ -177,9 +168,7 @@ const OrderDetailsTable = ({
     return res.data;
   };
 
-  const handleApprovePayPalOrder = async (data: {
-    orderID: string;
-  }) => {
+  const handleApprovePayPalOrder = async (data: { orderID: string }) => {
     const res = await approvePayPalOrder(order.id, data);
 
     if (res.success) {
@@ -191,7 +180,6 @@ const OrderDetailsTable = ({
 
   return (
     <div className="grid gap-6 lg:grid-cols-3 my-6">
-
       <div className="space-y-6 lg:col-span-2">
         {/* PAYMENT INFORMATION */}
 
@@ -212,18 +200,12 @@ const OrderDetailsTable = ({
               </div>
 
               {isPaid ? (
-                <Badge
-                  variant="secondary"
-                  className="gap-1.5"
-                >
+                <Badge variant="secondary" className="gap-1.5">
                   <CheckCircle2 className="size-3.5" />
                   Paid
                 </Badge>
               ) : (
-                <Badge
-                  variant="destructive"
-                  className="gap-1.5"
-                >
+                <Badge variant="destructive" className="gap-1.5">
                   <Clock3 className="size-3.5" />
                   Unpaid
                 </Badge>
@@ -234,20 +216,14 @@ const OrderDetailsTable = ({
           <CardContent className="pt-6">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-sm text-muted-foreground">
-                  Payment Method
-                </p>
+                <p className="text-sm text-muted-foreground">Payment Method</p>
 
-                <p className="mt-1 font-medium">
-                  {paymentMethod}
-                </p>
+                <p className="mt-1 font-medium">{paymentMethod}</p>
               </div>
 
               {isPaid && paidAt && (
                 <div>
-                  <p className="text-sm text-muted-foreground">
-                    Paid At
-                  </p>
+                  <p className="text-sm text-muted-foreground">Paid At</p>
 
                   <p className="mt-1 font-medium">
                     {formatDateTime(paidAt).dateTime}
@@ -278,22 +254,17 @@ const OrderDetailsTable = ({
 
           <CardContent className="pt-6">
             <div className="space-y-1 text-sm">
-              <p className="font-semibold">
-                {shippingAddress.fullName}
-              </p>
+              <p className="font-semibold">{shippingAddress.fullName}</p>
 
               <p className="text-muted-foreground">
                 {shippingAddress.streetAddress}
               </p>
 
               <p className="text-muted-foreground">
-                {shippingAddress.postalCode},{" "}
-                {shippingAddress.city}
+                {shippingAddress.postalCode}, {shippingAddress.city}
               </p>
 
-              <p className="text-muted-foreground">
-                {shippingAddress.country}
-              </p>
+              <p className="text-muted-foreground">{shippingAddress.country}</p>
             </div>
 
             <div className="mt-5 border-t pt-4">
@@ -317,8 +288,7 @@ const OrderDetailsTable = ({
 
               {isDelivered && deliveredAt && (
                 <p className="mt-2 text-right text-xs text-muted-foreground">
-                  Delivered at{" "}
-                  {formatDateTime(deliveredAt).dateTime}
+                  Delivered at {formatDateTime(deliveredAt).dateTime}
                 </p>
               )}
             </div>
@@ -338,8 +308,7 @@ const OrderDetailsTable = ({
                 <CardTitle>Order Items</CardTitle>
                 <CardDescription className="mt-1">
                   {orderItems.length}{" "}
-                  {orderItems.length === 1 ? "item" : "items"} in
-                  this order
+                  {orderItems.length === 1 ? "item" : "items"} in this order
                 </CardDescription>
               </div>
             </div>
@@ -350,17 +319,11 @@ const OrderDetailsTable = ({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="pl-6">
-                      Product
-                    </TableHead>
+                    <TableHead className="pl-6">Product</TableHead>
 
-                    <TableHead className="text-center">
-                      Quantity
-                    </TableHead>
+                    <TableHead className="text-center">Quantity</TableHead>
 
-                    <TableHead className="pr-6 text-right">
-                      Price
-                    </TableHead>
+                    <TableHead className="pr-6 text-right">Price</TableHead>
                   </TableRow>
                 </TableHeader>
 
@@ -381,9 +344,7 @@ const OrderDetailsTable = ({
                             />
                           </div>
 
-                          <span className="font-medium">
-                            {item.name}
-                          </span>
+                          <span className="font-medium">{item.name}</span>
                         </Link>
                       </TableCell>
 
@@ -405,17 +366,13 @@ const OrderDetailsTable = ({
         </Card>
       </div>
 
-      {/* ==================================================
-          RIGHT SIDE - ORDER SUMMARY
-      ================================================== */}
+      {/* RIGHT SIDE - ORDER SUMMARY */}
 
       <div className="lg:col-span-1">
         <Card className="sticky top-6">
           <CardHeader className="border-b">
             <CardTitle>Order Summary</CardTitle>
-            <CardDescription>
-              Review your order total
-            </CardDescription>
+            <CardDescription>Review your order total</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4 pt-6">
@@ -423,41 +380,27 @@ const OrderDetailsTable = ({
 
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">
-                  Items
-                </span>
+                <span className="text-muted-foreground">Items</span>
 
-                <span>
-                  {formatCurrency(itemsPrice)}
-                </span>
+                <span>{formatCurrency(itemsPrice)}</span>
               </div>
 
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">
-                  Tax
-                </span>
+                <span className="text-muted-foreground">Tax</span>
 
-                <span>
-                  {formatCurrency(taxPrice)}
-                </span>
+                <span>{formatCurrency(taxPrice)}</span>
               </div>
 
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">
-                  Shipping
-                </span>
+                <span className="text-muted-foreground">Shipping</span>
 
-                <span>
-                  {formatCurrency(shippingPrice)}
-                </span>
+                <span>{formatCurrency(shippingPrice)}</span>
               </div>
             </div>
 
             <div className="border-t pt-4">
               <div className="flex items-center justify-between">
-                <span className="font-semibold">
-                  Total
-                </span>
+                <span className="font-semibold">Total</span>
 
                 <span className="text-xl font-bold">
                   {formatCurrency(totalPrice)}
@@ -465,48 +408,41 @@ const OrderDetailsTable = ({
               </div>
             </div>
 
-            {/* ======================================
-                PAYMENT ACTIONS  
-                */}
+            {/* PAYMENT ACTIONS   */}
 
-            {!isPaid &&
-              normalizedPaymentMethod === "paypal" && (
-                <div className="space-y-3 border-t pt-5">
-                  <div>
-                    <h3 className="font-medium">
-                      Complete Payment
-                    </h3>
+            {!isPaid && normalizedPaymentMethod === "paypal" && (
+              <div className="space-y-3 border-t pt-5">
+                <div>
+                  <h3 className="font-medium">Complete Payment</h3>
 
-                    <p className="text-xs text-muted-foreground">
-                      Secure payment powered by PayPal
-                    </p>
-                  </div>
-
-                  <PayPalScriptProvider
-                    options={{
-                      clientId: paypalClientId,
-                      currency: "JPY",
-                      intent: "capture",
-                    }}
-                  >
-                    <PayPalStatus />
-
-                    <PayPalButtons
-                      createOrder={handleCreatePayPalOrder}
-                      onApprove={handleApprovePayPalOrder}
-                    />
-                  </PayPalScriptProvider>
+                  <p className="text-xs text-muted-foreground">
+                    Secure payment powered by PayPal
+                  </p>
                 </div>
-              )}
+
+                <PayPalScriptProvider
+                  options={{
+                    clientId: paypalClientId,
+                    currency: "JPY",
+                    intent: "capture",
+                  }}
+                >
+                  <PayPalStatus />
+
+                  <PayPalButtons
+                    createOrder={handleCreatePayPalOrder}
+                    onApprove={handleApprovePayPalOrder}
+                  />
+                </PayPalScriptProvider>
+              </div>
+            )}
 
             {!isPaid &&
               normalizedPaymentMethod === "stripe" &&
               stripeClientSecret && (
                 <div className="border-t pt-5">
                   <div className="mb-4">
-                    <h3 className="font-medium">
-                      Complete Payment
-                    </h3>
+                    <h3 className="font-medium">Complete Payment</h3>
 
                     <p className="text-xs text-muted-foreground">
                       Secure payment powered by Stripe
@@ -522,32 +458,25 @@ const OrderDetailsTable = ({
 
             {/* COD */}
 
-            {isAdmin &&
-              !isPaid &&
-              paymentMethod === "CashOnDelivery" && (
-                <div className="border-t pt-5">
-                  <p className="mb-3 text-sm text-muted-foreground">
-                    Cash on delivery order
-                  </p>
+            {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
+              <div className="border-t pt-5">
+                <p className="mb-3 text-sm text-muted-foreground">
+                  Cash on delivery order
+                </p>
 
-                  <MarkAsPaidButton
-                    orderId={order.id}
-                  />
-                </div>
-              )}
+                <MarkAsPaidButton orderId={order.id} />
+              </div>
+            )}
 
             {/* DELIVERY */}
 
             {isAdmin && isPaid && !isDelivered && (
               <div className="border-t pt-5">
                 <p className="mb-3 text-sm text-muted-foreground">
-                  Payment received. You can now mark this
-                  order as delivered.
+                  Payment received. You can now mark this order as delivered.
                 </p>
 
-                <MarkAsDeliveredButton
-                  orderId={order.id}
-                />
+                <MarkAsDeliveredButton orderId={order.id} />
               </div>
             )}
 

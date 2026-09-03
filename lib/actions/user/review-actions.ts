@@ -6,6 +6,7 @@ import { formatError } from "../../utils";
 import { auth } from "@/auth";
 import { prisma } from "@/db/prisma";
 import { revalidatePath } from "next/cache";
+import { reviewQuerySchema } from "@/lib/validators";
 
 //update or create review
 export async function createUpdateReview(
@@ -116,19 +117,47 @@ export async function createUpdateReview(
 
 //Get all reviews for a product  /{data: data}
 export async function getAllReviews({ productId }: { productId: string }) {
-  const data = await prisma.review.findMany({
-    where: { productId },
-    orderBy: { createdAt: "desc" },
-    include: {
-      user: {
-        select: {
-          name: true,
+  try {
+    //validate productId
+    const result = reviewQuerySchema.safeParse({ productId });
+
+    if (!result.success) {
+      return {
+        success: false,
+        message: "Invalid productId",
+        data: [],
+      };
+    }
+
+    //fetch required data from the database
+    const data = await prisma.review.findMany({
+      where: {
+        productId: result.data.productId,
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return { data, success: true, message: "Reviews fetched successfully" };
+    return {
+      success: true,
+      data,
+      message: "Reviews fetched successfully",
+    };
+  } catch (error) {
+    console.error("[Get All Reviews Error]", error);
+
+    return {
+      success: false,
+      message: formatError(error),
+      data: [],
+    };
+  }
 }
 
 //Get a review by userId and productId{get the single current user's review for a product}

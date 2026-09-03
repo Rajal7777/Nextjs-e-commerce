@@ -10,6 +10,30 @@ export const metadata: Metadata = {
   title: "Order Details",
 };
 
+const normalizePaymentResult = (value: unknown) => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+
+  const result = value as Record<string, unknown>;
+
+  if (
+    typeof result.id !== "string" ||
+    typeof result.status !== "string" ||
+    typeof result.email_address !== "string" ||
+    typeof result.pricePaid !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    id: result.id,
+    status: result.status,
+    email_address: result.email_address,
+    pricePaid: result.pricePaid,
+  };
+};
+
 const OrderDetailsPage = async ({
   params,
 }: {
@@ -19,20 +43,21 @@ const OrderDetailsPage = async ({
 
   const session = await auth();
 
+  // Redirect to login page if unauthenticated
   if (!session?.user) {
-    redirect("/api/auth/signin"); // Redirect to login page if unauthenticated
+    redirect("/sign-in");
   }
+
+  const isAdmin = session.user.role === "admin";
 
   const order = await getOrderById(id, {
     userId: session.user.id,
-    isAdmin: session.user.role === "admin",
+    isAdmin: isAdmin,
   });
-
 
   if (!order) notFound();
 
   // 3. Security Guard: Prevent data exposure across accounts
-  const isAdmin = session.user.role === "admin";
   const isOwner = order.userId === session.user.id;
 
   if (!isOwner && !isAdmin) {
@@ -47,35 +72,20 @@ const OrderDetailsPage = async ({
     if (paymentIntentResult.success) {
       clientSecret = paymentIntentResult.clientSecret ?? null;
     } else {
-      console.error("[Stripe PaymentIntent Exception]:", paymentIntentResult.message);
+      console.error(
+        "[Stripe PaymentIntent Exception]:",
+        paymentIntentResult.message,
+      );
     }
   }
 
-  const normalizePaymentResult = (value: unknown) => {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
-      return null;
-    }
-
-    const result = value as Record<string, unknown>;
-
-    if (
-      typeof result.id !== "string" ||
-      typeof result.status !== "string" ||
-      typeof result.email_address !== "string" ||
-      typeof result.pricePaid !== "string"
-    ) {
-      return null;
-    }
-
-    return {
-      id: result.id,
-      status: result.status,
-      email_address: result.email_address,
-      pricePaid: result.pricePaid,
-    };
-  };
-
   const normalizedPaymentResult = normalizePaymentResult(order.paymentResult);
+
+  const paypalClientId = process.env.PAYPAL_CLIENT_ID;
+
+  if (!paypalClientId) {
+    throw new Error("PAYPAL_CLIENT_ID is not configured");
+  }
 
   return (
     <OrderDetailsTable
@@ -85,8 +95,8 @@ const OrderDetailsPage = async ({
         paymentResult: normalizedPaymentResult,
       }}
       stripeClientSecret={clientSecret}
-      paypalClientId={process.env.PAYPAL_CLIENT_ID || "sb"}
-      isAdmin={session?.user?.role === "admin" || false}
+      paypalClientId={paypalClientId}
+      isAdmin
     />
   );
 };

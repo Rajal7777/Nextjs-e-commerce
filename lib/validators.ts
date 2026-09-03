@@ -147,6 +147,10 @@ export const wishListSchema = z.object({
   productId: z.string().min(1, "Product id is required"),
 })
 
+//review query schema
+export const reviewQuerySchema = z.object({
+  productId: z.string().uuid(),
+});
 
 //reset password schema
 export const resetPasswordSchema = z.object({

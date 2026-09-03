@@ -34,7 +34,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn("h-full", "antialiased", inter.className, "font-sans")}
     >
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.className} antialiased min-h-screen`}>
         <ThemeProvider
           attribute="class"
           enableSystem

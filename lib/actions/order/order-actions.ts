@@ -4,6 +4,7 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { convertToPlainObject, formatError } from "../../utils";
 import { auth } from "@/auth";
 import { getMyCart } from "../cart/cart-actions";
+import { calcPrice } from "../cart/cart-utils";
 import { getUserById } from "../user/user-actions";
 import { insertOrderSchema } from "../../validators";
 import { prisma } from "@/db/prisma";
@@ -36,12 +37,16 @@ export type CreateOrderResult =
 export async function createOrder(): Promise<CreateOrderResult> {
   try {
     const session = await auth();
-    if (!session) throw new Error("User is not authenticated");
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        message: "Please sign in to continue.",
+        redirectTo: "/sign-in?callbackUrl=%2Fplace-order",
+      };
+    }
 
     const cart = await getMyCart();
-    const userId = session?.user?.id;
-
-    if (!userId) throw new Error("User not found");
+    const userId = session.user.id;
 
     const user = await getUserById(userId);
 
@@ -69,48 +74,81 @@ export async function createOrder(): Promise<CreateOrderResult> {
       };
     }
 
-    //Create order object
-    const order = insertOrderSchema.parse({
-      userId: user.id,
-      shippingAddress: user.address,
-      paymentMethod: user.paymentMethod,
-      itemsPrice: cart.itemsPrice,
-      shippingPrice: cart.shippingPrice,
-      taxPrice: cart.taxPrice,
-      totalPrice: cart.totalPrice,
-    });
+    //Create a transaction to verify stock/price, create order and order items in database, or revert if any step fails
+    const insertOrderId = await prisma.$transaction(
+      async (tx) => {
+        // Lock each product row, verify stock and read the authoritative price from the db
+        const verifiedItems: CartItem[] = [];
 
-    //Create a transaction to create order and order items in database
-    //case any thing false then all the process revert
-    const insertOrderId = await prisma.$transaction(async (tx) => {
-      //Create order
-      const insertedOrder = await tx.order.create({ data: order });
+        for (const item of cart.items as CartItem[]) {
+          const lockedProducts = await tx.$queryRaw<
+            { id: string; name: string; stock: number; price: number }[]
+          >`
+            SELECT id, name, stock, price
+            FROM "Product"
+            WHERE id = ${item.productId}::uuid
+            FOR UPDATE
+          `;
 
-      //Create order items from the cart items
-      for (const item of cart.items as CartItem[]) {
-        await tx.orderItem.create({
+          const product = lockedProducts[0];
+
+          if (!product) throw new Error(`Product "${item.name}" not found`);
+
+          if (product.stock < item.qty) {
+            throw new Error(
+              `Only ${product.stock} of "${product.name}" left in stock`,
+            );
+          }
+
+          // Use the current db price instead of the cached cart price
+          verifiedItems.push({ ...item, price: String(product.price) });
+        }
+
+        //Recalculate prices from the verified items instead of trusting the cached cart totals
+        const order = insertOrderSchema.parse({
+          userId: user.id,
+          shippingAddress: user.address,
+          paymentMethod: user.paymentMethod,
+          ...calcPrice(verifiedItems),
+        });
+
+        //Create order
+        const insertedOrder = await tx.order.create({ data: order });
+
+        //Create order items and decrement stock for each verified item
+        for (const item of verifiedItems) {
+          await tx.orderItem.create({
+            data: {
+              ...item,
+              orderId: insertedOrder.id,
+            },
+          });
+
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { decrement: item.qty } },
+          });
+        }
+
+        //Clear cart -> move to order
+        await tx.cart.update({
+          where: { id: cart.id },
           data: {
-            ...item,
-            price: item.price,
-            orderId: insertedOrder.id,
+            items: [],
+            totalPrice: 0,
+            taxPrice: 0,
+            shippingPrice: 0,
+            itemsPrice: 0,
           },
         });
-      }
 
-      //Clear cart -> move to order
-      await tx.cart.update({
-        where: { id: cart.id },
-        data: {
-          items: [],
-          totalPrice: 0,
-          taxPrice: 0,
-          shippingPrice: 0,
-          itemsPrice: 0,
-        },
-      });
-
-      return insertedOrder.id;
-    });
+        return insertedOrder.id;
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+        timeout: 10000,
+      },
+    );
 
     //incase some thing went wrong throw error instead of continue with invalid data
     if (!insertOrderId) throw new Error("Order not found");
@@ -135,14 +173,16 @@ export async function createOrder(): Promise<CreateOrderResult> {
 }
 
 //Get order by id
-export async function getOrderById(orderId: string, options?: GetOrderOptions) {
-  const { userId, isAdmin } = options ?? {};
+export async function getOrderById(orderId: string, options: GetOrderOptions) {
+  const { userId, isAdmin } = options;
 
   // Construct a secure where clause dynamically
-  const whereClause: Record<string, any> = { id: orderId };
+  const whereClause: Prisma.OrderWhereInput = {
+    id: orderId,
+  };
 
-  // Security Guard: If not an admin, restrict the query to the user's own rows
-  if (userId && !isAdmin) {
+  //not an admin, restrict the query to the user's own rows
+  if (!isAdmin) {
     whereClause.userId = userId;
   }
 
@@ -150,7 +190,12 @@ export async function getOrderById(orderId: string, options?: GetOrderOptions) {
     where: whereClause,
     include: {
       orderItems: true,
-      user: { select: { name: true, email: true } },
+      user: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
     },
   });
 

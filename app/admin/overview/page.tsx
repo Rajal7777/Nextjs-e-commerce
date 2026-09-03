@@ -15,6 +15,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Charts from "./charts";
+import VisitorChart from "./visitor-chart";
 import { requireAdmin } from "@/lib/actions/auth-guard";
 
 export const metadata: Metadata = {
@@ -33,7 +34,7 @@ const AdminOverViewPage = async () => {
   }
 
   const summary = await getOrderSummary();
-
+ 
   return (
     <div className="space-y-4 mt-2">
       <h1 className="h2-bold">Dashboard</h1>
@@ -101,56 +102,71 @@ const AdminOverViewPage = async () => {
         </Card>
 
         <Card className="col-span-1 lg:col-span-3">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>BUYER</TableHead>
-                  <TableHead>DATE</TableHead>
-                  <TableHead>TOTAL</TableHead>
-                  <TableHead>ACTIONS</TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                {summary.latestSales.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {order?.user?.image ? (
-                          <Image
-                            src={order.user.image}
-                            alt={order.user.name || "User"}
-                            width={32}
-                            height={32}
-                            className="h-8 w-8 rounded-full object-cover ring-1 ring-border"
-                          />
-                        ) : (
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-semibold">
-                            {order?.user?.name?.slice(0, 1).toUpperCase() || "U"}
-                          </div>
-                        )}
-                        <span className="truncate">
-                          {order?.user?.name ? order.user.name : "Deleted User"}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {formatDateTime(order.createdAt).dateOnly}
-                    </TableCell>
-                    <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
-                    <TableCell>
-                      <Link href={`/order/${order.id}`}>
-                        <span>Details</span>
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <CardHeader>
+            <CardTitle>User Overview Breakdown</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <VisitorChart
+              data={{
+                users: summary.usersCount,
+                orders: summary.ordersCount,
+                products: summary.productsCount,
+              }}
+            />
+          </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>BUYER</TableHead>
+                <TableHead>DATE</TableHead>
+                <TableHead>TOTAL</TableHead>
+                <TableHead>ACTIONS</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {summary.latestSales.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {order?.user?.image ? (
+                        <Image
+                          src={order.user.image}
+                          alt={order.user.name || "User"}
+                          width={32}
+                          height={32}
+                          className="h-8 w-8 rounded-full object-cover ring-1 ring-border"
+                        />
+                      ) : (
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-semibold">
+                          {order?.user?.name?.slice(0, 1).toUpperCase() || "U"}
+                        </div>
+                      )}
+                      <span className="truncate">
+                        {order?.user?.name ? order.user.name : "Deleted User"}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {formatDateTime(order.createdAt).dateOnly}
+                  </TableCell>
+                  <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
+                  <TableCell>
+                    <Link href={`/order/${order.id}`}>
+                      <span>Details</span>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </Card>
     </div>
   );
 };

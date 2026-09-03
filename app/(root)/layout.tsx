@@ -8,9 +8,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="h-screen flex flex-col ">
+    <div className="min-h-screen flex flex-col ">
       <Navbar />
-      <main className="wrapper flex-1 pb-20 md:pb-0">{children}</main>
+      <main className="wrapper flex-1 pb-20 md:pb-0 mb-6">{children}</main>
       <MobileBottomNav />
       <Footer />
     </div>
