@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import FilterControls from "./filter-bar";
 import MobileFilterSheet from "./mobile-filter-sheet";
+import { buildFilterUrl } from "./get-filter-url";
 
 export async function generateMetadata({
   searchParams,
@@ -77,37 +78,9 @@ const Search = async ({
   } = await searchParams;
 
   // Filter URL Builder
-  const getFilterUrl = ({
-    c,
-    s,
-    p,
-    r,
-    pg,
-  }: {
-    c?: string;
-    s?: string;
-    p?: string;
-    r?: string;
-    pg?: string;
-  }) => {
-    const params = {
-      q: c !== undefined ? "" : q, // Category badalda Search Query reset
-      category: c ?? category,
-      price: p ?? price,
-      rating: r ?? rating,
-      sort: s ?? sort,
-      page: pg ?? (c !== undefined || p || r ? "1" : page),
-    };
-
-    const searchParamsObj = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value && value !== "all") {
-        searchParamsObj.set(key, value);
-      }
-    });
-
-    return `/search?${searchParamsObj.toString()}`;
-  };
+  const filterState = { q, category, price, rating, sort, page };
+  const getFilterUrl = (override: Parameters<typeof buildFilterUrl>[1]) =>
+    buildFilterUrl(filterState, override);
 
   const parsedPage = Number(page);
   const currentPage =
@@ -209,7 +182,7 @@ const Search = async ({
           <div className="flex items-center gap-2 lg:hidden">
             <MobileFilterSheet
               hasActiveFilter={hasActiveFilter}
-              getFilterUrl={getFilterUrl}
+              filterState={filterState}
               category={category}
               price={price}
               rating={rating}
@@ -230,7 +203,11 @@ const Search = async ({
             </span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 text-xs sm:text-sm font-medium">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 text-xs sm:text-sm font-medium"
+                >
                   <span>{currentSortLabel}</span>
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </Button>

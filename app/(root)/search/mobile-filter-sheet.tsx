@@ -14,17 +14,16 @@ import {
     SheetClose,
 } from "@/components/ui/sheet";
 import FilterControls from "./filter-bar";
+import { buildFilterUrl, type FilterState } from "./get-filter-url";
 
 type FilterItem = {
     name: string;
     value: string;
 };
 
-type GetFilterUrl = (filters: { c?: string; p?: string; r?: string; }) => string;
-
 type MobileFilterSheetProps = {
     hasActiveFilter: boolean;
-    getFilterUrl: GetFilterUrl;
+    filterState: FilterState;
     category: string;
     price: string;
     rating: string;
@@ -35,7 +34,7 @@ type MobileFilterSheetProps = {
 
 export default function MobileFilterSheet({
     hasActiveFilter,
-    getFilterUrl,
+    filterState,
     category,
     price,
     rating,
@@ -43,6 +42,8 @@ export default function MobileFilterSheet({
     priceItems,
     ratingItems,
 }: MobileFilterSheetProps) {
+    const getFilterUrl = (override: Parameters<typeof buildFilterUrl>[1]) =>
+        buildFilterUrl(filterState, override);
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const urlKey = `${pathname}?${searchParams.toString()}`;
