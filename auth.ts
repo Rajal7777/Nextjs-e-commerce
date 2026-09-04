@@ -1,4 +1,3 @@
-//PrismaAdapter is bridge auth logic and prisma{database}:
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth, { type NextAuthConfig } from "next-auth";
 import { NextResponse } from "next/server";
@@ -25,13 +24,14 @@ export const config = {
   //connect authjs to prisma client{allows authjs to automatically create and manage users, liked acc  sessions, verification tokens}
   adapter: PrismaAdapter(prisma),
 
-  //tells authjs user will login with email, password
+  //login with email, password
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     CredentialsProvider({
+      name: "Credentials",
       credentials: {
         email: { type: "email" },
         password: { type: "password" },

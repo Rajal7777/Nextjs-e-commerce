@@ -14,17 +14,19 @@ export async function createUpdateReview(
 ) {
   try {
     const session = await auth();
-    if (!session) throw new Error("You must be logged in to submit a review");
-
+    if (!session?.user?.id) {
+      throw new Error("You must be logged in to submit a review");
+    }
     //validate form data & add userId
     const review = insertReviewSchema.parse({
       ...data,
       userId: session?.user.id,
     });
 
-    //Get product being reviewed
+    //check if product exist before creating review
     const product = await prisma.product.findUnique({
       where: { id: review.productId },
+      select: { slug: true },
     });
 
     if (!product) throw new Error("Product not found");
@@ -53,13 +55,13 @@ export async function createUpdateReview(
         productId: review.productId,
         userId: review.userId,
       },
+      select: { id: true },
     });
 
-    //If existingReview exists, update it, otherwise create a new review
-    //if failed Everything roll back. case success change the product's rating and  change number of reviews
+    // Execute atomic isolated transactional updates across tables
     await prisma.$transaction(async (tx) => {
+      //update the current review
       if (existingReview) {
-        //update the current review
         await tx.review.update({
           where: { id: existingReview.id },
           data: {
@@ -83,12 +85,14 @@ export async function createUpdateReview(
       const numReviews = await tx.review.count({
         where: { productId: review.productId },
       });
+      // Avoid trailing decimal precision errors by rounding explicitly
+      const rawAvg = averageRating._avg.rating || 0;
+      const roundedRating = Math.round(rawAvg * 10) / 10;
 
-      //update rating and number of reviewes of the product in product table
       await tx.product.update({
         where: { id: review.productId },
         data: {
-          rating: averageRating._avg.rating || 0,
+          rating: roundedRating,
           numReviews: numReviews,
         },
       });
@@ -97,8 +101,6 @@ export async function createUpdateReview(
     //revalidate the cached data for this page and load the updated data
     revalidatePath(`/product/${product.slug}`);
 
-    // ...existing code...
-
     return {
       success: true,
       message: existingReview
@@ -106,7 +108,6 @@ export async function createUpdateReview(
         : "Review submitted successfully",
     };
 
-    // ...existing code...
   } catch (error) {
     return {
       success: false,
@@ -133,6 +134,9 @@ export async function getAllReviews({ productId }: { productId: string }) {
     const data = await prisma.review.findMany({
       where: {
         productId: result.data.productId,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
       include: {
         user: {
@@ -162,13 +166,20 @@ export async function getAllReviews({ productId }: { productId: string }) {
 
 //Get a review by userId and productId{get the single current user's review for a product}
 export async function getSingleReview({ productId }: { productId: string }) {
-  const session = await auth();
-  if (!session) throw new Error("User not logged in");
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return null; // Safe fallback for unauthenticated views
 
-  return await prisma.review.findFirst({
-    where: {
-      productId: productId,
-      userId: session.user.id,
-    },
-  });
+    const review = await prisma.review.findFirst({
+      where: {
+        productId: productId,
+        userId: session.user.id,
+      },
+    });
+
+    return review;
+  } catch (error) {
+    console.error("[Get Single Review Error]", error);
+    return null;
+  }
 }

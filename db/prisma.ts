@@ -21,9 +21,36 @@ if (process.env.NEON === "1" || process.env.NEON === "true") {
   adapter = new PrismaPg({ connectionString });
 }
 
+// Neon (and other serverless Postgres) pooler connections can be dropped when idle,
+// causing "Server has closed the connection" errors. Retry once on these transient errors.
+const TRANSIENT_CONNECTION_ERROR_PATTERN =
+  /server has closed the connection|connection terminated|econnreset|connection reset/i;
+
+function isTransientConnectionError(error: unknown) {
+  if (error instanceof Error) {
+    return TRANSIENT_CONNECTION_ERROR_PATTERN.test(error.message);
+  }
+  return false;
+}
+
 // Create and optionally extend the Prisma client
 function createPrismaClient() {
   return new PrismaClient({ adapter }).$extends({
+    query: {
+      $allModels: {
+        async $allOperations({ query, args }) {
+          try {
+            return await query(args);
+          } catch (error) {
+            if (!isTransientConnectionError(error)) {
+              throw error;
+            }
+            // Connection was stale; retry once with a fresh connection from the pool.
+            return await query(args);
+          }
+        },
+      },
+    },
     result: {
       product: {
         rating: {

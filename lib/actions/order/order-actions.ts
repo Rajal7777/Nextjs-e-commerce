@@ -74,17 +74,17 @@ export async function createOrder(): Promise<CreateOrderResult> {
       };
     }
 
-    //Create a transaction to verify stock/price, create order and order items in database, or revert if any step fails
+    // Create the order from inventory already reserved when items entered the cart.
     const insertOrderId = await prisma.$transaction(
       async (tx) => {
-        // Lock each product row, verify stock and read the authoritative price from the db
+        // Lock each product row and read the authoritative price from the db.
         const verifiedItems: CartItem[] = [];
 
         for (const item of cart.items as CartItem[]) {
           const lockedProducts = await tx.$queryRaw<
-            { id: string; name: string; stock: number; price: number }[]
+            { id: string; name: string; price: number }[]
           >`
-            SELECT id, name, stock, price
+            SELECT id, name, price
             FROM "Product"
             WHERE id = ${item.productId}::uuid
             FOR UPDATE
@@ -93,12 +93,6 @@ export async function createOrder(): Promise<CreateOrderResult> {
           const product = lockedProducts[0];
 
           if (!product) throw new Error(`Product "${item.name}" not found`);
-
-          if (product.stock < item.qty) {
-            throw new Error(
-              `Only ${product.stock} of "${product.name}" left in stock`,
-            );
-          }
 
           // Use the current db price instead of the cached cart price
           verifiedItems.push({ ...item, price: String(product.price) });
@@ -115,18 +109,13 @@ export async function createOrder(): Promise<CreateOrderResult> {
         //Create order
         const insertedOrder = await tx.order.create({ data: order });
 
-        //Create order items and decrement stock for each verified item
+        // Create order items. Stock was already decremented when added to cart.
         for (const item of verifiedItems) {
           await tx.orderItem.create({
             data: {
               ...item,
               orderId: insertedOrder.id,
             },
-          });
-
-          await tx.product.update({
-            where: { id: item.productId },
-            data: { stock: { decrement: item.qty } },
           });
         }
 
@@ -536,6 +525,14 @@ export async function updateOrderToPaidCOD(orderId: string) {
 //update COD order to delivered
 export async function deliverOrder(orderId: string) {
   try {
+    const session = await auth();
+
+    if (session?.user?.role !== "admin") {
+      throw new Error(
+        "Unauthorized: only administrators can mark orders as delivered.",
+      );
+    }
+
     //get current order by id
     const order = await prisma.order.findFirst({
       where: { id: orderId },

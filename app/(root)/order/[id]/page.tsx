@@ -96,7 +96,7 @@ const OrderDetailsPage = async ({
       }}
       stripeClientSecret={clientSecret}
       paypalClientId={paypalClientId}
-      isAdmin
+      isAdmin={isAdmin}
     />
   );
 };
