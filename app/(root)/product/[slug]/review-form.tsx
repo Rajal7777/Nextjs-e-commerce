@@ -10,7 +10,6 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -31,7 +30,10 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { StarIcon } from "lucide-react";
-import { createUpdateReview, getSingleReview } from "@/lib/actions/user/review-actions";
+import {
+    createUpdateReview,
+    getSingleReview,
+} from "@/lib/actions/user/review-actions";
 import { toast } from "sonner";
 
 type CustomerReviewInput = z.input<typeof insertReviewSchema>;
@@ -72,7 +74,7 @@ const ReviewForm = ({
                 form.setValue("description", res.description);
                 form.setValue("rating", res.rating);
             }
-  
+
             setOpen(true);
         } catch (error) {
             console.error("Failed to load review:", error);
@@ -93,11 +95,12 @@ const ReviewForm = ({
         }
 
         setOpen(false);
-
-      await  onReviewSubmitted();
-
         toast.success(res.message);
+
+        //background refetch
+        await onReviewSubmitted();
     };
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <Button onClick={handleOpenForm} variant="default">
@@ -114,7 +117,8 @@ const ReviewForm = ({
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
-                    <form id="review-form" onSubmit={form.handleSubmit(onSubmit)}>
+                    <form
+                        onSubmit={form.handleSubmit(onSubmit)}>
                         <FieldGroup>
                             <Controller
                                 name="title"
@@ -176,20 +180,18 @@ const ReviewForm = ({
                                 )}
                             />
                         </FieldGroup>
+
+                        <Button
+                            type="submit"
+                            size="lg"
+                            className="w-full mt-4"
+                            disabled={form.formState.isSubmitting}
+                        >
+                            {form.formState.isSubmitting ? "Submitting..." : "Submit"}
+                        </Button>
                     </form>
                 </div>
 
-                <DialogFooter>
-                    <Button
-                        type="submit"
-                        form="review-form"
-                        size="lg"
-                        className="w-full"
-                        disabled={form.formState.isSubmitting}
-                    >
-                        {form.formState.isSubmitting ? "Submitting..." : "Submit"}
-                    </Button>
-                </DialogFooter>
             </DialogContent>
         </Dialog>
     );

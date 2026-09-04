@@ -6,20 +6,18 @@ import {
 } from "@/lib/actions/product/product-actions";
 import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Filter, X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import Pagination from "@/components/shared/pagination";
 import { Suspense } from "react";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetClose,
-} from "@/components/ui/sheet";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import FilterControls from "./filter-bar";
+import MobileFilterSheet from "./mobile-filter-sheet";
 
-// Dynamic metadata
 export async function generateMetadata({
   searchParams,
 }: {
@@ -37,10 +35,10 @@ export async function generateMetadata({
     rating = "all",
   } = await searchParams;
 
-  const isQuery = q && q !== "all" && q.trim() !== "";
-  const isCategory = category && category !== "all" && category.trim() !== "";
-  const isPrice = price && price !== "all" && price.trim() !== "";
-  const isRating = rating && rating !== "all" && rating.trim() !== "";
+  const isQuery = Boolean(q && q !== "all" && q.trim() !== "");
+  const isCategory = Boolean(category && category !== "all");
+  const isPrice = Boolean(price && price !== "all");
+  const isRating = Boolean(rating && rating !== "all");
 
   if (isQuery || isCategory || isPrice || isRating) {
     const titleParts = [];
@@ -53,7 +51,7 @@ export async function generateMetadata({
     };
   }
   return {
-    title: "Search",
+    title: "Search Products",
   };
 }
 
@@ -78,7 +76,7 @@ const Search = async ({
     page = "1",
   } = await searchParams;
 
-  // Filter URL builder
+  // Filter URL Builder
   const getFilterUrl = ({
     c,
     s,
@@ -92,40 +90,30 @@ const Search = async ({
     r?: string;
     pg?: string;
   }) => {
-    const params = { q, category, price, rating, sort, page };
+    const params = {
+      q: c !== undefined ? "" : q, // Category badalda Search Query reset
+      category: c ?? category,
+      price: p ?? price,
+      rating: r ?? rating,
+      sort: s ?? sort,
+      page: pg ?? (c !== undefined || p || r ? "1" : page),
+    };
 
-    if (c !== undefined) {
-      params.category = c;
-      params.q = ""; // Clears the search query when filtering by category
-      params.page = "1";
-    }
-
-    if (p) {
-      params.price = p;
-      params.page = "1";
-    }
-
-    if (r) {
-      params.rating = r;
-      params.page = "1";
-    }
-    if (pg) params.page = pg;
-    if (s) params.sort = s;
-
-    const searchParams = new URLSearchParams();
+    const searchParamsObj = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
       if (value && value !== "all") {
-        searchParams.set(key, value);
+        searchParamsObj.set(key, value);
       }
     });
 
-    return `/search?${searchParams.toString()}`;
+    return `/search?${searchParamsObj.toString()}`;
   };
 
   const parsedPage = Number(page);
   const currentPage =
     Number.isFinite(parsedPage) && parsedPage > 0 ? Math.floor(parsedPage) : 1;
 
+  // Parallel Data Fetching
   const [products, wishlistIds, categories] = await Promise.all([
     getAllProducts({
       query: q,
@@ -181,24 +169,22 @@ const Search = async ({
   ];
 
   const hasActiveFilter =
-    (q !== "all" && q !== "") ||
+    (q !== "all" && q.trim() !== "") ||
     (category !== "all" && category !== "") ||
     (price !== "all" && price !== "") ||
     (rating !== "all" && rating !== "");
 
-
-
   return (
-    <div className="mt-4 grid gap-6 lg:grid-cols-[240px_1fr] lg:mt-6">
+    <div className="mt-4 grid gap-6 lg:mt-6 lg:grid-cols-[240px_1fr]">
       {/* Desktop Sidebar Filters */}
       <aside className="hidden lg:block">
-        <div className="sticky top-20 rounded-xl p-4">
+        <div className="sticky top-20 rounded-xl p-4 border bg-card">
           <div className="mb-4 flex items-center justify-between border-b pb-3">
             <h2 className="font-semibold text-foreground">Filters</h2>
             {hasActiveFilter && (
               <Link
                 href="/search"
-                className="text-xs text-destructive hover:underline"
+                className="text-xs text-destructive hover:underline font-medium"
               >
                 Reset All
               </Link>
@@ -219,84 +205,50 @@ const Search = async ({
       <div className="space-y-4">
         {/* Top Controls Bar */}
         <div className="flex items-center justify-between gap-3 border-b pb-3">
-          {/* Mobile Filter Button */}
+          {/* Mobile Filter Sheet */}
           <div className="flex items-center gap-2 lg:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Filter className="h-4 w-4" />
-                  <span>Filters</span>
-                  {hasActiveFilter && (
-                    <span className="flex h-2 w-2 rounded-full bg-primary" />
-                  )}
-                </Button>
-              </SheetTrigger>
-              <SheetContent
-                side="left"
-                className="w-75 sm:w-87 p-6 overflow-y-auto "
-              >
-                <SheetHeader className="border-b pb-4 text-left">
-                  <SheetTitle className="flex items-center justify-between">
-                    <span>Filter Products</span>
-                    {hasActiveFilter && (
-                      <SheetClose asChild>
-                        <Link
-                          href="/search"
-                          className="text-xs font-normal text-destructive hover:underline"
-                        >
-                          Clear All
-                        </Link>
-                      </SheetClose>
-                    )}
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="mt-4">
-                  <FilterControls
-                    getFilterUrl={getFilterUrl}
-                    category={category}
-                    price={price}
-                    rating={rating}
-                    categoryItems={categoryItems}
-                    priceItems={priceItems}
-                    ratingItems={ratingItems}
-                  />
-                </div>
-              </SheetContent>
-            </Sheet>
+            <MobileFilterSheet
+              hasActiveFilter={hasActiveFilter}
+              getFilterUrl={getFilterUrl}
+              category={category}
+              price={price}
+              rating={rating}
+              categoryItems={categoryItems}
+              priceItems={priceItems}
+              ratingItems={ratingItems}
+            />
           </div>
 
           <div className="hidden text-sm text-muted-foreground sm:block">
             {hasActiveFilter ? "Filtered results" : "Showing all products"}
           </div>
 
-          {/* Sort Dropdown */}
+          {/* Sort Dropdown (Standard Accessible Dropdown) */}
           <div className="flex items-center gap-2 text-sm ml-auto sm:ml-0">
             <span className="hidden text-muted-foreground sm:inline">
               Sort by:
             </span>
-            <div className="relative">
-              <details className="group">
-                <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg border bg-card px-3 py-1.5 text-xs font-medium shadow-sm transition-colors hover:bg-muted sm:text-sm">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2 text-xs sm:text-sm font-medium">
                   <span>{currentSortLabel}</span>
-                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
-                </summary>
-                <div className="absolute right-0 z-30 mt-1.5 min-w-40 rounded-lg border bg-popover p-1 shadow-lg ring-1 ring-black/5">
-                  {sortItems.map((item) => (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                {sortItems.map((item) => (
+                  <DropdownMenuItem key={item.value} asChild>
                     <Link
-                      key={item.value}
                       href={getFilterUrl({ s: item.value })}
-                      className={`block rounded-md px-3 py-2 text-xs transition-colors sm:text-sm ${
-                        sort === item.value
-                          ? "bg-accent font-semibold text-accent-foreground"
-                          : "hover:bg-muted"
-                      }`}
+                      className={`w-full text-xs sm:text-sm cursor-pointer ${sort === item.value ? "font-semibold text-primary" : ""
+                        }`}
                     >
                       {item.label}
                     </Link>
-                  ))}
-                </div>
-              </details>
-            </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -304,22 +256,22 @@ const Search = async ({
         {hasActiveFilter && (
           <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
             {q && q !== "all" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground">
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground border">
                 Search: {q}
               </span>
             )}
             {category && category !== "all" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground">
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground border">
                 Category: {category}
               </span>
             )}
             {price && price !== "all" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground">
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground border">
                 Price: {price}
               </span>
             )}
             {rating && rating !== "all" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground">
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium text-foreground border">
                 Rating: {rating}+★
               </span>
             )}
@@ -337,10 +289,10 @@ const Search = async ({
           </div>
         )}
 
-        {/* Mobile Product Card Grid Polish */}
+        {/* Product Cards Grid */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
           {productsWithWishlist.length === 0 ? (
-            <div className="col-span-full py-12 text-center text-muted-foreground">
+            <div className="col-span-full py-16 text-center text-muted-foreground">
               No products match your criteria.
             </div>
           ) : (

@@ -58,7 +58,7 @@ const ReviewList = ({
     void fetchReviews();
   }, [fetchReviews]);
 
-  const callbackUrl = encodeURIComponent(`/product/${productSlug}`);
+  const callbackUrl = `/product/${encodeURIComponent(productSlug)}`;
 
   return (
     <div className="space-y-4">
@@ -118,7 +118,7 @@ const ReviewList = ({
 
                   <div className="flex items-center">
                     <User className="mr-2 h-4 w-4" aria-hidden="true" />
-                    {review.user.name || "Anonymous"}
+                    {review.user.name || "User"}
                   </div>
 
                   <div className="flex items-center">

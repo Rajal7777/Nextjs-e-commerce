@@ -25,8 +25,11 @@ type ProductSlugProps = {
 //SEO optimization 
 export async function generateMetadata({ params }: ProductSlugProps): Promise<Metadata> {
   const { slug } = await params;
+
   if (!slug || !/^[a-zA-Z0-9-]+$/.test(slug)) return { title: "Product Not Found" };
+
   const product = await getProductBySlug(slug);
+  
   if (!product) return { title: "Product Not Found" };
   return { title: `${product.name} - Store`, description: product.description };
 }

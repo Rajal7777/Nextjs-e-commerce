@@ -107,7 +107,6 @@ export async function createUpdateReview(
         ? "Review updated successfully"
         : "Review submitted successfully",
     };
-
   } catch (error) {
     return {
       success: false,
@@ -164,16 +163,20 @@ export async function getAllReviews({ productId }: { productId: string }) {
   }
 }
 
-//Get a review by userId and productId{get the single current user's review for a product}
+//Get a review by productId{get the single current user's review for a product}
 export async function getSingleReview({ productId }: { productId: string }) {
   try {
     const session = await auth();
-    if (!session?.user?.id) return null; // Safe fallback for unauthenticated views
 
-    const review = await prisma.review.findFirst({
+    // Safe fallback for unauthenticated views
+    if (!session?.user?.id) return null;
+
+    const review = await prisma.review.findUnique({
       where: {
-        productId: productId,
-        userId: session.user.id,
+        userId_productId: {
+          userId: session.user.id,
+          productId: productId,
+        },
       },
     });
 
