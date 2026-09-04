@@ -4,6 +4,7 @@ import { getProductBySlug } from "@/lib/actions/product/product-actions";
 import ProductForm from "@/components/admin/product-form";
 import { insertProductSchema } from "@/lib/validators";
 import { z } from "zod";
+import { requireAdmin } from "@/lib/actions/auth-guard";
 
 export const metadata: Metadata = {
   title: "Update Product",
@@ -15,6 +16,9 @@ const AdminProductUpdatePage = async ({
 }: {
   params: Promise<{ slug: string }>;
 }) => {
+ //safe guard
+  await requireAdmin();
+
   const { slug } = await params;
 
   const product = await getProductBySlug(slug);

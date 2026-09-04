@@ -1,6 +1,7 @@
 import DeleteDialog from "@/components/shared/delete-dialog";
 import Pagination from "@/components/shared/pagination";
 import { Button } from "@/components/ui/button";
+import { requireAdmin } from "@/lib/actions/auth-guard";
 import {
     Table,
     TableBody,
@@ -24,6 +25,8 @@ const AdminProductPage = async ({ searchParams }: {
         category: string;
     }>;
 }) => {
+    await requireAdmin();
+
     const searchParam = await searchParams;
 
     const page = Number(searchParam.page) || 1;

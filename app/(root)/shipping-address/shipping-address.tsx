@@ -15,7 +15,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { shippingAdressDefaultValue } from "@/lib/constants";
+import { shippingAddressDefaultValue } from "@/lib/constants";
 import { shippingAddressSchema } from "@/lib/validators";
 import { ShippingAddress } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,7 +33,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
 
   const form = useForm<z.infer<typeof shippingAddressSchema>>({
     resolver: zodResolver(shippingAddressSchema),
-    defaultValues: address || shippingAdressDefaultValue,
+    defaultValues: address || shippingAddressDefaultValue,
   });
 
   // 3. Destructure + isSubmit Successful then reset

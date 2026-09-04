@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
-import { updateUser } from "@/lib/actions/user-actions";
+import { updateUser } from "@/lib/actions/user/user-actions";
 import { useRouter } from "next/navigation";
 
 //use the form form shadcn
@@ -28,7 +28,12 @@ const UpdateUserForm = ({
 
     const form = useForm<z.infer<typeof updateUserSchema>>({
         resolver: zodResolver(updateUserSchema),
-        defaultValues: user,
+        defaultValues: {
+            id: user.id,
+            name: user.name ?? "",
+            email: user.email ?? "",
+            role: user.role ?? "user",
+        },
     });
 
     async function onSubmit(data: z.infer<typeof updateUserSchema>) {
@@ -39,13 +44,13 @@ const UpdateUserForm = ({
             }
 
             toast.success(res.message);
-
-            form.reset();
-
             router.push("/admin/users");
+            router.refresh();
         } catch (error: unknown) {
             if (error instanceof Error) {
                 toast.error(error.message);
+            } else {
+                toast.error("An unexpected error occurred");
             }
         }
     }
@@ -63,9 +68,9 @@ const UpdateUserForm = ({
 
                                 <input
                                     {...field}
-                                    disabled={true}
+                                    readOnly
                                     type="email"
-                                    className="w-full border p-1 rounded-md"
+                                className="bg-muted cursor-not-allowed p-2"
                                 />
 
                                 {fieldState.error && (

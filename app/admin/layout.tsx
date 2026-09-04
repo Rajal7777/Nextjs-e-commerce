@@ -11,34 +11,36 @@ import {
 
 import { requireAdmin } from "@/lib/actions/auth-guard";
 import { auth } from "@/auth";
-import { Home } from "lucide-react";
 
 export default async function AdminLayout({
   children,
-}: Readonly<{ children: React.ReactNode; }>) {
+}: Readonly<{ children: React.ReactNode }>) {
+  // 1. Single Security Check & Auth Hydration
   await requireAdmin();
   const session = await auth();
 
   return (
     <SidebarProvider>
+      {/* Admin Sidebar Navigation */}
       <AdminSidebar
         name={session?.user?.name ?? "Admin User"}
-        role={session?.user?.role ?? "user"}
+        role={session?.user?.role ?? "Admin"}
       />
 
       <SidebarInset>
-        <div className="border-b">
-          <div className="wrapper mx-auto flex min-h-16 items-center gap-3">
+        {/* Header Header Navigation */}
+        <header className="border-b bg-background sticky top-0 z-10">
+          <div className="wrapper mx-auto flex min-h-16 items-center gap-3 px-4">
             <SidebarTrigger />
 
-            <Link href="/" className="hidden w-22 sm:block" aria-label="Home">
+            <Link href="/" className="hidden sm:flex items-center gap-2" aria-label="Home Page">
               <Image
                 src="/images/store-icon.jpg"
-                alt="logo"
-                loading="eager"
+                alt="Store Logo"
+                priority
                 height={40}
                 width={40}
-                className="rounded-full"
+                className="rounded-full object-cover"
               />
             </Link>
 
@@ -50,12 +52,14 @@ export default async function AdminLayout({
             </div>
           </div>
 
-          <div className="wrapper mx-auto pb-3 sm:hidden">
+          {/* Mobile Admin Search Bar */}
+          <div className="wrapper mx-auto px-4 pb-3 sm:hidden">
             <AdminSearch />
           </div>
-        </div>
+        </header>
 
-        <div className="wrapper py-4">{children}</div>
+        {/* Main Content Area */}
+        <main className="wrapper flex-1 p-4 md:p-6">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

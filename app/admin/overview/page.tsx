@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -26,13 +25,7 @@ const AdminOverViewPage = async () => {
   //safe guard
   await requireAdmin();
 
-  const session = await auth();
-
-
-  if (session?.user?.role !== "admin") {
-    throw new Error("User is not authorized");
-  }
-
+  //fetch order summary
   const summary = await getOrderSummary();
  
   return (

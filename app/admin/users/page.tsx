@@ -15,26 +15,39 @@ import { formatId } from "@/lib/utils";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { requireAdmin } from "@/lib/actions/auth-guard";
 
 export const metadata: Metadata = {
-  title: "Display users",
+  title: "Users",
 };
 
-const AdminUserPage = async ({ searchParams }: {
-  searchParams: Promise<{ page?: string; query?: string; }>;
+const AdminUserPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; query?: string }>;
 }) => {
+  //Authorization Guard
+  await requireAdmin();
+
   const { page = "1", query = "" } = await searchParams;
 
+  // Safe Pagination Parsing
+  const parsedPage = Number(page);
+  const currentPage =
+    Number.isFinite(parsedPage) && parsedPage > 0 ? Math.floor(parsedPage) : 1;
+
   const users = await getAllUsers({
-    page: Number(page),
+    page: currentPage,
     query,
   });
 
   return (
-    <div className="space-y-2">
-      <h2 className="h2-bold">User Details</h2>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold tracking-tight">Users</h2>
+      </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -43,26 +56,34 @@ const AdminUserPage = async ({ searchParams }: {
               <TableHead>NAME</TableHead>
               <TableHead>EMAIL</TableHead>
               <TableHead>ROLE</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-right">ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {users.totalPages === 0 ? (
+            {users.data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6}>No users found.</TableCell>
+                <TableCell
+                  colSpan={6}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  No users found.
+                </TableCell>
               </TableRow>
             ) : (
               users.data.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell>{formatId(user.id)}</TableCell>
+                  <TableCell className="font-medium">
+                    {formatId(user.id)}
+                  </TableCell>
                   <TableCell>
                     {user.image ? (
                       <Image
                         src={user.image}
-                        alt={user.name}
+                        alt={user.name || "User"}
                         width={32}
                         height={32}
+                        unoptimized
                         className="h-8 w-8 rounded-full object-cover ring-1 ring-border"
                       />
                     ) : (
@@ -71,34 +92,43 @@ const AdminUserPage = async ({ searchParams }: {
                       </div>
                     )}
                   </TableCell>
-                  <TableCell>{user.name}</TableCell>
+                  <TableCell className="font-medium">
+                    {user.name || "N/A"}
+                  </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
                     {user.role === "admin" ? (
-                      <Badge variant="default">admin</Badge>
+                      <Badge variant="default" className="capitalize">
+                        Admin
+                      </Badge>
                     ) : (
-                      <Badge variant="outline">user</Badge>
+                      <Badge variant="outline" className="capitalize">
+                        User
+                      </Badge>
                     )}
                   </TableCell>
 
-                  <TableCell>
-                    <Button asChild variant="outline" size="sm">
-                      <Link href={`/admin/users/${user.id}`}>Edit</Link>
-                    </Button>
-                    <DeleteDialog id={user.id} action={deleteUser} />
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/users/${user.id}`}>Edit</Link>
+                      </Button>
+                      <DeleteDialog id={user.id} action={deleteUser} />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
             )}
-
           </TableBody>
         </Table>
-
-        {/* Pagination btn */}
-        {users.totalPages > 1 && (
-          <Pagination page={Number(page) || 1} totalPages={users?.totalPages} />
-        )}
       </div>
+
+      {/* Pagination Container */}
+      {users.totalPages > 1 && (
+        <div className="mt-4 flex justify-center">
+          <Pagination page={currentPage} totalPages={users.totalPages} />
+        </div>
+      )}
     </div>
   );
 };

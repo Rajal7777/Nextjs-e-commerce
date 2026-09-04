@@ -6,42 +6,41 @@ import { redirect } from "next/navigation";
 import ShippingAddressForm from "./shipping-address";
 import { ShippingAddress } from "@/types";
 import CheckoutSteps from "@/components/shared/checkout-steps";
-import { shippingAdressDefaultValue } from "@/lib/constants";
+import { shippingAddressDefaultValue } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Shipping Address",
 };
-const ShippingAdressPage = async () => {
-  const cart = await getMyCart();
-  if (!cart || cart.items.length === 0) redirect("/cart");
-
+const ShippingAddressPage = async () => {
   const session = await auth();
-
-  //in case no user
   if (!session?.user?.id) {
-    redirect("/sign-in");
+    redirect("/sign-in?callbackUrl=/shipping-address");
+  }
+  // 2. Parallel Fetching for Cart & User Details
+  const [cart, user] = await Promise.all([
+    getMyCart(),
+    getUserById(session.user.id),
+  ]);
+
+  // Cart Empty Guard
+  if (!cart || cart.items.length === 0) {
+    redirect("/cart");
   }
 
-  const user = await getUserById(session.user.id);
   if (!user) {
     redirect("/sign-in");
   }
 
-  // Check if user.address exists and is a valid, non-array object
+  // Check valid non-array address object
   const hasSavedAddress =
-    user.address &&
+    user.address !== null &&
     typeof user.address === "object" &&
     !Array.isArray(user.address);
 
   // Safely cast or merge with the fallback layout
   const typedAddress: ShippingAddress = hasSavedAddress
     ? (user.address as ShippingAddress)
-    : shippingAdressDefaultValue;
-
-  // Replace: if (user.address)
-  if (hasSavedAddress) {
-    redirect("/payment-method");
-  }
+    : shippingAddressDefaultValue;
 
   return (
     <>
@@ -51,4 +50,4 @@ const ShippingAdressPage = async () => {
   );
 };
 
-export default ShippingAdressPage;
+export default ShippingAddressPage;

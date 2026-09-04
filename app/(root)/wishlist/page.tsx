@@ -1,12 +1,13 @@
 import ProductCart from "@/components/shared/product/product-cart";
 import { getWishlistProducts } from "@/lib/actions/wishlist/wish.action";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Heart } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const WishListPage = async () => {
   const wishlistItems = await getWishlistProducts();
 
-  //convert the typeof rating and date to num and string
+  // Convert the typeof rating and date to number and string respectively
   const wishlistProducts = wishlistItems.map((item) => ({
     ...item.product,
     rating: Number(item.product.rating),
@@ -16,28 +17,36 @@ const WishListPage = async () => {
 
   if (wishlistItems.length === 0) {
     return (
-      <div className="py-10 text-center">
-        <h1 className="text-2xl font-semibold text-muted-foreground">My Wishlist</h1>
-        <p className="mt-4 text-muted-foreground">No items in your wishlist.</p>
-        <Link
-          href="/"
-          className="text-green-500 py-2 px-5 rounded-md mt-4 inline-flex items-center gap-2 hover:underline"
-        >
-          Go shopping
-          <ArrowRight />
-        </Link>
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="rounded-full bg-muted p-4 text-muted-foreground mb-3">
+          <Heart className="h-8 w-8" />
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight">Your wishlist is empty</h1>
+        <p className="mt-2 text-sm text-muted-foreground max-w-sm">
+          Explore our items and save your favorites to view them anytime here.
+        </p>
+        <Button asChild className="mt-6 gap-2">
+          <Link href="/search">
+            Go shopping
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
       </div>
     );
   }
 
   return (
-    <section className="py-10 px-4  text-center">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-6">My Wishlist</h1>
+   <section className="py-8 space-y-6">
+      <div className="flex items-center justify-between border-b pb-4">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          My Wishlist ({wishlistProducts.length})
+        </h1>
+      </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {wishlistProducts.map((item) => (
-          <div key={item.id}>
-            <ProductCart product={item} />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {wishlistProducts.map((product) => (
+          <div key={product.id} className="h-full">
+            <ProductCart product={product} />
           </div>
         ))}
       </div>
