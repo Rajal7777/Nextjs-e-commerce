@@ -12,8 +12,8 @@ type PaginationProps = {
 
 const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
   const router = useRouter();
-  const searchParams = useSearchParams(); 
-  
+  const searchParams = useSearchParams();
+
 
   const pageNumber = Number(page);
   const currentPage =
@@ -26,8 +26,8 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
       key: urlParamName || "page",
       value: pageValue.toString(),
     });
-    console.log("newUrl", newUrl);
-    router.push(newUrl, { scroll: false });
+    // Default Next.js behavior scrolls to top so the new page's results are visible.
+    router.push(newUrl);
   }
 
   return (
