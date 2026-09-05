@@ -1,4 +1,5 @@
 import Pagination from "@/components/shared/pagination";
+import AdminSearch from "@/components/admin/admin-search";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import DeleteDialog from "@/components/shared/delete-dialog";
@@ -47,6 +48,11 @@ const AdminUserPage = async ({
         <h2 className="text-2xl font-bold tracking-tight">Users</h2>
       </div>
 
+      <AdminSearch
+        actionPath="/admin/users"
+        placeholder="Search users by name or email..."
+      />
+
       <div className="overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
@@ -67,7 +73,9 @@ const AdminUserPage = async ({
                   colSpan={6}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  No users found.
+                  {query
+                    ? `No users found for "${query}"`
+                    : "No users found."}
                 </TableCell>
               </TableRow>
             ) : (

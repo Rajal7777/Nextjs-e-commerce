@@ -1,5 +1,6 @@
 import DeleteDialog from "@/components/shared/delete-dialog";
 import Pagination from "@/components/shared/pagination";
+import AdminSearch from "@/components/admin/admin-search";
 import { Button } from "@/components/ui/button";
 import { requireAdmin } from "@/lib/actions/auth-guard";
 import {
@@ -48,6 +49,11 @@ const AdminProductPage = async ({ searchParams }: {
                 </Button>
             </header>
 
+            <AdminSearch
+                actionPath="/admin/products"
+                placeholder="Search products by name or slug..."
+            />
+
             <div className="overflow-x-auto">
                 <Table>
                     <TableHeader>
@@ -64,7 +70,19 @@ const AdminProductPage = async ({ searchParams }: {
                     </TableHeader>
 
                     <TableBody>
-                        {products.data.map((product) => (
+                        {products.data.length === 0 ? (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={8}
+                                    className="h-24 text-center text-muted-foreground"
+                                >
+                                    {searchText
+                                        ? `No products found for "${searchText}"`
+                                        : "No products found."}
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            products.data.map((product) => (
                             <TableRow key={product.id}>
                                 <TableCell>{formatId(product.id)}</TableCell>
                                 <TableCell>
@@ -87,7 +105,8 @@ const AdminProductPage = async ({ searchParams }: {
                                     <DeleteDialog id={product.id} action={deleteProductById} />
                                 </TableCell>
                             </TableRow>
-                        ))}
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </div>

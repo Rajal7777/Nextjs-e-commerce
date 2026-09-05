@@ -1,4 +1,3 @@
-
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signoutUser } from "@/lib/actions/user/user-actions";
 import { UserIcon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 const UserButton = async () => {
@@ -31,6 +31,7 @@ const UserButton = async () => {
 
   //?? means if every thing in the left is null || undefine then use right side value
   const firstInitial = session.user?.name?.charAt(0).toUpperCase() ?? "Z";
+  const userImage = session.user?.image;
 
   return (
     <div className="flex gap-2 items-center">
@@ -39,9 +40,20 @@ const UserButton = async () => {
           <div className="flex items-center">
             <Button
               variant="ghost"
-              className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-200"
+              className="relative w-8 h-8 rounded-full flex items-center justify-center bg-gray-200 overflow-hidden"
             >
-              {firstInitial}
+              {userImage ? (
+                <Image
+                  src={userImage}
+                  alt={session.user?.name ?? "User avatar"}
+                  fill
+                  sizes="32px"
+                  unoptimized
+                  className="object-cover"
+                />
+              ) : (
+                firstInitial
+              )}
             </Button>
           </div>
         </DropdownMenuTrigger>
@@ -61,6 +73,12 @@ const UserButton = async () => {
           <DropdownMenuItem>
             <Link href="/user/profile" className="w-full">
               profile
+            </Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem>
+            <Link href="/user/orders" className="w-full">
+              orders
             </Link>
           </DropdownMenuItem>
 

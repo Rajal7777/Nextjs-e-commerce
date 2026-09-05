@@ -217,7 +217,11 @@ export async function updateUserPaymentMethod(
 }
 
 //Update user profile
-export async function updateProfile(user: { name: string; email: string }) {
+export async function updateProfile(user: {
+  name: string;
+  email: string;
+  image?: string | null;
+}) {
   try {
     const session = await auth();
 
@@ -236,6 +240,8 @@ export async function updateProfile(user: { name: string; email: string }) {
       data: {
         name: user.name,
         email: user.email,
+        // Only overwrite the avatar when a new image url is provided.
+        ...(user.image ? { image: user.image } : {}),
       },
     });
 

@@ -48,9 +48,7 @@ const OrdersPage = async ({
 
   return (
     <div className="space-y-6">
-      {/* =========================
-          PAGE HEADER
-      ========================= */}
+      {/* PAGE HEADER */}
 
       <div className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -62,9 +60,7 @@ const OrdersPage = async ({
         </p>
       </div>
 
-      {/* =========================
-          ORDERS CARD
-      ========================= */}
+      {/* ORDERS CARD */}
 
       <Card>
         <CardHeader>
@@ -88,17 +84,13 @@ const OrdersPage = async ({
         <CardContent className="p-0">
           {orders.data.length > 0 ? (
             <>
-              {/* =========================
-                  TABLE
-              ========================= */}
+              {/* TABLE */}
 
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="pl-6">
-                        Order
-                      </TableHead>
+                      <TableHead className="pl-6">Order</TableHead>
 
                       <TableHead>Date</TableHead>
 
@@ -108,9 +100,7 @@ const OrdersPage = async ({
 
                       <TableHead>Delivery</TableHead>
 
-                      <TableHead className="pr-6 text-right">
-                        Action
-                      </TableHead>
+                      <TableHead className="pr-6 text-right">Action</TableHead>
                     </TableRow>
                   </TableHeader>
 
@@ -132,9 +122,7 @@ const OrdersPage = async ({
 
                         <TableCell>
                           <span className="whitespace-nowrap text-sm text-muted-foreground">
-                            {formatDateTime(
-                              order.createdAt,
-                            ).dateTime}
+                            {formatDateTime(order.createdAt).dateTime}
                           </span>
                         </TableCell>
 
@@ -151,25 +139,17 @@ const OrdersPage = async ({
                         <TableCell>
                           {order.isPaid && order.paidAt ? (
                             <div className="space-y-1">
-                              <Badge
-                                variant="secondary"
-                                className="gap-1"
-                              >
+                              <Badge variant="secondary" className="gap-1">
                                 <CheckCircle2 className="size-3.5" />
                                 Paid
                               </Badge>
 
                               <p className="text-xs text-muted-foreground">
-                                {formatDateTime(
-                                  order.paidAt,
-                                ).dateTime}
+                                {formatDateTime(order.paidAt).dateTime}
                               </p>
                             </div>
                           ) : (
-                            <Badge
-                              variant="outline"
-                              className="gap-1"
-                            >
+                            <Badge variant="outline" className="gap-1">
                               <Clock3 className="size-3.5" />
                               Unpaid
                             </Badge>
@@ -180,18 +160,12 @@ const OrdersPage = async ({
 
                         <TableCell>
                           {order.isDelivered ? (
-                            <Badge
-                              variant="secondary"
-                              className="gap-1"
-                            >
+                            <Badge variant="secondary" className="gap-1">
                               <PackageCheck className="size-3.5" />
                               Delivered
                             </Badge>
                           ) : (
-                            <Badge
-                              variant="outline"
-                              className="gap-1"
-                            >
+                            <Badge variant="outline" className="gap-1">
                               <Clock3 className="size-3.5" />
                               Processing
                             </Badge>
@@ -201,14 +175,8 @@ const OrdersPage = async ({
                         {/* ACTION */}
 
                         <TableCell className="pr-6 text-right">
-                          <Button
-                            asChild
-                            variant="outline"
-                            size="sm"
-                          >
-                            <Link
-                              href={`/order/${order.id}`}
-                            >
+                          <Button asChild variant="outline" size="sm">
+                            <Link href={`/order/${order.id}`}>
                               <Eye className="mr-2 size-4" />
                               View Order
                             </Link>
@@ -220,9 +188,7 @@ const OrdersPage = async ({
                 </Table>
               </div>
 
-              {/* =========================
-                  PAGINATION
-              ========================= */}
+              {/* PAGINATION */}
 
               {orders.totalPages > 1 && (
                 <div className="border-t p-4">
@@ -234,28 +200,22 @@ const OrdersPage = async ({
               )}
             </>
           ) : (
-            /* =========================
-               EMPTY STATE
-            ========================= */
+            /*EMPTY STATE */
 
             <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
               <div className="mb-5 flex size-16 items-center justify-center rounded-full bg-muted">
                 <ShoppingBag className="size-7 text-muted-foreground" />
               </div>
 
-              <h2 className="text-lg font-semibold">
-                No orders yet
-              </h2>
+              <h2 className="text-lg font-semibold">No orders yet</h2>
 
               <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-                You haven&apos;t placed any orders yet. Start
-                shopping and your orders will appear here.
+                You haven&apos;t placed any orders yet. Start shopping and your
+                orders will appear here.
               </p>
 
               <Button asChild className="mt-6">
-                <Link href="/">
-                  Start Shopping
-                </Link>
+                <Link href="/">Start Shopping</Link>
               </Button>
             </div>
           )}

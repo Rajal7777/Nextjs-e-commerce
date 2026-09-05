@@ -134,6 +134,7 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    overflow-x: clip;
   }
 }
 
@@ -155,6 +156,13 @@
     @media (width >= 64rem) {
       margin-inline: auto;
     }
+  }
+
+  /* Stretches a child of .wrapper edge-to-edge across the viewport */
+  .full-bleed {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
   }
 
   .flex-start {

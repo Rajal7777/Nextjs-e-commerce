@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductBySlug } from "@/lib/actions/product/product-actions";
+import { getProductById } from "@/lib/actions/product/product-actions";
 import ProductForm from "@/components/admin/product-form";
 import { insertProductSchema } from "@/lib/validators";
 import { z } from "zod";
@@ -14,14 +14,14 @@ export const metadata: Metadata = {
 const AdminProductUpdatePage = async ({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; }>;
 }) => {
- //safe guard
+  //safe guard
   await requireAdmin();
 
   const { slug } = await params;
 
-  const product = await getProductBySlug(slug);
+  const product = await getProductById(slug);
 
   if (!product) {
     notFound();
@@ -43,7 +43,7 @@ const AdminProductUpdatePage = async ({
   return (
     <div className="space-y-2 max-w-5xl mx-auto">
       <h1 className="h1-bold">Update Product</h1>
-      <ProductForm type="update" product={productFormValues} productId={slug} />
+      <ProductForm type="update" product={productFormValues} productId={product.id} />
     </div>
   );
 };

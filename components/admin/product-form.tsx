@@ -11,7 +11,10 @@ import slugify from "slugify";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { z } from "zod";
-import { createProduct, updateProduct } from "@/lib/actions/product/product-actions";
+import {
+  createProduct,
+  updateProduct,
+} from "@/lib/actions/product/product-actions";
 import { UploadButton } from "@/lib/uploadThing";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
@@ -52,7 +55,6 @@ const ProductForm = ({
   const images = useWatch({ control, name: "images" }) || [];
   const isFeatured = useWatch({ control, name: "isFeatured" }) || false;
   const banner = useWatch({ control, name: "banner" }) || null;
-
 
   //Delete image from the images array
   const removeImage = (imageToRemove: string) => {
@@ -275,14 +277,24 @@ const ProductForm = ({
                           aria-label={`Remove product image ${index + 1}`}
                           className="absolute bottom-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-300 text-sm font-bold text-white hover:bg-red-400"
                         >
-                          <Trash2 aria-hidden="true" width={16} height={16} className="flex items-center" />
+                          <Trash2
+                            aria-hidden="true"
+                            width={16}
+                            height={16}
+                            className="flex items-center"
+                          />
                         </button>
                       </div>
                     ))}
 
                     <UploadButton
                       endpoint="imageUploader"
-                      onClientUploadComplete={(res: { url: string; }[]) => {
+                      appearance={{
+                        button:
+                          "bg-primary/60 px-2 py-1 text-primary-foreground hover:bg-primary/90",
+                        allowedContent: "text-muted-foreground",
+                      }}
+                      onClientUploadComplete={(res: { url: string }[]) => {
                         const uploadedImages = res
                           .map((file) => file.url)
                           .filter(Boolean);
@@ -370,7 +382,7 @@ const ProductForm = ({
               <UploadButton
                 className="pl-8"
                 endpoint="imageUploader"
-                onClientUploadComplete={(res: { url: string; }[]) => {
+                onClientUploadComplete={(res: { url: string }[]) => {
                   const bannerUrl = res[0]?.url;
 
                   if (!bannerUrl) {

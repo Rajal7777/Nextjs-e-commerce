@@ -1,6 +1,4 @@
 import Menu from "@/components/shared/header/menu";
-import Image from "next/image";
-import Link from "next/link";
 import UserSidebar from "@/components/user/user-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { auth } from "@/auth";
@@ -24,16 +22,6 @@ export default async function UserLayout({
           <div className="wrapper mx-auto flex min-h-16 items-center gap-3">
             <SidebarTrigger />
 
-            <Link href="/" className="hidden w-22 sm:block" aria-label="Home">
-              <Image
-                src="/images/store-icon.jpg"
-                alt="logo"
-                loading="eager"
-                height={40}
-                width={40}
-                className="rounded-full"
-              />
-            </Link>
 
             <div className="ml-auto flex items-center gap-3">
               <Menu />

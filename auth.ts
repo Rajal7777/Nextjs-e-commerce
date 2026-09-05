@@ -24,12 +24,13 @@ export const config = {
   //connect authjs to prisma client{allows authjs to automatically create and manage users, liked acc  sessions, verification tokens}
   adapter: PrismaAdapter(prisma),
 
-  //login with email, password
+  //google provider
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
+    //login with email, password
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -66,6 +67,7 @@ export const config = {
               name: user.name,
               email: user.email,
               role: user.role,
+              image: user.image,
             };
           }
         }
@@ -75,6 +77,7 @@ export const config = {
       },
     }),
   ],
+  secret: process.env.NEXTAUTH_SECRET,
 
   //callbacks let you customize what Auth.js does at different stages
   callbacks: {
@@ -84,6 +87,7 @@ export const config = {
       session.user.role = token.role;
       session.user.name = token.name;
       session.user.email = token.email;
+      session.user.image = token.picture;
 
       return session;
     },
@@ -103,10 +107,12 @@ export const config = {
         const updateSession = session as {
           name?: string;
           email?: string;
+          image?: string;
         };
 
         if (updateSession.name) token.name = updateSession.name;
         if (updateSession.email) token.email = updateSession.email;
+        if (updateSession.image) token.picture = updateSession.image;
       }
 
       //only runs once after the successful login
@@ -114,6 +120,8 @@ export const config = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        // carry the stored avatar into the token so session.user.image is set
+        token.picture = user.image ?? undefined;
 
         //use Email name in case no name is set
         if (user.name === "NO_NAME" && user.email) {

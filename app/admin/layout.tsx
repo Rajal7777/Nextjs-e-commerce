@@ -1,7 +1,4 @@
 import Menu from "@/components/shared/header/menu";
-import Image from "next/image";
-import Link from "next/link";
-import AdminSearch from "@/components/admin/admin-search-form";
 import AdminSidebar from "@/components/admin/admin-sidebar";
 import {
   SidebarInset,
@@ -15,7 +12,7 @@ import { auth } from "@/auth";
 export default async function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // 1. Single Security Check & Auth Hydration
+  // Single Security Check & Auth Hydration
   await requireAdmin();
   const session = await auth();
 
@@ -33,28 +30,9 @@ export default async function AdminLayout({
           <div className="wrapper mx-auto flex min-h-16 items-center gap-3 px-4">
             <SidebarTrigger />
 
-            <Link href="/" className="hidden sm:flex items-center gap-2" aria-label="Home Page">
-              <Image
-                src="/images/store-icon.jpg"
-                alt="Store Logo"
-                priority
-                height={40}
-                width={40}
-                className="rounded-full object-cover"
-              />
-            </Link>
-
             <div className="ml-auto flex items-center gap-3">
-              <div className="hidden sm:block">
-                <AdminSearch />
-              </div>
               <Menu />
             </div>
-          </div>
-
-          {/* Mobile Admin Search Bar */}
-          <div className="wrapper mx-auto px-4 pb-3 sm:hidden">
-            <AdminSearch />
           </div>
         </header>
 

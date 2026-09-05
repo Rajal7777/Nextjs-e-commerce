@@ -37,12 +37,22 @@ export async function getLatestProducts() {
   return data.map(toClientProduct);
 }
 
-//Get product by id
+//Get product by slug
 export async function getProductBySlug(slug: string) {
   const product = await prisma.product.findUnique({
     where: { slug },
   });
   if (!product) return notFound();
+
+  return convertToPlainObject(product);
+}
+
+//Get product by id (returns null when not found)
+export async function getProductById(id: string) {
+  const product = await prisma.product.findUnique({
+    where: { id },
+  });
+  if (!product) return null;
 
   return convertToPlainObject(product);
 }
@@ -70,6 +80,12 @@ export async function getAllProducts({
           OR: [
             {
               name: {
+                contains: query,
+                mode: "insensitive",
+              },
+            },
+            {
+              slug: {
                 contains: query,
                 mode: "insensitive",
               },

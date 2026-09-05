@@ -8,6 +8,7 @@ import { getWishlistIds } from "@/lib/actions/wishlist/wish.action";
 import ViewAllProductsButton from "@/components/view-all-products-button";
 import IconBox from "@/components/iconBox";
 import DealCountdown from "@/components/deal-countDown";
+import HomeBanner from "@/components/home-banner";
 
 type HomepageProps = {
   searchParams: Promise<{ page?: string }>;
@@ -48,6 +49,7 @@ const Homepage = async ({ searchParams }: HomepageProps) => {
       <ViewAllProductsButton />
       <DealCountdown />
       <IconBox />
+      <HomeBanner />
     </>
   );
 };
