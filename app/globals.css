@@ -136,6 +136,12 @@
     font-family: var(--font-sans);
     overflow-x: clip;
   }
+
+  /* Always reserve space for the vertical scrollbar so content doesn't
+     shift horizontally when page height changes between routes. */
+  html {
+    overflow-y: scroll;
+  }
 }
 
 /* Utilities */

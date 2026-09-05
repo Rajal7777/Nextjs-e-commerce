@@ -27,7 +27,7 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
       value: pageValue.toString(),
     });
     // Default Next.js behavior scrolls to top so the new page's results are visible.
-    router.push(newUrl, { scroll: false });
+    router.push(newUrl);
   }
 
   return (
