@@ -1,10 +1,18 @@
 import ProductCart from "@/components/shared/product/product-cart";
 import { getWishlistProducts } from "@/lib/actions/wishlist/wish.action";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { ArrowRight, Heart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const WishListPage = async () => {
+  // Guests must sign in before viewing their wishlist
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/sign-in?callbackUrl=/wishlist");
+  }
+
   const wishlistItems = await getWishlistProducts();
 
   // Convert the typeof rating and date to number and string respectively
@@ -36,7 +44,7 @@ const WishListPage = async () => {
   }
 
   return (
-   <section className="py-8 space-y-6">
+    <section className="py-8 space-y-6">
       <div className="flex items-center justify-between border-b pb-4">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
           My Wishlist ({wishlistProducts.length})

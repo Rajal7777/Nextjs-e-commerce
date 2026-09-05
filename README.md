@@ -4,8 +4,8 @@ Full-stack e-commerce platform built with Next.js (App Router), TypeScript, Pris
 
 ## Demo / Links
 
-- **Live Demo:** [Add deployment URL]
-- **GitHub:** [Add repository URL]
+- **Live Demo:** [nextjs-e-commerce-sigma.vercel.app]
+- **GitHub:** [https://github.com/Rajal7777/Nextjs-e-commerce]
 
 ## Project Overview
 
@@ -147,7 +147,7 @@ Product ──┬── OrderItem
 ## Setup
 
 ```bash
-git clone [repository-url]
+git clone [https://github.com/Rajal7777/Nextjs-e-commerce.git]
 cd e-commerce
 npm install
 ```
