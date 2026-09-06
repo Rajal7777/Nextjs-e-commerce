@@ -74,7 +74,8 @@ const DealCountdown = () => {
               </h2>
 
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                This exclusive deal is no longer available. Stay tuned for our next upcoming promotions.
+                This exclusive deal is no longer available. Stay tuned for our
+                next upcoming promotions.
               </p>
 
               {/* Dummy Badge */}
@@ -108,7 +109,7 @@ const DealCountdown = () => {
       {/* Background Accent Glow */}
       <div className="absolute -left-12 -top-12 -z-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
 
-      <div className="relative overflow-hidden rounded-3xl border border-neutral-200/80 bg-linear-to-b from-background via-background/95 to-neutral-50/50 p-6 shadow-2xl shadow-neutral-200/50 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950 dark:shadow-none sm:p-10 lg:p-12">
+      <div className="relative overflow-hidden rounded-3xl border border-neutral-200/60 bg-linear-to-b from-background via-background to-muted/30 p-6 shadow-2xl shadow-neutral-200/50 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950 dark:shadow-none sm:p-10 lg:p-12">
         <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
           {/* Left Column Content */}
           <div className="flex flex-col justify-center lg:col-span-7">
@@ -140,7 +141,6 @@ const DealCountdown = () => {
               <StatBox value={time.seconds} label="Secs" />
             </div>
 
-            {/* Dummy Badge */}
             <div className="mt-8 flex items-center gap-4">
               <div className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25">
                 <span>Deal Ends Soon</span>
@@ -149,20 +149,20 @@ const DealCountdown = () => {
             </div>
           </div>
 
-          {/* Right Column Banner Image */}
-          <div className="lg:col-span-5">
-            <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl border border-neutral-200/80 bg-background shadow-xl dark:border-neutral-800 dark:bg-neutral-800 lg:aspect-square">
-              <Image
-                src="/images/promo.jpg"
-                alt="Deal of the month promotion"
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 40vw"
-                className="object-contain"
-              />
+          {/* Right Column Banner Image*/}
+          <div className="relative w-full overflow-hidden rounded-2xl border border-neutral-200/60 bg-background shadow-xl dark:border-neutral-800 dark:bg-neutral-800 aspect-11/10 sm:aspect-video lg:aspect-square lg:col-span-5 p-2">
+            <Image
+              src="/images/promo.jpg"
+              alt="Deal of the month promotion"
+              width={900}
+              height={900}
+              priority
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="h-full w-full object-cover"
+            />
 
-              <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
-            </div>
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
           </div>
         </div>
       </div>
@@ -172,9 +172,9 @@ const DealCountdown = () => {
 
 export default DealCountdown;
 
-function StatBox({ value, label }: { value: number; label: string; }) {
+function StatBox({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-neutral-200/80 bg-background/60 p-3 shadow-sm backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-900/60 sm:p-4">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-neutral-200/60 bg-background p-3 shadow-sm backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-900/60 sm:p-4">
       <span className="text-2xl font-black tracking-tight text-foreground tabular-nums sm:text-3xl lg:text-4xl">
         {String(value).padStart(2, "0")}
       </span>
