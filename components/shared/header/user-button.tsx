@@ -40,7 +40,7 @@ const UserButton = async () => {
           <div className="flex items-center">
             <Button
               variant="ghost"
-              className="relative w-8 h-8 rounded-full flex items-center justify-center bg-gray-200 overflow-hidden"
+              className="relative w-8 h-8 rounded-full flex items-center justify-center bg-gray-400 overflow-hidden"
             >
               {userImage ? (
                 <Image
@@ -70,31 +70,25 @@ const UserButton = async () => {
             </div>
           </DropdownMenuLabel>
 
-          <DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link href="/user/profile" className="w-full">
               profile
             </Link>
           </DropdownMenuItem>
 
-          <DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link href="/user/orders" className="w-full">
-              orders
+              Order History
             </Link>
           </DropdownMenuItem>
 
           {session?.user?.role === "admin" && (
-            <DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link href="/admin/overview" className="w-full">
                 Admin
               </Link>
             </DropdownMenuItem>
           )}
-
-          <DropdownMenuItem>
-            <Link href="/user/orders" className="w-full">
-              Order History
-            </Link>
-          </DropdownMenuItem>
 
           <DropdownMenuItem className="p-0 mb-1">
             <form className="w-full">

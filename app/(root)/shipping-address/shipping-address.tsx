@@ -19,7 +19,7 @@ import { shippingAddressDefaultValue } from "@/lib/constants";
 import { shippingAddressSchema } from "@/lib/validators";
 import { ShippingAddress } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { updateUserAddress } from "@/lib/actions/user/user-actions";
 import * as z from "zod";
 
-const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
+const ShippingAddressForm = ({ address }: { address: ShippingAddress; }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -144,12 +144,10 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
             {/* button */}
             <Field orientation="responsive">
               <Button type="submit" disabled={isPending}>
-                {isPending ? (
-                  <Loader className="w-4 h-4 animate-spin" />
-                ) : (
-                  <ArrowRight className="w-4 h-4" />
-                )}{" "}
                 Continue
+                {isPending && (
+                  <Loader className="w-4 h-4 animate-spin" />
+                )}
               </Button>
             </Field>
           </FieldGroup>

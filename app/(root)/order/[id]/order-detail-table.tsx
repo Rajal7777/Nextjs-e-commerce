@@ -75,7 +75,7 @@ const PayPalStatus = () => {
 
 // MARK AS PAID
 
-const MarkAsPaidButton = ({ orderId }: { orderId: string }) => {
+const MarkAsPaidButton = ({ orderId }: { orderId: string; }) => {
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -101,7 +101,7 @@ const MarkAsPaidButton = ({ orderId }: { orderId: string }) => {
 };
 
 // MARK AS DELIVERED
-const MarkAsDeliveredButton = ({ orderId }: { orderId: string }) => {
+const MarkAsDeliveredButton = ({ orderId }: { orderId: string; }) => {
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -155,8 +155,8 @@ const OrderDetailsTable = ({
 
   const normalizedPaymentMethod = paymentMethod?.toLowerCase();
 
-  
-  
+
+
   const handleCreatePayPalOrder = async () => {
     const res = await createPayPalOrder(order.id);
 
@@ -168,7 +168,7 @@ const OrderDetailsTable = ({
     return res.data;
   };
 
-  const handleApprovePayPalOrder = async (data: { orderID: string }) => {
+  const handleApprovePayPalOrder = async (data: { orderID: string; }) => {
     const res = await approvePayPalOrder(order.id, data);
 
     if (res.success) {
@@ -179,8 +179,8 @@ const OrderDetailsTable = ({
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3 my-6">
-      <div className="space-y-6 lg:col-span-2">
+    <div className="grid grid-cols-1 lg:grid-cols-3 my-6 gap-6 border-amber-200">
+      <div className="space-y-6 col-span-1 lg:col-span-2 ">
         {/* PAYMENT INFORMATION */}
 
         <Card>
@@ -194,7 +194,7 @@ const OrderDetailsTable = ({
                 <div>
                   <CardTitle>Payment Information</CardTitle>
                   <CardDescription className="mt-1">
-                    Payment method and status
+                    Payment method and status 
                   </CardDescription>
                 </div>
               </div>
@@ -324,6 +324,8 @@ const OrderDetailsTable = ({
                     <TableHead className="text-center">Quantity</TableHead>
 
                     <TableHead className="pr-6 text-right">Price</TableHead>
+
+                    <TableHead className="pr-6 text-right">Total</TableHead>
                   </TableRow>
                 </TableHeader>
 
@@ -356,6 +358,9 @@ const OrderDetailsTable = ({
 
                       <TableCell className="pr-6 text-right font-medium">
                         {formatCurrency(item.price)}
+                      </TableCell>
+                      <TableCell className="pr-6 text-right font-medium">
+                        {formatCurrency(Number(item.price) * item.qty)}
                       </TableCell>
                     </TableRow>
                   ))}

@@ -22,13 +22,14 @@ const ShippingAddressPage = async () => {
     getUserById(session.user.id),
   ]);
 
+  //not logged in guard
+  if (!user) {
+    redirect("/sign-in");
+  }
+
   // Cart Empty Guard
   if (!cart || cart.items.length === 0) {
     redirect("/cart");
-  }
-
-  if (!user) {
-    redirect("/sign-in");
   }
 
   // Check valid non-array address object

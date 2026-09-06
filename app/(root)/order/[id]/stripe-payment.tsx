@@ -65,7 +65,7 @@ const StripeForm = ({ orderId }: { orderId: string; }) => {
         <LinkAuthenticationElement onChange={(e) => setEmail(e.value.email)} />
       </div>
       <Button
-        className="w-full"
+        className="w-full mt-6"
         size="lg"
         disabled={isLoading || !stripe || !elements}
       >
