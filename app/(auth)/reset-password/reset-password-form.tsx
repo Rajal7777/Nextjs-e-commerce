@@ -74,8 +74,11 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
       )}
 
       <div className="text-center text-sm">
-        <Link href="/sign-in" className="text-muted-foreground hover:underline">
-          Back to sign in
+        <Link
+          href="/sign-in"
+          className="flex text-muted-foreground hover:underline"
+        >
+          ← Go back to Sign-in
         </Link>
       </div>
     </form>

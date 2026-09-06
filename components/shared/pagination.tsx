@@ -14,7 +14,6 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-
   const pageNumber = Number(page);
   const currentPage =
     Number.isFinite(pageNumber) && pageNumber > 0 ? pageNumber : 1;
@@ -22,12 +21,13 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
   function handleClick(btnType: string) {
     const pageValue = btnType === "next" ? currentPage + 1 : currentPage - 1;
     const newUrl = formUrlQuery({
-      params: searchParams.toString(),  //output "page=1&limit=10"
+      params: searchParams.toString(), //output "page=1&limit=10"
       key: urlParamName || "page",
       value: pageValue.toString(),
     });
-    // Default Next.js behavior scrolls to top so the new page's results are visible.
-    router.push(newUrl);
+
+    // Disable Next.js router auto-scroll
+    router.push(newUrl, { scroll: false });
   }
 
   return (

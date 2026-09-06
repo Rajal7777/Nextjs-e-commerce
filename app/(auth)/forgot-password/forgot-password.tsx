@@ -5,6 +5,7 @@ import { SubmitEventHandler, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { requestPasswordReset } from "@/lib/actions/password-reset-actions";
+import { ArrowLeft } from "lucide-react";
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
@@ -44,9 +45,9 @@ const ForgotPasswordForm = () => {
         <div>
           <Link
             href="/sign-in"
-            className="text-muted-foreground hover:underline"
+            className="text-muted-foreground hover:underline "
           >
-            Back to Signin
+           ← Go back to Sign-in
           </Link>
         </div>
       </div>

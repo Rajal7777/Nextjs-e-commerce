@@ -18,7 +18,7 @@ export const insertProductSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   slug: z.string().min(3, "Slug must be at least 3 characters"),
   category: z.string().min(3, "Category must be at least 3 characters"),
-  brand: z.string().min(3, "Brand must be at least 3 characters"),
+  brand: z.string().min(2, "Brand must be at least 2 characters"),
   description: z.string().min(3, "Description must be at least 3 characters"),
   stock: z.coerce.number(), //stock will come as a string so convert it into the number
   images: z
