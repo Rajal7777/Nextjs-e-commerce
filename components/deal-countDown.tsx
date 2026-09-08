@@ -53,7 +53,7 @@ const DealCountdown = () => {
   }
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:py-20">
+    <section className="mx-auto w-full max-w-7xl px-1 py-16 sm:px-4 lg:py-10 ">
       <div className="relative overflow-hidden rounded-3xl">
         {/* Subtle background glow */}
 
@@ -102,7 +102,7 @@ const DealCountdown = () => {
 
           {/* Image */}
           <div className="lg:col-span-5">
-            <div className="relative  mx-auto aspect-square w-full max-w-40 overflow-hidden rounded-lg md:max-w-90 p-4">
+            <div className="relative mx-0 sm:mx-auto aspect-square w-full max-w-40 overflow-hidden rounded-lg md:max-w-90 p-4">
               <Image
                 src="/images/promo.jpg"
                 alt="Deal of the month promotion"
@@ -113,12 +113,12 @@ const DealCountdown = () => {
               />
 
               {/* Image badge */}
-              <div className="absolute bottom-4 left-4 rounded-xl border border-white/20 bg-black/50 px-4 py-2.5 text-white backdrop-blur-md">
-                <p className="text-[10px] font-medium uppercase tracking-widest text-white/70">
+              <div className="absolute bottom-2 left-2 rounded-xl border border-white/20 bg-black/50 text-white  px-1 py-1 backdrop-blur-md ">
+                <p className="text-[10px] font-medium uppercase  text-white/70">
                   Special Offer
                 </p>
 
-                <p className="mt-0.5 text-sm font-semibold">
+                <p className="text-sm font-semibold tracking-tighter ">
                   Shop before it&apos;s gone
                 </p>
               </div>
@@ -134,7 +134,7 @@ export default DealCountdown;
 
 /* Countdown Box  */
 
-function StatBox({ value, label }: { value: number; label: string; }) {
+function StatBox({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex min-w-0 flex-col items-center justify-center rounded-xl border border-border bg-background px-2 py-3.5 sm:px-4 sm:py-4">
       <span className="text-2xl font-bold tabular-nums tracking-tight text-foreground sm:text-3xl">
@@ -191,16 +191,15 @@ function DealEnded() {
 
           {/* Image */}
           <div className="lg:col-span-5">
-            <div className="relative aspect-4/3 overflow-hidden rounded-2xl border border-border bg-muted">
+            <div className="relative mx-0 sm:mx-auto aspect-square w-full max-w-40 overflow-hidden rounded-lg md:max-w-90 p-4">
               <Image
                 src="/images/promo.jpg"
                 alt="Deal of the month promotion"
                 fill
-                sizes="(max-width: 1024px) 100vw, 40vw"
-                className="object-cover grayscale opacity-60"
+                priority
+                sizes="100vw"
+                className="object-cover transition-transform duration-700 hover:scale-105"
               />
-
-              <div className="absolute inset-0 bg-background/30" />
             </div>
           </div>
         </div>
