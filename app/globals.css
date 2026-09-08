@@ -135,6 +135,8 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     overflow-x: clip;
+    transition: background-color 250ms, color 250ms;
+  
   }
 
   /* Always reserve space for the vertical scrollbar so content doesn't
