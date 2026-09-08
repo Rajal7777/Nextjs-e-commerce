@@ -1,128 +1,136 @@
 "use client";
 
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarRail,
-    SidebarTrigger,
-    useSidebar,
-} from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
-import { LayoutDashboard, Package, ReceiptText, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import { LayoutDashboard, Package, ReceiptText, Users } from "lucide-react";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  useSidebar,
+} from "@/components/ui/sidebar";
+
 import { Badge } from "@/components/ui/badge";
 
 const adminLinks = [
-    {
-        title: "Overview",
-        href: "/admin/overview",
-        icon: LayoutDashboard,
-    },
-    {
-        title: "Products",
-        href: "/admin/products",
-        icon: Package,
-    },
-    {
-        title: "Orders",
-        href: "/admin/orders",
-        icon: ReceiptText,
-    },
-    {
-        title: "Users",
-        href: "/admin/users",
-        icon: Users,
-    },
+  {
+    title: "Overview",
+    href: "/admin/overview",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Products",
+    href: "/admin/products",
+    icon: Package,
+  },
+  {
+    title: "Orders",
+    href: "/admin/orders",
+    icon: ReceiptText,
+  },
+  {
+    title: "Users",
+    href: "/admin/users",
+    icon: Users,
+  },
 ];
 
-const AdminSidebar = ({
-    name,
-    role,
-}: {
-    name?: string;
-    role?: string;
-}) => {
-    const pathname = usePathname();
-    const { isMobile, setOpenMobile } = useSidebar();
+type AdminSidebarProps = {
+  name?: string;
+  role?: string;
+};
 
-    return (
-        <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
-            <SidebarHeader>
-                <div className="flex items-center justify-between gap-2">
-                    <Link href="/" className="flex items-center gap-2" onClick={() => setOpenMobile(false)}>
-                        <Image
-                            src="/images/store-icon.jpg"
-                            alt="Store logo"
-                            width={36}
-                            height={36}
-                            className="rounded-full"
-                        />
-                        <div className="leading-tight group-data-[collapsible=icon]:hidden">
-                            <p className="text-sm font-semibold">Admin Panel</p>
-                            <div className="mt-1 flex items-center gap-2">
-                                <p className="text-xs text-muted-foreground truncate">
-                                    {name || "Admin User"}
-                                </p>
-                                <Badge
-                                    variant={(role || "user") === "admin" ? "default" : "secondary"}
-                                    className="text-[10px] uppercase"
-                                >
-                                    {role || "user"}
-                                </Badge>
-                            </div>
-                        </div>
+const AdminSidebar = ({ name, role }: AdminSidebarProps) => {
+  const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
+  return (
+    <Sidebar collapsible="icon">
+      {/* Header */}
+      <SidebarHeader>
+        <Link
+          href="/"
+          onClick={handleLinkClick}
+          className="flex items-center gap-2"
+        >
+          <Image
+            src="/images/store-icon.jpg"
+            alt="Store logo"
+            width={36}
+            height={36}
+            className="rounded-full"
+          />
+
+          {/* Hidden when sidebar is collapsed */}
+          <div className="leading-tight group-data-[collapsible=icon]:hidden">
+            <p className="text-sm font-semibold  uppercase">{name || "User"} Panel</p>
+
+            <div className="mt-1 flex items-center gap-2">
+              <span className="max-w-24 truncate text-xs text-muted-foreground uppercase">
+                {name || "Admin User"}
+              </span>
+
+              <Badge
+                variant={role === "admin" ? "default" : "secondary"}
+                className="text-[10px] capitalize"
+              >
+                {role || "user"}
+              </Badge>
+            </div>
+          </div>
+        </Link>
+      </SidebarHeader>
+
+      {/* Navigation */}
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+
+          <SidebarMenu>
+            {adminLinks.map((link) => {
+              const Icon = link.icon;
+
+              const isActive =
+                pathname === link.href || pathname.startsWith(`${link.href}/`);
+
+              return (
+                <SidebarMenuItem key={link.href}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive}
+                    tooltip={link.title}
+                    className="bg-transparent hover:bg-transparent focus-visible:bg-transparent data-[active=true]:bg-gray-600 data-[active=true]:text-white data-[active=true]:hover:bg-gray-600"
+                  >
+                    <Link href={link.href} onClick={handleLinkClick}>
+                      <Icon />
+                      <span>{link.title}</span>
                     </Link>
-                 <SidebarTrigger className={cn("hidden size-8 text-sidebar-foreground", isMobile && "block")} />
-                </div>
-            </SidebarHeader>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
 
-            <SidebarContent>
-                <SidebarGroup>
-                    <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-                    <SidebarMenu>
-                        {adminLinks.map((link) => {
-                            const Icon = link.icon;
-                            const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
-
-                            return (
-                                <SidebarMenuItem key={link.href}>
-                                    <SidebarMenuButton
-                                        asChild
-                                        isActive={isActive}
-                                        className="data-[active=true]:bg-gray-600 data-[active=true]:text-white data-[active=true]:hover:bg-gray-600"
-                                    >
-                                        <Link
-                                            href={link.href}
-                                            className={cn("w-full")}
-                                            onClick={() => {
-                                                if (isMobile) {
-                                                    setOpenMobile(false);
-                                                }
-                                            }}
-                                        >
-                                            <Icon className="size-4" />
-                                            <span className="group-data-[collapsible=icon]:hidden">
-                                                {link.title}
-                                            </span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            );
-                        })}
-                    </SidebarMenu>
-                </SidebarGroup>
-            </SidebarContent>
-            <SidebarRail />
-        </Sidebar>
-    );
+      <SidebarRail />
+    </Sidebar>
+  );
 };
 
 export default AdminSidebar;

@@ -7,6 +7,7 @@ const TARGET_DATE = new Date("2026-09-20T00:00:00Z");
 
 function calculateTimeLeft(targetDate: Date) {
   const currentTime = new Date();
+
   const timeDifference = Math.max(
     targetDate.getTime() - currentTime.getTime(),
     0,
@@ -20,10 +21,10 @@ function calculateTimeLeft(targetDate: Date) {
   };
 }
 
+type TimeLeft = ReturnType<typeof calculateTimeLeft>;
+
 const DealCountdown = () => {
-  const [time, setTime] = useState<ReturnType<typeof calculateTimeLeft> | null>(
-    null,
-  );
+  const [time, setTime] = useState<TimeLeft | null>(null);
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -31,25 +32,14 @@ const DealCountdown = () => {
     };
 
     updateCountdown();
-    const timeInterval = setInterval(updateCountdown, 1000);
 
-    return () => clearInterval(timeInterval);
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  // Loading skeleton state
   if (!time) {
-    return (
-      <section className="mx-auto my-16 w-full max-w-7xl px-4 sm:px-6">
-        <div className="flex h-105 w-full items-center justify-center rounded-3xl border border-neutral-200/60 bg-neutral-50/50 dark:border-neutral-800/60 dark:bg-neutral-900/50">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 animate-ping rounded-full bg-primary" />
-            <p className="text-sm font-medium text-muted-foreground">
-              Loading deal...
-            </p>
-          </div>
-        </div>
-      </section>
-    );
+    return <DealLoading />;
   }
 
   const isDealEnded =
@@ -58,111 +48,81 @@ const DealCountdown = () => {
     time.minutes === 0 &&
     time.seconds === 0;
 
-  // Deal ended view
   if (isDealEnded) {
-    return (
-      <section className="mx-auto my-16 w-full max-w-7xl px-4 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl border border-neutral-200/80 bg-background p-8 shadow-xl dark:border-neutral-800 md:p-12">
-          <div className="grid items-center gap-8 md:grid-cols-2">
-            <div className="max-w-md">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:bg-neutral-800">
-                Monthly Deal
-              </span>
-
-              <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Deal Has Ended
-              </h2>
-
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                This exclusive deal is no longer available. Stay tuned for our
-                next upcoming promotions.
-              </p>
-
-              {/* Dummy Badge */}
-              <div className="mt-6 inline-flex items-center justify-center rounded-full bg-neutral-200/80 px-8 py-3 text-sm font-semibold text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
-                Deal Expired
-              </div>
-            </div>
-
-            <div className="lg:col-span-5">
-              <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl border border-neutral-200/80 bg-neutral-100 shadow-xl dark:border-neutral-800 dark:bg-neutral-800 lg:aspect-square">
-                <Image
-                  src="/images/promo.jpg"
-                  alt="Deal of the month promotion"
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-contain grayscale"
-                />
-                <div className="absolute inset-0 bg-neutral-950/20" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
+    return <DealEnded />;
   }
 
-  // Active deal view
   return (
-    <section className="relative mx-auto my-16 w-full max-w-7xl px-4 sm:px-6">
-      {/* Background Accent Glow */}
-      <div className="absolute -left-12 -top-12 -z-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+    <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:py-20">
+      <div className="relative overflow-hidden rounded-3xl">
+        {/* Subtle background glow */}
 
-      <div className="relative overflow-hidden rounded-3xl border border-neutral-200/60 bg-linear-to-b from-background via-background to-muted/30 p-6 shadow-2xl shadow-neutral-200/50 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950 dark:shadow-none sm:p-10 lg:p-12">
-        <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
-          {/* Left Column Content */}
-          <div className="flex flex-col justify-center lg:col-span-7">
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-primary backdrop-blur-md">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+        <div className="relative grid items-center gap-10 p-6 sm:p-10 lg:grid-cols-12 lg:gap-12 lg:p-12">
+          {/* Content */}
+          <div className="lg:col-span-7">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
+                <span className="relative inline-flex size-2 rounded-full bg-primary" />
               </span>
               Limited Time Offer
             </div>
 
-            <h2 className="mt-5 text-3xl font-black tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Deal of the{" "}
-              <span className="bg-linear-to-r from-primary via-primary/80 to-amber-500 bg-clip-text text-transparent">
-                Month
-              </span>
+            {/* Heading */}
+            <h2 className="mt-5 max-w-2xl text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+              Deal of the <span className="text-primary">Month</span>
             </h2>
 
-            <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base">
-              Get ready for an extraordinary shopping experience. Enjoy
-              exclusive savings and premium quality before the timer runs out.
+            <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground sm:text-base">
+              Discover exclusive deals and enjoy special savings on selected
+              products. Don&apos;t miss out — this offer ends soon.
             </p>
 
-            {/* Countdown Grid */}
-            <div className="mt-8 grid max-w-md grid-cols-4 gap-2 sm:gap-4">
+            {/* Countdown */}
+            <div className="mt-8 grid max-w-lg grid-cols-4 gap-2 sm:gap-3">
               <StatBox value={time.days} label="Days" />
               <StatBox value={time.hours} label="Hours" />
-              <StatBox value={time.minutes} label="Mins" />
-              <StatBox value={time.seconds} label="Secs" />
+              <StatBox value={time.minutes} label="Minutes" />
+              <StatBox value={time.seconds} label="Seconds" />
             </div>
 
-            <div className="mt-8 flex items-center gap-4">
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25">
-                <span>Deal Ends Soon</span>
-                <span className="h-2 w-2 rounded-full bg-primary-foreground/80 animate-pulse" />
+            {/* Bottom status */}
+            <div className="mt-7 flex items-center gap-3">
+              <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium text-primary">
+                <span className="size-2 rounded-full bg-primary animate-pulse" />
+                Deal ends soon
               </div>
+
+              <span className="hidden text-sm text-muted-foreground sm:block">
+                Limited availability
+              </span>
             </div>
           </div>
 
-          {/* Right Column Banner Image*/}
-          <div className="relative w-full overflow-hidden rounded-2xl border border-neutral-200/60 bg-background shadow-xl dark:border-neutral-800 dark:bg-neutral-800 aspect-11/10 sm:aspect-video lg:aspect-square lg:col-span-5 p-2">
-            <Image
-              src="/images/promo.jpg"
-              alt="Deal of the month promotion"
-              width={900}
-              height={900}
-              priority
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="h-full w-full object-cover"
-            />
+          {/* Image */}
+          <div className="lg:col-span-5">
+            <div className="relative  mx-auto aspect-square w-full max-w-40 overflow-hidden rounded-lg md:max-w-90 p-4">
+              <Image
+                src="/images/promo.jpg"
+                alt="Deal of the month promotion"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover transition-transform duration-700 hover:scale-105"
+              />
 
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+              {/* Image badge */}
+              <div className="absolute bottom-4 left-4 rounded-xl border border-white/20 bg-black/50 px-4 py-2.5 text-white backdrop-blur-md">
+                <p className="text-[10px] font-medium uppercase tracking-widest text-white/70">
+                  Special Offer
+                </p>
+
+                <p className="mt-0.5 text-sm font-semibold">
+                  Shop before it&apos;s gone
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -172,15 +132,79 @@ const DealCountdown = () => {
 
 export default DealCountdown;
 
-function StatBox({ value, label }: { value: number; label: string }) {
+/* Countdown Box  */
+
+function StatBox({ value, label }: { value: number; label: string; }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-neutral-200/60 bg-background p-3 shadow-sm backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-900/60 sm:p-4">
-      <span className="text-2xl font-black tracking-tight text-foreground tabular-nums sm:text-3xl lg:text-4xl">
+    <div className="flex min-w-0 flex-col items-center justify-center rounded-xl border border-border bg-background px-2 py-3.5 sm:px-4 sm:py-4">
+      <span className="text-2xl font-bold tabular-nums tracking-tight text-foreground sm:text-3xl">
         {String(value).padStart(2, "0")}
       </span>
-      <span className="mt-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground sm:text-xs">
+
+      <span className="mt-1 text-[9px] font-medium uppercase tracking-widest text-muted-foreground sm:text-[10px]">
         {label}
       </span>
     </div>
+  );
+}
+
+/* Loading   */
+
+function DealLoading() {
+  return (
+    <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:py-20">
+      <div className="flex min-h-80 items-center justify-center rounded-3xl border border-border bg-card">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <span className="size-2 animate-pulse rounded-full bg-primary" />
+          Loading deal...
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* Deal Ended */
+function DealEnded() {
+  return (
+    <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:py-20">
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-card">
+        <div className="grid items-center gap-10 p-6 sm:p-10 lg:grid-cols-12 lg:p-12">
+          {/* Content */}
+          <div className="lg:col-span-7">
+            <span className="inline-flex rounded-full border border-border bg-muted px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Monthly Deal
+            </span>
+
+            <h2 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">
+              Deal Has Ended
+            </h2>
+
+            <p className="mt-4 max-w-lg text-sm leading-7 text-muted-foreground sm:text-base">
+              This exclusive deal is no longer available. Stay tuned for our
+              next upcoming promotion.
+            </p>
+
+            <div className="mt-7 inline-flex items-center rounded-full border border-border bg-muted px-5 py-2.5 text-sm font-medium text-muted-foreground">
+              Deal Expired
+            </div>
+          </div>
+
+          {/* Image */}
+          <div className="lg:col-span-5">
+            <div className="relative aspect-4/3 overflow-hidden rounded-2xl border border-border bg-muted">
+              <Image
+                src="/images/promo.jpg"
+                alt="Deal of the month promotion"
+                fill
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                className="object-cover grayscale opacity-60"
+              />
+
+              <div className="absolute inset-0 bg-background/30" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

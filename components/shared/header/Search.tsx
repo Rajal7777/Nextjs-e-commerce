@@ -5,7 +5,7 @@ import { SearchIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 
-const Search = ({ debounceMs = 400 }: { debounceMs?: number }) => {
+const Search = ({ debounceMs = 500 }: { debounceMs?: number }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 

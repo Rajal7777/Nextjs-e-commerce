@@ -25,18 +25,6 @@ type ProductQueryParams = {
   sort?: string;
 };
 
-//Get latest products
-export async function getLatestProducts() {
-  const data = await prisma.product.findMany({
-    // take: LATEST_PRODUCTS_LIMIT,
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-  //pass every single product to toClientProduct function to convert it to a client product {rating: stirng -> number}
-  return data.map(toClientProduct);
-}
-
 //Get product by slug
 export async function getProductBySlug(slug: string) {
   const product = await prisma.product.findUnique({
@@ -56,13 +44,6 @@ export async function getProductById(id: string) {
 
   return convertToPlainObject(product);
 }
-
-//Get single product by it's slug
-// export async function getProductBySlug(slug: string) {
-//   return await prisma.product.findFirst({
-//     where: { slug },
-//   });
-// }
 
 //Get all products
 export async function getAllProducts({
@@ -147,30 +128,51 @@ export async function getAllProducts({
     ...ratingFilter,
   };
 
-  const data = await prisma.product.findMany({
-    where,
-    orderBy:
-      sort === "lowest"
-        ? { price: "asc" }
-        : sort === "highest"
-          ? { price: "desc" }
-          : sort === "rating"
-            ? { rating: "desc" }
-            : { createdAt: "desc" },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+  const safePage = Math.max(1, page);
 
-  const dataCount = await prisma.product.count({ where });
+  const safeLimit = Math.min(Math.max(1, limit), 50);
+
+  const [data, dataCount] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      orderBy:
+        sort === "lowest"
+          ? { price: "asc" }
+          : sort === "highest"
+            ? { price: "desc" }
+            : sort === "rating"
+              ? { rating: "desc" }
+              : { createdAt: "desc" },
+      skip: (safePage - 1) * safeLimit,
+      take: safeLimit,
+    }),
+
+    prisma.product.count({ where }),
+  ]);
 
   return {
     data: data.map(toClientProduct),
-    totalPages: getTotalPages(dataCount, limit),
+    totalPages: getTotalPages(dataCount, safeLimit),
   };
 }
 
 //Delete product by id
 export async function deleteProductById(id: string) {
+  const session = await auth();
+  if (session?.user?.role !== "admin") {
+    return {
+      success: false,
+      message: "You are not authorized to perform this action",
+    };
+  }
+
+  if (!id || typeof id !== "string") {
+    return {
+      success: false,
+      message: "A valid product ID is required",
+    };
+  }
+  
   try {
     const product = await prisma.product.findFirst({
       where: { id },
